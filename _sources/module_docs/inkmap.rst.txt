@@ -1,0 +1,4 @@
+inkmap
+======
+.. automodule:: inkmap
+   :members:

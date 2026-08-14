@@ -1,0 +1,353 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>inkmap.types &mdash; inkmap 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            inkmap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap.html">inkmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/config.html">inkmap.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/coverage.html">inkmap.coverage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/data.html">inkmap.data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/geometry.html">inkmap.geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/locate.html">inkmap.locate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/locate/barcode.html">inkmap.locate.barcode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/locate/qr.html">inkmap.locate.qr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/models.html">inkmap.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/models/base.html">inkmap.models.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/models/freeform.html">inkmap.models.freeform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/models/grid.html">inkmap.models.grid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/photometry.html">inkmap.photometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/synth.html">inkmap.synth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/types.html">inkmap.types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/viz.html">inkmap.viz</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">inkmap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../inkmap.html">inkmap</a></li>
+      <li class="breadcrumb-item active">inkmap.types</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for inkmap.types</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;The data types the whole package speaks in.</span>
+
+<span class="sd">Naming here is deliberate, because the obvious names are traps:</span>
+
+<span class="sd">* The two classes inside a mark&#39;s footprint are ``FOREGROUND`` and ``BACKGROUND``,</span>
+<span class="sd">  **not** dark and light. Dark/light describe *appearance*, and appearance inverts:</span>
+<span class="sd">  white-on-black print, reflectance-reversed symbols (explicitly permitted by ISO/IEC</span>
+<span class="sd">  18004 for QR), and any inverted imaging modality all swap which class is dark. A</span>
+<span class="sd">  ``dark_mask`` would then silently mean foreground in one image and background in the</span>
+<span class="sd">  next. :class:`Polarity` carries that mapping explicitly instead.</span>
+<span class="sd">* ``BACKGROUND`` is scoped to *within the mark&#39;s footprint*. The clear margin around</span>
+<span class="sd">  the mark is ``MARGIN`` and everything else is ``OUTSIDE``, so the ambiguity that</span>
+<span class="sd">  makes a bare &quot;background&quot; dangerous -- substrate inside the mark, or everything that</span>
+<span class="sd">  is not the mark? -- cannot arise.</span>
+<span class="sd">* The continuous value is ``coverage``, after ISO 12647-2:2013 3.1 *area coverage*,</span>
+<span class="sd">  &quot;ratio of the area covered with ink to the entire area&quot; -- the only term in any</span>
+<span class="sd">  standard whose definition is literally the quantity computed here.</span>
+
+<span class="sd">See ``docs/terminology.md`` for the full cross-field mapping.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span>
+
+
+<div class="viewcode-block" id="Region">
+<a class="viewcode-back" href="../../module_docs/inkmap/types.html#inkmap.Region">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Region</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Four-way pixel classification.</span>
+
+<span class="sd">    Not a matting *trimap*: a trimap&#39;s third class is &quot;unknown/undecided&quot;, whereas</span>
+<span class="sd">    every class here is a decided statement about location.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">OUTSIDE</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Outside the mark and its margin.&quot;&quot;&quot;</span>
+
+    <span class="n">MARGIN</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The clear surround a mark is specified to have -- a QR quiet zone, a barcode</span>
+<span class="sd">    light margin, the whitespace around a glyph. Guaranteed background, contiguous, and</span>
+<span class="sd">    free of edge effects from neighbouring foreground, which often makes it a better</span>
+<span class="sd">    reference region than the background *inside* the mark.&quot;&quot;&quot;</span>
+
+    <span class="n">BACKGROUND</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Bare substrate within the mark&#39;s footprint.&quot;&quot;&quot;</span>
+
+    <span class="n">FOREGROUND</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The mark itself -- printed ink, toner, engraving, whatever laid it down.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="Polarity">
+<a class="viewcode-back" href="../../module_docs/inkmap/types.html#inkmap.Polarity">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Polarity</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Which apparent-brightness state the foreground corresponds to.</span>
+
+<span class="sd">    Carried explicitly so that no appearance word ever has to stand in for a physical</span>
+<span class="sd">    class. Flipping this is the supported way to handle inverted print and inverted</span>
+<span class="sd">    imaging, rather than inverting masks at the call site.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">FOREGROUND_IS_DARK</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The usual case: ink absorbs, so the mark reads darker than the substrate.&quot;&quot;&quot;</span>
+
+    <span class="n">FOREGROUND_IS_LIGHT</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reversed: the mark reads brighter than the substrate.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">foreground_is_dark</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span> <span class="ow">is</span> <span class="n">Polarity</span><span class="o">.</span><span class="n">FOREGROUND_IS_DARK</span></div>
+
+
+
+<div class="viewcode-block" id="Placement">
+<a class="viewcode-back" href="../../module_docs/inkmap/types.html#inkmap.Placement">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Placement</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A located instance of a model: which shape, and where it sits in the image.</span>
+
+<span class="sd">    ``transform`` is the bridge the whole package is built on -- a 3x3 homography from</span>
+<span class="sd">    *model space* (the model&#39;s own units, origin at its top-left) to image pixels. The</span>
+<span class="sd">    quad is just its image under that transform, kept for convenience.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">model</span><span class="p">:</span> <span class="n">Model</span>
+    <span class="n">transform</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;(3, 3) float64, model coordinates -&gt; image pixels.&quot;&quot;&quot;</span>
+
+    <span class="n">quad</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;(4, 2) float32 image-space corners of the model&#39;s extent, in the *model&#39;s* own</span>
+<span class="sd">    order (its top-left first), not re-sorted into image order. Re-sorting by</span>
+<span class="sd">    coordinate sum/difference -- a common idiom -- silently mislabels corners once the</span>
+<span class="sd">    mark is rotated past 45 degrees, which rotates the model and corrupts every derived</span>
+<span class="sd">    mask while leaving it looking plausible.&quot;&quot;&quot;</span>
+
+    <span class="n">locator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Which locator strategy produced this.&quot;&quot;&quot;</span>
+
+    <span class="n">payload</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decoded content, when the locator happened to decode something. Never required:</span>
+<span class="sd">    decoding is not the point, and a barely-deposited mark may locate but not decode.&quot;&quot;&quot;</span>
+
+    <span class="n">refined</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Alignment score from refinement, if it ran. A proxy for geometric fit quality.&quot;&quot;&quot;</span>
+
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">units_per_pixel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Model units spanned by one image pixel, averaged over the two axes.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pixels_per_unit</span><span class="p">,</span> <span class="mf">1e-12</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pixels_per_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Image pixels across the model&#39;s smallest feature.</span>
+
+<span class="sd">        **This** is the resolution figure that governs whether a trustworthy</span>
+<span class="sd">        measurement is possible -- not :attr:`pixels_per_unit`. A model unit is not a</span>
+<span class="sd">        feature: a QR module is both, but a glyph rendered onto a 512-cell raster has</span>
+<span class="sd">        strokes tens of cells wide, so pixels-per-unit there would understate the real</span>
+<span class="sd">        resolution by that factor and declare every image unmeasurable.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixels_per_unit</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;feature_size&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pixels_per_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Image pixels per model unit.</span>
+
+<span class="sd">        For a QR symbol a &quot;unit&quot; is one module; for a barcode, one narrow bar; for a</span>
+<span class="sd">        raster model, one raster cell. Use :attr:`pixels_per_feature` to reason about</span>
+<span class="sd">        whether the image resolves the mark.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">extent</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quad</span>
+        <span class="n">top</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">bottom</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">q</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+        <span class="n">left</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">scales</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">width</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">scales</span> <span class="o">+=</span> <span class="p">[</span><span class="n">top</span> <span class="o">/</span> <span class="n">width</span><span class="p">,</span> <span class="n">bottom</span> <span class="o">/</span> <span class="n">width</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">height</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">scales</span> <span class="o">+=</span> <span class="p">[</span><span class="n">left</span> <span class="o">/</span> <span class="n">height</span><span class="p">,</span> <span class="n">right</span> <span class="o">/</span> <span class="n">height</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">scales</span><span class="p">))</span> <span class="k">if</span> <span class="n">scales</span> <span class="k">else</span> <span class="mf">0.0</span></div>
+
+
+
+<div class="viewcode-block" id="InkMap">
+<a class="viewcode-back" href="../../module_docs/inkmap/types.html#inkmap.InkMap">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">InkMap</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Per-pixel foreground coverage for one placement, plus the geometry it came from.</span>
+
+<span class="sd">    ``coverage`` is *geometric* area coverage: the fraction of each pixel&#39;s area lying</span>
+<span class="sd">    under foreground. It is not an optical/reflectance-derived coverage (which lateral</span>
+<span class="sd">    light scattering in the substrate inflates -- the Murray-Davies/Yule-Nielsen</span>
+<span class="sd">    effect), and it is not a probability. See :meth:`confidence` for that.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">coverage</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;(H, W) float32 in [0, 1]. Zero outside the mark.&quot;&quot;&quot;</span>
+
+    <span class="n">region</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;(H, W) uint8 of :class:`Region` values.&quot;&quot;&quot;</span>
+
+    <span class="n">placement</span><span class="p">:</span> <span class="n">Placement</span>
+    <span class="n">polarity</span><span class="p">:</span> <span class="n">Polarity</span> <span class="o">=</span> <span class="n">Polarity</span><span class="o">.</span><span class="n">FOREGROUND_IS_DARK</span>
+
+    <span class="n">weight</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;(H, W) float32 in [0, 1] -- the blur-aware measurement weight, and the **only**</span>
+<span class="sd">    channel that should gate a physical measurement. Coverage is geometric and ignores</span>
+<span class="sd">    the point spread function; confidence is epistemic and says nothing about</span>
+<span class="sd">    partial-area contamination. See :func:`inkmap.coverage.measurement_weight`.&quot;&quot;&quot;</span>
+
+    <span class="n">blur_sigma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Estimated image blur (px). ``nan`` means estimation failed -- typically because</span>
+<span class="sd">    the modelled shape and the photograph do not correspond.&quot;&quot;&quot;</span>
+
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Model</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">placement</span><span class="o">.</span><span class="n">model</span>
+
+    <span class="c1"># -- masks --------------------------------------------------------------- #</span>
+
+<div class="viewcode-block" id="InkMap.foreground_mask">
+<a class="viewcode-back" href="../../module_docs/inkmap/types.html#inkmap.InkMap.foreground_mask">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">foreground_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Boolean foreground mask by thresholding coverage. Fine for display and</span>
+<span class="sd">        labelling; for anything photometric use :func:`inkmap.measurement_mask`</span>
+<span class="sd">        instead, which accounts for blur.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coverage</span> <span class="o">&gt;=</span> <span class="n">threshold</span></div>
+
+
+<div class="viewcode-block" id="InkMap.background_mask">
+<a class="viewcode-back" href="../../module_docs/inkmap/types.html#inkmap.InkMap.background_mask">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">background_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Bare-substrate pixels within the mark&#39;s footprint (not the margin).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">region</span> <span class="o">==</span> <span class="n">Region</span><span class="o">.</span><span class="n">BACKGROUND</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coverage</span> <span class="o">&lt;</span> <span class="n">threshold</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InkMap.inside_mask">
+<a class="viewcode-back" href="../../module_docs/inkmap/types.html#inkmap.InkMap.inside_mask">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inside_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">margin</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Every pixel within the mark&#39;s footprint. With ``margin=True``, include the</span>
+<span class="sd">        clear surround as well.&quot;&quot;&quot;</span>
+        <span class="n">inside</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">region</span> <span class="o">==</span> <span class="n">Region</span><span class="o">.</span><span class="n">FOREGROUND</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">region</span> <span class="o">==</span> <span class="n">Region</span><span class="o">.</span><span class="n">BACKGROUND</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">margin</span><span class="p">:</span>
+            <span class="n">inside</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">region</span> <span class="o">==</span> <span class="n">Region</span><span class="o">.</span><span class="n">MARGIN</span>
+        <span class="k">return</span> <span class="n">inside</span></div>
+
+
+<div class="viewcode-block" id="InkMap.margin_mask">
+<a class="viewcode-back" href="../../module_docs/inkmap/types.html#inkmap.InkMap.margin_mask">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">margin_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The clear surround -- an alternative reference region.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">region</span> <span class="o">==</span> <span class="n">Region</span><span class="o">.</span><span class="n">MARGIN</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__array__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;``np.asarray(ink_map)`` gives the coverage map -- usually what you want.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coverage</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span> <span class="k">if</span> <span class="n">dtype</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">coverage</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

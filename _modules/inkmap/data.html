@@ -1,0 +1,258 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>inkmap.data &mdash; inkmap 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            inkmap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap.html">inkmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/config.html">inkmap.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/coverage.html">inkmap.coverage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/data.html">inkmap.data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/geometry.html">inkmap.geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/locate.html">inkmap.locate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/locate/barcode.html">inkmap.locate.barcode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/locate/qr.html">inkmap.locate.qr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/models.html">inkmap.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/models/base.html">inkmap.models.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/models/freeform.html">inkmap.models.freeform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/models/grid.html">inkmap.models.grid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/photometry.html">inkmap.photometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/synth.html">inkmap.synth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/types.html">inkmap.types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/viz.html">inkmap.viz</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">inkmap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../inkmap.html">inkmap</a></li>
+      <li class="breadcrumb-item active">inkmap.data</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for inkmap.data</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;The real-photograph test corpus: 189 photographed marks in the wild (QR codes), from Wikimedia Commons.</span>
+
+<span class="sd">Synthetic scenes (:mod:`inkmap.synth`) are the only way to validate a *coverage* value,</span>
+<span class="sd">because no photograph comes with per-pixel ink ground truth. But synthetic scenes cannot</span>
+<span class="sd">tell you whether detection works on a QR code printed on a curved bottle under a</span>
+<span class="sd">sodium lamp. The two test sets answer different questions and you need both.</span>
+
+<span class="sd">Only the manifest ships with the package -- titles, URLs, licences and attribution, about</span>
+<span class="sd">100 KB. The images themselves are fetched on demand and cached, because ~120 MB of</span>
+<span class="sd">photographs has no business inside a wheel, and because redistributing them would mean</span>
+<span class="sd">carrying every attribution requirement into this repository.</span>
+
+<span class="sd">Every image is CC0, public domain, CC BY or CC BY-SA. Attribution is in the manifest and</span>
+<span class="sd">:func:`attribution_text` will render it -- if you publish results using these images,</span>
+<span class="sd">use it.</span>
+
+<span class="sd">    from inkmap import data</span>
+
+<span class="sd">    paths = data.fetch()             # download + cache, returns local paths</span>
+<span class="sd">    for path, meta in data.items():  # iterate cached images with their metadata</span>
+<span class="sd">        ...</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib.error</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib.request</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterator</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;MANIFEST&quot;</span><span class="p">,</span> <span class="s2">&quot;cache_dir&quot;</span><span class="p">,</span> <span class="s2">&quot;fetch&quot;</span><span class="p">,</span> <span class="s2">&quot;items&quot;</span><span class="p">,</span> <span class="s2">&quot;attribution_text&quot;</span><span class="p">]</span>
+
+<span class="n">_MANIFEST_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;assets&quot;</span> <span class="o">/</span> <span class="s2">&quot;commons_qr.json&quot;</span>
+<span class="n">_USER_AGENT</span> <span class="o">=</span> <span class="s2">&quot;inkmap/0.1 (https://github.com/thorwhalen/inkmap)&quot;</span>
+
+<span class="c1">#: Manifest records: file, title, url, source, license, artist.</span>
+<span class="n">MANIFEST</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">_MANIFEST_PATH</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="cache_dir">
+<a class="viewcode-back" href="../../module_docs/inkmap/data.html#inkmap.data.cache_dir">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cache_dir</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Where fetched images live.</span>
+
+<span class="sd">    Honours ``INKMAP_DATA_DIR``, else the XDG cache location. Test data is neither code</span>
+<span class="sd">    nor user configuration, so it does not belong beside the package: a wheel install</span>
+<span class="sd">    would make the package directory read-only, and a reinstall would silently discard</span>
+<span class="sd">    a 120 MB download.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;INKMAP_DATA_DIR&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">env</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">env</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;XDG_CACHE_HOME&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;.cache&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">base</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;inkmap&quot;</span> <span class="o">/</span> <span class="s2">&quot;commons_qr&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="fetch">
+<a class="viewcode-back" href="../../module_docs/inkmap/data.html#inkmap.data.fetch">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fetch</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">dest</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">pace</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.1</span><span class="p">,</span>
+    <span class="n">attempts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Download the corpus (skipping anything already cached) and return local paths.</span>
+
+<span class="sd">    Commons rate-limits hard and answers with HTTP 429 rather than queueing, so</span>
+<span class="sd">    requests are paced and retried with exponential backoff. A full cold fetch takes</span>
+<span class="sd">    several minutes; it is incremental, so interrupting and re-running is safe.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dest</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span> <span class="k">if</span> <span class="n">dest</span> <span class="k">else</span> <span class="n">cache_dir</span><span class="p">()</span>
+    <span class="n">dest</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">MANIFEST</span><span class="p">[:</span><span class="n">limit</span><span class="p">]:</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">dest</span> <span class="o">/</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">target</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">target</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">_download</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">],</span> <span class="n">target</span><span class="p">,</span> <span class="n">pace</span><span class="o">=</span><span class="n">pace</span><span class="p">,</span> <span class="n">attempts</span><span class="o">=</span><span class="n">attempts</span><span class="p">):</span>
+            <span class="n">paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">paths</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_download</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dest</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">pace</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">attempts</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">attempts</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="n">_USER_AGENT</span><span class="p">})</span>
+            <span class="k">with</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span> <span class="k">as</span> <span class="n">response</span><span class="p">:</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write_bytes</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">pace</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="n">urllib</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">HTTPError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">code</span> <span class="o">!=</span> <span class="mi">429</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">pace</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">attempt</span><span class="p">)</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">pace</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<div class="viewcode-block" id="items">
+<a class="viewcode-back" href="../../module_docs/inkmap/data.html#inkmap.data.items">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">items</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">dest</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield ``(path, record)`` for every corpus image already cached.&quot;&quot;&quot;</span>
+    <span class="n">dest</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span> <span class="k">if</span> <span class="n">dest</span> <span class="k">else</span> <span class="n">cache_dir</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">MANIFEST</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">dest</span> <span class="o">/</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">yield</span> <span class="n">path</span><span class="p">,</span> <span class="n">record</span></div>
+
+
+
+<div class="viewcode-block" id="attribution_text">
+<a class="viewcode-back" href="../../module_docs/inkmap/data.html#inkmap.data.attribution_text">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">attribution_text</span><span class="p">(</span><span class="n">records</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Render the attribution block required by the CC BY / CC BY-SA images.&quot;&quot;&quot;</span>
+    <span class="n">records</span> <span class="o">=</span> <span class="n">MANIFEST</span> <span class="k">if</span> <span class="n">records</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">records</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;Test images from Wikimedia Commons, used under their respective licences:&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">&quot;File:&quot;</span><span class="p">)</span>
+        <span class="n">artist</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;artist&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;unknown&quot;</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;- </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2"> -- </span><span class="si">{</span><span class="n">artist</span><span class="si">}</span><span class="s2"> -- </span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="s1">&#39;license&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> -- </span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

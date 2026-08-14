@@ -1,0 +1,4 @@
+inkmap.locate.qr
+================
+.. automodule:: inkmap.locate.qr
+   :members:

@@ -1,0 +1,354 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>inkmap.geometry &mdash; inkmap 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            inkmap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap.html">inkmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/config.html">inkmap.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/coverage.html">inkmap.coverage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/data.html">inkmap.data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/geometry.html">inkmap.geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/locate.html">inkmap.locate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/locate/barcode.html">inkmap.locate.barcode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/locate/qr.html">inkmap.locate.qr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/models.html">inkmap.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/models/base.html">inkmap.models.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/models/freeform.html">inkmap.models.freeform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/models/grid.html">inkmap.models.grid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/photometry.html">inkmap.photometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/synth.html">inkmap.synth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/types.html">inkmap.types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/viz.html">inkmap.viz</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">inkmap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../inkmap.html">inkmap</a></li>
+      <li class="breadcrumb-item active">inkmap.geometry</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for inkmap.geometry</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Model space &lt;-&gt; image space: transforms, and refining them against the photograph.</span>
+
+<span class="sd">The central object is a homography mapping *model coordinates* to image pixels. Get it</span>
+<span class="sd">right and every mask, sample and margin polygon follows exactly. Get it wrong by a</span>
+<span class="sd">pixel and every downstream number inherits the error, while the mask still looks</span>
+<span class="sd">plausible.</span>
+
+<span class="sd">Three half-pixel conventions have to agree, and each is invisible on inspection:</span>
+
+<span class="sd">1. **Pixel centre vs pixel corner.** OpenCV treats integer coordinate ``x`` as the</span>
+<span class="sd">   *centre* of a pixel spanning ``[x-0.5, x+0.5)``. Rasterising ``[x, x+1)`` instead --</span>
+<span class="sd">   the natural array-indexing reading -- offsets the entire coverage map by half a</span>
+<span class="sd">   pixel.</span>
+<span class="sd">2. **The template raster.** A model rendered at ``s`` px per unit puts template pixel</span>
+<span class="sd">   ``t`` over ``[t/s, (t+1)/s)`` in model units, so its *centre* is ``(t+0.5)/s``.</span>
+<span class="sd">   Omitting that half-pixel puts a fixed ~0.7 px bias into every refinement.</span>
+<span class="sd">3. **Detector corner conventions differ.** OpenCV&#39;s QR corners are the integer index of</span>
+<span class="sd">   the last *contained* pixel; zxing-cpp returns the continuous outer boundary. Measured</span>
+<span class="sd">   directly, not read from docs -- hence ``inclusive_pixel_corners``.</span>
+
+<span class="sd">A symptom worth recognising: if refinement error grows with the mark&#39;s rotation angle</span>
+<span class="sd">in the pattern ``R(d) - d``, the residual ``d`` is a coordinate-convention offset, not</span>
+<span class="sd">noise.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span><span class="p">,</span> <span class="n">render_model</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;model_quad&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;quad_to_transform&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;transform_to_quad&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pixels_per_unit&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;refine_transform&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;margin_quad&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cell_centers&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="model_quad">
+<a class="viewcode-back" href="../../module_docs/inkmap/geometry.html#inkmap.geometry.model_quad">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">model_quad</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">Model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The model&#39;s four extent corners in model coordinates, top-left first.&quot;&quot;&quot;</span>
+    <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">extent</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="n">w</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">h</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="quad_to_transform">
+<a class="viewcode-back" href="../../module_docs/inkmap/geometry.html#inkmap.geometry.quad_to_transform">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">quad_to_transform</span><span class="p">(</span>
+    <span class="n">quad</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Model</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">inclusive_pixel_corners</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Homography mapping model coordinates onto an image quad.</span>
+
+<span class="sd">    ``quad`` must be in the *model&#39;s* own corner order (its top-left first), which is</span>
+<span class="sd">    what the locators natively produce -- do not re-sort it.</span>
+
+<span class="sd">    Set ``inclusive_pixel_corners=True`` for detectors whose corners are the integer</span>
+<span class="sd">    index of the last contained pixel rather than the continuous outer edge. The quad</span>
+<span class="sd">    is then expanded half a pixel outward, removing a systematic one-pixel scale error</span>
+<span class="sd">    -- which is a third of a unit at 3 px per unit.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">quad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">quad</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">inclusive_pixel_corners</span><span class="p">:</span>
+        <span class="n">center</span> <span class="o">=</span> <span class="n">quad</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">span</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">quad</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">quad</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">span</span> <span class="o">&gt;</span> <span class="mf">1e-6</span><span class="p">:</span>
+            <span class="n">quad</span> <span class="o">=</span> <span class="n">center</span> <span class="o">+</span> <span class="p">(</span><span class="n">quad</span> <span class="o">-</span> <span class="n">center</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">span</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">getPerspectiveTransform</span><span class="p">(</span><span class="n">model_quad</span><span class="p">(</span><span class="n">model</span><span class="p">),</span> <span class="n">quad</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="transform_to_quad">
+<a class="viewcode-back" href="../../module_docs/inkmap/geometry.html#inkmap.geometry.transform_to_quad">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">transform_to_quad</span><span class="p">(</span><span class="n">transform</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Image-space corners implied by a transform, in model order.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">perspectiveTransform</span><span class="p">(</span>
+        <span class="n">model_quad</span><span class="p">(</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="pixels_per_unit">
+<a class="viewcode-back" href="../../module_docs/inkmap/geometry.html#inkmap.geometry.pixels_per_unit">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">pixels_per_unit</span><span class="p">(</span><span class="n">transform</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mean image pixels per model unit implied by a transform.&quot;&quot;&quot;</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">transform_to_quad</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+    <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">extent</span>
+    <span class="n">scales</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">w</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">scales</span> <span class="o">+=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">w</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">q</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">/</span> <span class="n">w</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">h</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">scales</span> <span class="o">+=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">h</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">h</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">scales</span><span class="p">))</span> <span class="k">if</span> <span class="n">scales</span> <span class="k">else</span> <span class="mf">0.0</span></div>
+
+
+
+<div class="viewcode-block" id="refine_transform">
+<a class="viewcode-back" href="../../module_docs/inkmap/geometry.html#inkmap.geometry.refine_transform">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">refine_transform</span><span class="p">(</span>
+    <span class="n">gray</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Model</span><span class="p">,</span>
+    <span class="n">transform</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">ECC_ITERATIONS</span><span class="p">,</span>
+    <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">ECC_EPS</span><span class="p">,</span>
+    <span class="n">blur_frac</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">ECC_TEMPLATE_BLUR_FRAC</span><span class="p">,</span>
+    <span class="n">min_correlation</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">ECC_MIN_CORRELATION</span><span class="p">,</span>
+    <span class="n">margin_units</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">TEMPLATE_MARGIN_UNITS</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Refine a model-&gt;image transform by ECC-aligning the rendered model.</span>
+
+<span class="sd">    Four detector corners are four observations; the model&#39;s whole shape is thousands.</span>
+<span class="sd">    Aligning the rendered pattern therefore pins the 8-DoF homography far more tightly</span>
+<span class="sd">    -- measured at 0.02-0.03 px corner RMS versus ~1 px from detector corners.</span>
+
+<span class="sd">    Returns ``(transform, correlation)``, falling back to the input unchanged when the</span>
+<span class="sd">    optimiser fails or the correlation lands below ``min_correlation`` -- a refinement</span>
+<span class="sd">    that did not converge is worse than none.</span>
+
+<span class="sd">    Two details do most of the work. The template is rendered at the *observed* scale;</span>
+<span class="sd">    rendering at a fixed small scale aliases the comparison and makes the result</span>
+<span class="sd">    measurably worse than no refinement at all. And the template carries a clear margin,</span>
+<span class="sd">    because blurring a template that stops at the mark&#39;s edge makes the kernel reflect</span>
+<span class="sd">    interior content back across the border, inventing an edge profile the photograph</span>
+<span class="sd">    does not have -- ECC then shifts the whole fit to match the artefact.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span>
+            <span class="nb">round</span><span class="p">(</span><span class="n">pixels_per_unit</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">model</span><span class="p">)),</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">ECC_MIN_SCALE</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">ECC_MAX_SCALE</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="n">render_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">supersample</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">blur_frac</span><span class="p">:</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">GaussianBlur</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">scale</span> <span class="o">*</span> <span class="n">blur_frac</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">))</span>
+
+    <span class="n">pad</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">margin_units</span> <span class="o">*</span> <span class="n">scale</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">pad</span><span class="p">:</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">copyMakeBorder</span><span class="p">(</span>
+            <span class="n">template</span><span class="p">,</span> <span class="n">pad</span><span class="p">,</span> <span class="n">pad</span><span class="p">,</span> <span class="n">pad</span><span class="p">,</span> <span class="n">pad</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">BORDER_CONSTANT</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">0.0</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Foreground renders as 1; photographs of normal-polarity marks are dark there.</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">template</span>
+
+    <span class="c1"># ECC&#39;s warp maps template pixels -&gt; image pixels; ours maps model units -&gt; image.</span>
+    <span class="c1"># Fold in the render scale, the margin offset (template pixel 0 is model unit</span>
+    <span class="c1"># -pad/scale) and the half-pixel centre convention, then take them back out.</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="n">scale</span> <span class="o">-</span> <span class="n">pad</span> <span class="o">/</span> <span class="n">scale</span>
+    <span class="n">to_model</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">scale</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">offset</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">scale</span><span class="p">,</span> <span class="n">offset</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]]</span>
+    <span class="p">)</span>
+    <span class="n">warp</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">@</span> <span class="n">to_model</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">warp</span> <span class="o">/=</span> <span class="n">warp</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">correlation</span><span class="p">,</span> <span class="n">warp</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">findTransformECC</span><span class="p">(</span>
+            <span class="n">_zscore</span><span class="p">(</span><span class="n">template</span><span class="p">),</span>
+            <span class="n">_zscore</span><span class="p">(</span><span class="n">gray</span><span class="p">),</span>
+            <span class="n">warp</span><span class="p">,</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">MOTION_HOMOGRAPHY</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">TERM_CRITERIA_EPS</span> <span class="o">|</span> <span class="n">cv2</span><span class="o">.</span><span class="n">TERM_CRITERIA_COUNT</span><span class="p">,</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">eps</span><span class="p">),</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="mi">5</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="n">cv2</span><span class="o">.</span><span class="n">error</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">correlation</span><span class="p">)</span> <span class="ow">or</span> <span class="n">correlation</span> <span class="o">&lt;</span> <span class="n">min_correlation</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">correlation</span><span class="p">)</span>
+
+    <span class="n">refined</span> <span class="o">=</span> <span class="n">warp</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">to_model</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">refined</span> <span class="o">/</span> <span class="n">refined</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="n">correlation</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_zscore</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Zero-mean unit-variance float32. ECC is contrast-invariant but conditions better</span>
+<span class="sd">    on normalised input, and this makes template and image commensurate.&quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">std</span><span class="p">()</span> <span class="o">+</span> <span class="mf">1e-6</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="margin_quad">
+<a class="viewcode-back" href="../../module_docs/inkmap/geometry.html#inkmap.geometry.margin_quad">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">margin_quad</span><span class="p">(</span>
+    <span class="n">transform</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Model</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">units</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">MARGIN_UNITS</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Image-space quad of the model plus a clear margin of ``units`` model units.</span>
+
+<span class="sd">    ISO/IEC 18004 mandates a 4-module quiet zone for QR; linear symbologies specify</span>
+<span class="sd">    light margins; printed text has its own whitespace. The margin is guaranteed</span>
+<span class="sd">    background, which makes it a reference region that -- unlike background *inside*</span>
+<span class="sd">    the mark -- carries no risk of spread from adjacent foreground.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">extent</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">units</span><span class="p">)</span>
+    <span class="n">outer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[[</span><span class="o">-</span><span class="n">m</span><span class="p">,</span> <span class="o">-</span><span class="n">m</span><span class="p">],</span> <span class="p">[</span><span class="n">w</span> <span class="o">+</span> <span class="n">m</span><span class="p">,</span> <span class="o">-</span><span class="n">m</span><span class="p">],</span> <span class="p">[</span><span class="n">w</span> <span class="o">+</span> <span class="n">m</span><span class="p">,</span> <span class="n">h</span> <span class="o">+</span> <span class="n">m</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="n">m</span><span class="p">,</span> <span class="n">h</span> <span class="o">+</span> <span class="n">m</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">perspectiveTransform</span><span class="p">(</span>
+        <span class="n">outer</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="cell_centers">
+<a class="viewcode-back" href="../../module_docs/inkmap/geometry.html#inkmap.geometry.cell_centers">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cell_centers</span><span class="p">(</span><span class="n">transform</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">n_cols</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``(n_rows, n_cols, 2)`` image coordinates of unit-cell centres.</span>
+
+<span class="sd">    Meaningful for grid models. ISO/IEC 18004&#39;s reference decode algorithm samples a</span>
+<span class="sd">    small area at each grid intersection -- deliberately avoiding edges rather than</span>
+<span class="sd">    modelling them -- and this is where to do the same.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">uu</span><span class="p">,</span> <span class="n">vv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_cols</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_rows</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">uu</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">vv</span><span class="o">.</span><span class="n">ravel</span><span class="p">()],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">perspectiveTransform</span><span class="p">(</span>
+        <span class="n">pts</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_rows</span><span class="p">,</span> <span class="n">n_cols</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

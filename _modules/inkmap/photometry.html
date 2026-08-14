@@ -1,0 +1,467 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>inkmap.photometry &mdash; inkmap 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            inkmap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap.html">inkmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/config.html">inkmap.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/coverage.html">inkmap.coverage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/data.html">inkmap.data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/geometry.html">inkmap.geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/locate.html">inkmap.locate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/locate/barcode.html">inkmap.locate.barcode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/locate/qr.html">inkmap.locate.qr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/models.html">inkmap.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/models/base.html">inkmap.models.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/models/freeform.html">inkmap.models.freeform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/models/grid.html">inkmap.models.grid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/photometry.html">inkmap.photometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/synth.html">inkmap.synth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/types.html">inkmap.types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/viz.html">inkmap.viz</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">inkmap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../inkmap.html">inkmap</a></li>
+      <li class="breadcrumb-item active">inkmap.photometry</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for inkmap.photometry</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Turning masks into measurements that are actually valid.</span>
+
+<span class="sd">Everything here exists because a per-pixel mask is necessary but nowhere near</span>
+<span class="sd">sufficient for measuring anything *about* the mark -- its reflectance, its density, its</span>
+<span class="sd">colour, how much of it actually printed. The failure modes are silent: they do not</span>
+<span class="sd">raise, they return a plausible number wrong by tens of percent.</span>
+
+<span class="sd">Measured on synthetic scenes with exact ground truth (see ``docs/validation.md``), the</span>
+<span class="sd">bias in recovering a foreground-only signal at 6 px per model unit:</span>
+
+<span class="sd">=====================  ========  ==========  ==========  ==========</span>
+<span class="sd">pixel selection        blur=0    sigma=1 px  sigma=2 px  sigma=3 px</span>
+<span class="sd">=====================  ========  ==========  ==========  ==========</span>
+<span class="sd">coverage &gt; 0.5           -3.3%     -12.2%      -23.3%      -32.4%</span>
+<span class="sd">coverage == 1.0          -0.0%      -8.0%      -19.9%      -30.1%</span>
+<span class="sd">weight (2 sigma)         +0.0%      -0.2%       -0.6%       -1.5%</span>
+<span class="sd">=====================  ========  ==========  ==========  ==========</span>
+
+<span class="sd">Two lessons. Geometric purity is necessary but *not* sufficient -- a pixel entirely</span>
+<span class="sd">under foreground still reads 30% low, because the point spread function drags</span>
+<span class="sd">background signal into it, and that contamination has a different footprint from</span>
+<span class="sd">partial area coverage. Only spatial erosion removes it, which is what the weight</span>
+<span class="sd">channel is.</span>
+
+<span class="sd">And erosion stops working once the blur is wide relative to a model unit: there are no</span>
+<span class="sd">uncontaminated pixels left. That is the classic partial-volume result, and it is why</span>
+<span class="sd">:func:`measurability` exists -- better to say the measurement is not possible than to</span>
+<span class="sd">return a confidently wrong number.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">InkMap</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;srgb_to_linear&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;measurement_mask&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;measurement_margin&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;measurability&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Measurability&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Measurement&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;measure&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;illumination_field&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="srgb_to_linear">
+<a class="viewcode-back" href="../../module_docs/inkmap/photometry.html#inkmap.srgb_to_linear">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">srgb_to_linear</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Undo the sRGB transfer function, returning float in ``[0, 1]``.</span>
+
+<span class="sd">    Averaging pixel values without this is a real error, not a nicety: sRGB values are</span>
+<span class="sd">    perceptually encoded, so the mean of encoded values is not the encoded mean</span>
+<span class="sd">    intensity. Any difference between two exposures compounds it. Apply before any</span>
+<span class="sd">    arithmetic that claims to be about light.</span>
+
+<span class="sd">    The piecewise IEC 61966-2-1 curve, not the 2.2 power approximation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">/</span> <span class="mf">255.0</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x</span> <span class="o">&lt;=</span> <span class="mf">0.04045</span><span class="p">,</span> <span class="n">x</span> <span class="o">/</span> <span class="mf">12.92</span><span class="p">,</span> <span class="p">((</span><span class="n">x</span> <span class="o">+</span> <span class="mf">0.055</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1.055</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.4</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">float32</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="measurement_margin">
+<a class="viewcode-back" href="../../module_docs/inkmap/photometry.html#inkmap.measurement_margin">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">measurement_margin</span><span class="p">(</span>
+    <span class="n">blur_sigma</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sigmas</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">EDGE_MARGIN_SIGMAS</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Erosion radius in pixels for a given blur sigma. At least 1 px.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">sigmas</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">blur_sigma</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))))</span></div>
+
+
+
+<div class="viewcode-block" id="measurement_mask">
+<a class="viewcode-back" href="../../module_docs/inkmap/photometry.html#inkmap.measurement_mask">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">measurement_mask</span><span class="p">(</span>
+    <span class="n">ink_map</span><span class="p">:</span> <span class="n">InkMap</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;foreground&quot;</span><span class="p">,</span>
+    <span class="n">purity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">config</span><span class="o">.</span><span class="n">PURE_COVERAGE_TOL</span><span class="p">,</span>
+    <span class="n">margin</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pixels safe to measure: geometrically pure, then eroded clear of edges.</span>
+
+<span class="sd">    ``kind`` selects ``&quot;foreground&quot;`` or ``&quot;background&quot;``. ``purity`` is the coverage</span>
+<span class="sd">    threshold for &quot;pure&quot;; the default demands essentially total coverage, which is the</span>
+<span class="sd">    point -- a partially covered pixel biases the mean toward the other class.</span>
+
+<span class="sd">    This is the mask to use for a measurement. :meth:`InkMap.foreground_mask` is for</span>
+<span class="sd">    display and for anything that only needs a label.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.coverage</span><span class="w"> </span><span class="kn">import</span> <span class="n">measurement_weight</span>
+
+    <span class="k">if</span> <span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;foreground&quot;</span><span class="p">,</span> <span class="s2">&quot;background&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;kind must be &#39;foreground&#39; or &#39;background&#39;, got </span><span class="si">{</span><span class="n">kind</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># The foreground weight is precomputed by `find`; reuse unless a custom margin</span>
+    <span class="c1"># means it was built at the wrong radius.</span>
+    <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;foreground&quot;</span> <span class="ow">and</span> <span class="n">margin</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ink_map</span><span class="o">.</span><span class="n">weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ink_map</span><span class="o">.</span><span class="n">weight</span> <span class="o">&gt;=</span> <span class="n">purity</span>
+
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">ink_map</span><span class="o">.</span><span class="n">blur_sigma</span>
+    <span class="k">if</span> <span class="n">sigma</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">sigma</span><span class="p">):</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">DEFAULT_BLUR_SIGMA</span>
+
+    <span class="n">weight</span> <span class="o">=</span> <span class="n">measurement_weight</span><span class="p">(</span>
+        <span class="n">ink_map</span><span class="o">.</span><span class="n">coverage</span><span class="p">,</span>
+        <span class="n">blur_sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span>
+        <span class="n">radius</span><span class="o">=</span><span class="n">margin</span><span class="p">,</span>
+        <span class="n">inside</span><span class="o">=</span><span class="n">ink_map</span><span class="o">.</span><span class="n">inside_mask</span><span class="p">(),</span>
+        <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">weight</span> <span class="o">&gt;=</span> <span class="n">purity</span></div>
+
+
+
+<div class="viewcode-block" id="Measurability">
+<a class="viewcode-back" href="../../module_docs/inkmap/photometry.html#inkmap.Measurability">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Measurability</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Whether a trustworthy measurement is possible on this image at all.&quot;&quot;&quot;</span>
+
+    <span class="n">ok</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">pixels_per_feature</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">blur_sigma</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">resolution_ratio</span><span class="p">:</span> <span class="nb">float</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``pixels_per_feature / blur_sigma``. Below ~6 the blur is wide relative to the</span>
+<span class="sd">    mark&#39;s smallest feature and no erosion leaves uncontaminated pixels.&quot;&quot;&quot;</span>
+    <span class="n">n_foreground_pixels</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">n_background_pixels</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">reasons</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ok</span></div>
+
+
+
+<div class="viewcode-block" id="measurability">
+<a class="viewcode-back" href="../../module_docs/inkmap/photometry.html#inkmap.measurability">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">measurability</span><span class="p">(</span><span class="n">ink_map</span><span class="p">:</span> <span class="n">InkMap</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">min_pixels</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Measurability</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Judge whether a foreground/background measurement can be trusted here.</span>
+
+<span class="sd">    Returning a number quietly biased by 30% is worse than refusing, so this is checked</span>
+<span class="sd">    up front and attached to every :class:`Measurement`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">ink_map</span><span class="o">.</span><span class="n">blur_sigma</span>
+    <span class="k">if</span> <span class="n">sigma</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">sigma</span><span class="p">):</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">DEFAULT_BLUR_SIGMA</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="n">ink_map</span><span class="o">.</span><span class="n">placement</span><span class="o">.</span><span class="n">pixels_per_feature</span>
+    <span class="n">ratio</span> <span class="o">=</span> <span class="n">scale</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="mf">1e-6</span><span class="p">)</span>
+
+    <span class="n">n_fore</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">measurement_mask</span><span class="p">(</span><span class="n">ink_map</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;foreground&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+    <span class="n">n_back</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">measurement_mask</span><span class="p">(</span><span class="n">ink_map</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;background&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+
+    <span class="n">reasons</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">ratio</span> <span class="o">&lt;</span> <span class="n">config</span><span class="o">.</span><span class="n">MIN_SCALE_OVER_SIGMA</span><span class="p">:</span>
+        <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;blur is wide relative to the smallest feature (px/feature </span><span class="si">{</span><span class="n">scale</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> / sigma &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sigma</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">ratio</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">, want &gt;= </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">MIN_SCALE_OVER_SIGMA</span><span class="si">}</span><span class="s2">); &quot;</span>
+            <span class="s2">&quot;edge contamination cannot be eroded away&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">n_fore</span> <span class="o">&lt;</span> <span class="n">min_pixels</span><span class="p">:</span>
+        <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;only </span><span class="si">{</span><span class="n">n_fore</span><span class="si">}</span><span class="s2"> pure foreground pixels survive erosion (want &gt;= </span><span class="si">{</span><span class="n">min_pixels</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">n_back</span> <span class="o">&lt;</span> <span class="n">min_pixels</span><span class="p">:</span>
+        <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;only </span><span class="si">{</span><span class="n">n_back</span><span class="si">}</span><span class="s2"> pure background pixels survive erosion (want &gt;= </span><span class="si">{</span><span class="n">min_pixels</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Measurability</span><span class="p">(</span>
+        <span class="n">ok</span><span class="o">=</span><span class="ow">not</span> <span class="n">reasons</span><span class="p">,</span>
+        <span class="n">pixels_per_feature</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span>
+        <span class="n">blur_sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span>
+        <span class="n">resolution_ratio</span><span class="o">=</span><span class="n">ratio</span><span class="p">,</span>
+        <span class="n">n_foreground_pixels</span><span class="o">=</span><span class="n">n_fore</span><span class="p">,</span>
+        <span class="n">n_background_pixels</span><span class="o">=</span><span class="n">n_back</span><span class="p">,</span>
+        <span class="n">reasons</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">reasons</span><span class="p">),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="illumination_field">
+<a class="viewcode-back" href="../../module_docs/inkmap/photometry.html#inkmap.illumination_field">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">illumination_field</span><span class="p">(</span>
+    <span class="n">image</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ink_map</span><span class="p">:</span> <span class="n">InkMap</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">degree</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fit a smooth illumination field across the mark from its background pixels.</span>
+
+<span class="sd">    The background within the mark samples the illumination across the whole mark, so</span>
+<span class="sd">    the scene calibrates itself -- no flat-field frame required. A first-order (planar)</span>
+<span class="sd">    fit handles the usual oblique-lighting gradient; degree 2 handles vignetting</span>
+<span class="sd">    curvature at the cost of being able to absorb real signal.</span>
+
+<span class="sd">    Returns a field normalised to mean 1.0 over the mark; divide by it to flatten.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">measurement_mask</span><span class="p">(</span><span class="n">ink_map</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;background&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">12</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">ys</span><span class="p">,</span> <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">image</span><span class="p">[</span><span class="n">ys</span><span class="p">,</span> <span class="n">xs</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+    <span class="n">basis</span> <span class="o">=</span> <span class="n">_poly_basis</span><span class="p">(</span><span class="n">xs</span> <span class="o">/</span> <span class="n">w</span><span class="p">,</span> <span class="n">ys</span> <span class="o">/</span> <span class="n">h</span><span class="p">,</span> <span class="n">degree</span><span class="p">)</span>
+    <span class="n">coeffs</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="n">yy</span><span class="p">,</span> <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">h</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">w</span><span class="p">]</span>
+    <span class="n">field</span> <span class="o">=</span> <span class="p">(</span><span class="n">_poly_basis</span><span class="p">((</span><span class="n">xx</span> <span class="o">/</span> <span class="n">w</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="p">(</span><span class="n">yy</span> <span class="o">/</span> <span class="n">h</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">degree</span><span class="p">)</span> <span class="o">@</span> <span class="n">coeffs</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+        <span class="n">h</span><span class="p">,</span> <span class="n">w</span>
+    <span class="p">)</span>
+
+    <span class="n">inside</span> <span class="o">=</span> <span class="n">ink_map</span><span class="o">.</span><span class="n">inside_mask</span><span class="p">()</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">field</span><span class="p">[</span><span class="n">inside</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="k">if</span> <span class="n">inside</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">scale</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-9</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">field</span> <span class="o">/</span> <span class="n">scale</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_poly_basis</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">degree</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Design matrix of 2-D monomials up to ``degree``.&quot;&quot;&quot;</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">x</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">total</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">degree</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">total</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">cols</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">x</span> <span class="o">**</span> <span class="p">(</span><span class="n">total</span> <span class="o">-</span> <span class="n">i</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span><span class="o">**</span><span class="n">i</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Measurement">
+<a class="viewcode-back" href="../../module_docs/inkmap/photometry.html#inkmap.Measurement">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Measurement</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Aggregated signal over foreground and background, with its validity attached.</span>
+
+<span class="sd">    ``measurability`` is carried along deliberately: a caller that ignores it has to do</span>
+<span class="sd">    so explicitly.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">foreground_mean</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">foreground_std</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">foreground_median</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">background_mean</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">background_std</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">background_median</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">n_foreground</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">n_background</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">measurability</span><span class="p">:</span> <span class="n">Measurability</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">contrast</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Foreground minus background.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">foreground_mean</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">background_mean</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ratio</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Foreground over background; ``nan`` when the background reads zero.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">foreground_mean</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">background_mean</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">background_mean</span>
+            <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">snr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Contrast over the pooled standard deviation.&quot;&quot;&quot;</span>
+        <span class="n">pooled</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">foreground_std</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">background_std</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">contrast</span> <span class="o">/</span> <span class="n">pooled</span><span class="p">)</span> <span class="k">if</span> <span class="n">pooled</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="measure">
+<a class="viewcode-back" href="../../module_docs/inkmap/photometry.html#inkmap.measure">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">measure</span><span class="p">(</span>
+    <span class="n">image</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">ink_map</span><span class="p">:</span> <span class="n">InkMap</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">linearize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">flatten</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">margin</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">robust</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Measurement</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Aggregate ``image`` over the safe foreground and background pixels of ``ink_map``.</span>
+
+<span class="sd">    ``image`` need not be the one the mark was located in: any frame registered to it</span>
+<span class="sd">    works, which is the usual way to measure a different exposure, channel or modality</span>
+<span class="sd">    using geometry established once on the sharpest frame.</span>
+
+<span class="sd">    ``linearize`` undoes sRGB encoding first -- leave it on for anything from a normal</span>
+<span class="sd">    camera pipeline, off for already-linear data. ``flatten`` divides out a fitted</span>
+<span class="sd">    illumination field. ``robust`` reports medians alongside means; on real photographs</span>
+<span class="sd">    they diverge exactly where something is wrong, which makes the pair a free</span>
+<span class="sd">    diagnostic.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">image</span>
+    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2GRAY</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="n">ink_map</span><span class="o">.</span><span class="n">coverage</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;image shape </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2"> does not match the ink map &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ink_map</span><span class="o">.</span><span class="n">coverage</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2">; register the frames first&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">values</span> <span class="o">=</span> <span class="n">srgb_to_linear</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">if</span> <span class="n">linearize</span> <span class="k">else</span> <span class="n">data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">flatten</span><span class="p">:</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">values</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">illumination_field</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">ink_map</span><span class="p">),</span> <span class="mf">1e-6</span><span class="p">)</span>
+
+    <span class="n">fore</span> <span class="o">=</span> <span class="n">measurement_mask</span><span class="p">(</span><span class="n">ink_map</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;foreground&quot;</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="n">margin</span><span class="p">)</span>
+    <span class="n">back</span> <span class="o">=</span> <span class="n">measurement_mask</span><span class="p">(</span><span class="n">ink_map</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;background&quot;</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="n">margin</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">stats</span><span class="p">(</span><span class="n">mask</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">mask</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">),</span> <span class="mi">0</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+        <span class="n">median</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">vals</span><span class="p">))</span> <span class="k">if</span> <span class="n">robust</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">vals</span><span class="o">.</span><span class="n">mean</span><span class="p">()),</span> <span class="nb">float</span><span class="p">(</span><span class="n">vals</span><span class="o">.</span><span class="n">std</span><span class="p">()),</span> <span class="n">median</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">vals</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+
+    <span class="n">fm</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">fmed</span><span class="p">,</span> <span class="n">fn</span> <span class="o">=</span> <span class="n">stats</span><span class="p">(</span><span class="n">fore</span><span class="p">)</span>
+    <span class="n">bm</span><span class="p">,</span> <span class="n">bs</span><span class="p">,</span> <span class="n">bmed</span><span class="p">,</span> <span class="n">bn</span> <span class="o">=</span> <span class="n">stats</span><span class="p">(</span><span class="n">back</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Measurement</span><span class="p">(</span>
+        <span class="n">foreground_mean</span><span class="o">=</span><span class="n">fm</span><span class="p">,</span>
+        <span class="n">foreground_std</span><span class="o">=</span><span class="n">fs</span><span class="p">,</span>
+        <span class="n">foreground_median</span><span class="o">=</span><span class="n">fmed</span><span class="p">,</span>
+        <span class="n">background_mean</span><span class="o">=</span><span class="n">bm</span><span class="p">,</span>
+        <span class="n">background_std</span><span class="o">=</span><span class="n">bs</span><span class="p">,</span>
+        <span class="n">background_median</span><span class="o">=</span><span class="n">bmed</span><span class="p">,</span>
+        <span class="n">n_foreground</span><span class="o">=</span><span class="n">fn</span><span class="p">,</span>
+        <span class="n">n_background</span><span class="o">=</span><span class="n">bn</span><span class="p">,</span>
+        <span class="n">measurability</span><span class="o">=</span><span class="n">measurability</span><span class="p">(</span><span class="n">ink_map</span><span class="p">),</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;linearized&quot;</span><span class="p">:</span> <span class="n">linearize</span><span class="p">,</span> <span class="s2">&quot;flattened&quot;</span><span class="p">:</span> <span class="n">flatten</span><span class="p">},</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

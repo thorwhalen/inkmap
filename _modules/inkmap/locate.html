@@ -1,0 +1,245 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>inkmap.locate &mdash; inkmap 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            inkmap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap.html">inkmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/config.html">inkmap.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/coverage.html">inkmap.coverage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/data.html">inkmap.data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/geometry.html">inkmap.geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/locate.html">inkmap.locate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/locate/barcode.html">inkmap.locate.barcode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/locate/qr.html">inkmap.locate.qr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/models.html">inkmap.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/models/base.html">inkmap.models.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/models/freeform.html">inkmap.models.freeform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/models/grid.html">inkmap.models.grid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/photometry.html">inkmap.photometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/synth.html">inkmap.synth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/types.html">inkmap.types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/viz.html">inkmap.viz</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">inkmap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../inkmap.html">inkmap</a></li>
+      <li class="breadcrumb-item active">inkmap.locate</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for inkmap.locate</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Locators: finding where a model sits in an image.</span>
+
+<span class="sd">A locator is a plain function ``(bgr, gray) -&gt; list[Placement]``, so registering your</span>
+<span class="sd">own needs no subclassing:</span>
+
+<span class="sd">    from inkmap import locate</span>
+
+<span class="sd">    locate.LOCATORS[&quot;mine&quot;] = my_locator</span>
+<span class="sd">    inkmap.find_all(photo, locators=[&quot;mine&quot;, &quot;qr_zxing&quot;])</span>
+
+<span class="sd">For the many cases where the mark cannot be auto-detected -- a letter, a logo, a shape</span>
+<span class="sd">with no decoder in the world -- :func:`place` is the universal entry point: you supply</span>
+<span class="sd">the model and where its corners are, and the rest of the package proceeds identically.</span>
+<span class="sd">That is the seam that makes this work for &quot;anything the user provides a model for&quot;.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Sequence</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">geometry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Placement</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.barcode</span><span class="w"> </span><span class="kn">import</span> <span class="n">locate_barcode_zxing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.qr</span><span class="w"> </span><span class="kn">import</span> <span class="n">locate_qr_aruco</span><span class="p">,</span> <span class="n">locate_qr_opencv</span><span class="p">,</span> <span class="n">locate_qr_zxing</span>
+
+<span class="n">Locator</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="n">Placement</span><span class="p">]]</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;LOCATORS&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Locator&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;locate&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;place&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;locate_qr_opencv&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;locate_qr_aruco&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;locate_qr_zxing&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;locate_barcode_zxing&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="c1">#: Registry of locator strategies. Add your own: ``LOCATORS[&quot;mine&quot;] = my_locator``.</span>
+<span class="n">LOCATORS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Locator</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;qr_zxing&quot;</span><span class="p">:</span> <span class="n">locate_qr_zxing</span><span class="p">,</span>
+    <span class="s2">&quot;qr_aruco&quot;</span><span class="p">:</span> <span class="n">locate_qr_aruco</span><span class="p">,</span>
+    <span class="s2">&quot;qr_opencv&quot;</span><span class="p">:</span> <span class="n">locate_qr_opencv</span><span class="p">,</span>
+    <span class="s2">&quot;barcode_zxing&quot;</span><span class="p">:</span> <span class="n">locate_barcode_zxing</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="place">
+<a class="viewcode-back" href="../../module_docs/inkmap/locate.html#inkmap.place">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">place</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Model</span><span class="p">,</span>
+    <span class="n">quad</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">inclusive_pixel_corners</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">locator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;manual&quot;</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">metadata</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Placement</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Place a model at a known quadrilateral -- the universal escape hatch.</span>
+
+<span class="sd">    ``quad`` is four ``(x, y)`` image points in the *model&#39;s* own corner order: the</span>
+<span class="sd">    point corresponding to model-space ``(0, 0)`` first, then clockwise. Order matters</span>
+<span class="sd">    and is not inferred: sorting corners by image position silently mislabels them once</span>
+<span class="sd">    the mark is rotated past 45 degrees.</span>
+
+<span class="sd">    Use this for anything without a decoder -- printed letters, logos, engraved marks --</span>
+<span class="sd">    or when you already know where the mark is and only want the coverage machinery.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">quad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">quad</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Placement</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+        <span class="n">transform</span><span class="o">=</span><span class="n">geometry</span><span class="o">.</span><span class="n">quad_to_transform</span><span class="p">(</span>
+            <span class="n">quad</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inclusive_pixel_corners</span><span class="o">=</span><span class="n">inclusive_pixel_corners</span>
+        <span class="p">),</span>
+        <span class="n">quad</span><span class="o">=</span><span class="n">quad</span><span class="p">,</span>
+        <span class="n">locator</span><span class="o">=</span><span class="n">locator</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">metadata</span><span class="p">),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="locate">
+<a class="viewcode-back" href="../../module_docs/inkmap/locate.html#inkmap.locate">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">locate</span><span class="p">(</span>
+    <span class="n">bgr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">gray</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">locators</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">Locator</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">DEFAULT_LOCATORS</span><span class="p">,</span>
+    <span class="n">first_hit</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Placement</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run locator strategies and merge their results, de-duplicating by position.</span>
+
+<span class="sd">    Strategies are tried in order. With ``first_hit=True`` the cascade stops at the</span>
+<span class="sd">    first strategy that finds anything -- cheaper, and usually right when you know there</span>
+<span class="sd">    is one mark. Otherwise every strategy runs and results merge, which is what earns</span>
+<span class="sd">    the recall when an image holds several marks that no single detector finds all of.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">found</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Placement</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">locators</span><span class="p">:</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="n">LOCATORS</span><span class="p">[</span><span class="n">spec</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">spec</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">placements</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="n">bgr</span><span class="p">,</span> <span class="n">gray</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">for</span> <span class="n">placement</span> <span class="ow">in</span> <span class="n">placements</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">_duplicate</span><span class="p">(</span><span class="n">placement</span><span class="p">,</span> <span class="n">found</span><span class="p">):</span>
+                <span class="n">found</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">first_hit</span> <span class="ow">and</span> <span class="n">found</span><span class="p">:</span>
+            <span class="k">break</span>
+    <span class="k">return</span> <span class="n">found</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_duplicate</span><span class="p">(</span><span class="n">candidate</span><span class="p">:</span> <span class="n">Placement</span><span class="p">,</span> <span class="n">existing</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Placement</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Two placements are the same mark if their centres are within half a span.&quot;&quot;&quot;</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">candidate</span><span class="o">.</span><span class="n">quad</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">span</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">candidate</span><span class="o">.</span><span class="n">quad</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">candidate</span><span class="o">.</span><span class="n">quad</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="nb">any</span><span class="p">(</span>
+        <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">quad</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="n">c</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">span</span> <span class="o">*</span> <span class="mf">0.5</span>
+        <span class="k">for</span> <span class="n">other</span> <span class="ow">in</span> <span class="n">existing</span>
+    <span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

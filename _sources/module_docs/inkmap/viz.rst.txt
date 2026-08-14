@@ -1,0 +1,4 @@
+inkmap.viz
+==========
+.. automodule:: inkmap.viz
+   :members:

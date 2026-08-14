@@ -1,0 +1,245 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>inkmap.coverage &mdash; inkmap 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="inkmap.data" href="data.html" />
+    <link rel="prev" title="inkmap.config" href="config.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            inkmap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../inkmap.html">inkmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">inkmap.config</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">inkmap.coverage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#two-routes-to-coverage">Two routes to coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inkmap.coverage.confidence"><code class="docutils literal notranslate"><span class="pre">confidence()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inkmap.coverage.coverage_map"><code class="docutils literal notranslate"><span class="pre">coverage_map()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inkmap.coverage.estimate_blur_sigma"><code class="docutils literal notranslate"><span class="pre">estimate_blur_sigma()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inkmap.coverage.measurement_weight"><code class="docutils literal notranslate"><span class="pre">measurement_weight()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inkmap.coverage.observed_coverage"><code class="docutils literal notranslate"><span class="pre">observed_coverage()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inkmap.coverage.region_map"><code class="docutils literal notranslate"><span class="pre">region_map()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data.html">inkmap.data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">inkmap.geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="locate.html">inkmap.locate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="locate/barcode.html">inkmap.locate.barcode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="locate/qr.html">inkmap.locate.qr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">inkmap.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models/base.html">inkmap.models.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models/freeform.html">inkmap.models.freeform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models/grid.html">inkmap.models.grid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="photometry.html">inkmap.photometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="synth.html">inkmap.synth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="types.html">inkmap.types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="viz.html">inkmap.viz</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">inkmap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">inkmap.coverage</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/module_docs/inkmap/coverage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-inkmap.coverage">
+<span id="inkmap-coverage"></span><h1>inkmap.coverage<a class="headerlink" href="#module-inkmap.coverage" title="Link to this heading"></a></h1>
+<p>Per-pixel foreground coverage: the 0..1 value, and which one you want.</p>
+<p>Three different 0..1 quantities get conflated by “how foreground is this pixel”. They
+answer different questions, and mixing them produces numbers that mean nothing:</p>
+<p><strong>Coverage</strong> (<a class="reference internal" href="#inkmap.coverage.coverage_map" title="inkmap.coverage.coverage_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">coverage_map()</span></code></a>, <a class="reference internal" href="#inkmap.coverage.observed_coverage" title="inkmap.coverage.observed_coverage"><code class="xref py py-func docutils literal notranslate"><span class="pre">observed_coverage()</span></code></a>) is <em>physical</em>: the
+fraction of the pixel’s area lying under foreground. ISO 12647-2:2013 3.1 calls this
+<strong>area coverage</strong>. A pixel straddling a mark’s edge genuinely is 0.37 foreground. The
+same quantity is the matting <strong>alpha</strong> (identical, for opaque marks), the
+remote-sensing <strong>fractional abundance</strong> of an endmember in a <strong>mixed pixel</strong>, and the
+medical-imaging <strong>partial volume fraction</strong>.</p>
+<p><strong>Confidence</strong> (<a class="reference internal" href="#inkmap.coverage.confidence" title="inkmap.coverage.confidence"><code class="xref py py-func docutils literal notranslate"><span class="pre">confidence()</span></code></a>) is <em>epistemic</em>: how sure we are of the label. This
+is what the user’s “probability that the pixel is foreground” means when the underlying
+reality is genuinely binary. A pixel deep inside a mark has coverage 1.0 and confidence
+1.0; one in a blown-out highlight may have modelled coverage 1.0 and confidence near 0.</p>
+<p><strong>Weight</strong> (<a class="reference internal" href="#inkmap.coverage.measurement_weight" title="inkmap.coverage.measurement_weight"><code class="xref py py-func docutils literal notranslate"><span class="pre">measurement_weight()</span></code></a>) is <em>operational</em>: how safe the pixel is to
+measure, given that blur spreads signal across boundaries. It is the only one that
+should gate a physical measurement.</p>
+<section id="two-routes-to-coverage">
+<h2>Two routes to coverage<a class="headerlink" href="#two-routes-to-coverage" title="Link to this heading"></a></h2>
+<p><em>Modelled</em> (<a class="reference internal" href="#inkmap.coverage.coverage_map" title="inkmap.coverage.coverage_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">coverage_map()</span></code></a>): the shape is known, so back-project a supersampled
+grid of each pixel through the transform and ask the model. Exact up to the
+supersampling rate, immune to lighting, and the right default. It answers “where should
+the foreground be”.</p>
+<p><em>Observed</em> (<a class="reference internal" href="#inkmap.coverage.observed_coverage" title="inkmap.coverage.observed_coverage"><code class="xref py py-func docutils literal notranslate"><span class="pre">observed_coverage()</span></code></a>): normalise the photograph between a background
+endpoint and a solid-foreground endpoint. This is the Murray-Davies inversion, and it
+answers “where is the foreground actually” – so it is the one that can see a printing
+defect. It returns an <em>apparent</em> (optical) coverage, inflated relative to geometric
+coverage by lateral light scattering in the substrate (the Yule-Nielsen effect), which
+is why the two routes disagree.</p>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.coverage.confidence">
+<span class="sig-prename descclassname"><span class="pre">inkmap.coverage.</span></span><span class="sig-name descname"><span class="pre">confidence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gray</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="types.html#inkmap.types.Placement" title="inkmap.types.Placement"><span class="pre">Placement</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">coverage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">polarity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="types.html#inkmap.types.Polarity" title="inkmap.types.Polarity"><span class="pre">Polarity</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Polarity.FOREGROUND_IS_DARK</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../../_modules/inkmap/coverage.html#confidence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.coverage.confidence" title="Link to this definition"></a></dt>
+<dd><p>How much to trust the coverage value at each pixel, in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>.</p>
+<p>Distinct from coverage. Three things erode it, combined multiplicatively:</p>
+<ul class="simple">
+<li><p><strong>Model/image disagreement</strong> – where the observed value contradicts the modelled
+coverage, one of them is wrong. This is what catches foreground that failed to
+print, a torn label, or a mis-fitted transform.</p></li>
+<li><p><strong>Clipping</strong> – saturated or crushed pixels carry no photometric information.</p></li>
+<li><p><strong>Edge proximity</strong> – mixed pixels are inherently less certain, and their value
+depends on sub-pixel geometry known only to ~0.5 px.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.coverage.coverage_map">
+<span class="sig-prename descclassname"><span class="pre">inkmap.coverage.</span></span><span class="sig-name descname"><span class="pre">coverage_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="models/base.html#inkmap.models.base.Model" title="inkmap.models.base.Model"><span class="pre">Model</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_shape</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../../_modules/inkmap/coverage.html#coverage_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.coverage.coverage_map" title="Link to this definition"></a></dt>
+<dd><p>Area fraction of each pixel covered by the model’s foreground, in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>.</p>
+<p>Each pixel is probed at <code class="docutils literal notranslate"><span class="pre">samples**2</span></code> sub-positions on a regular grid at sub-pixel
+centres; each probe is back-projected into model coordinates and passed to
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">Model.occupancy()</span></code>. The mean is the covered area fraction – ordinary
+supersampled area coverage, the same quantity a renderer’s anti-aliasing computes.</p>
+<p>Values are quantised to <code class="docutils literal notranslate"><span class="pre">1/samples**2</span></code>, so <code class="docutils literal notranslate"><span class="pre">samples</span></code> sets the accuracy floor.
+Only the model’s bounding box is evaluated, so a mark occupying 2% of a 12 MP photo
+costs 2% of the work.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.coverage.estimate_blur_sigma">
+<span class="sig-prename descclassname"><span class="pre">inkmap.coverage.</span></span><span class="sig-name descname"><span class="pre">estimate_blur_sigma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gray</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="types.html#inkmap.types.Placement" title="inkmap.types.Placement"><span class="pre">Placement</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../../_modules/inkmap/coverage.html#estimate_blur_sigma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.coverage.estimate_blur_sigma" title="Link to this definition"></a></dt>
+<dd><p>Estimate imaging blur sigma, in pixels, from the mark’s own edges.</p>
+<p>Sizing the measurement margin needs this. Estimated by finding the sigma whose
+blurred ideal coverage best matches the photograph.</p>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">nan</span></code> when the minimum lands at the top of the search range: that is the
+search running out of room, not a measurement – the modelled shape and the
+photograph do not correspond – and reporting the boundary value would silently size
+the measurement margin from noise.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.coverage.measurement_weight">
+<span class="sig-prename descclassname"><span class="pre">inkmap.coverage.</span></span><span class="sig-name descname"><span class="pre">measurement_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coverage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">blur_sigma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inside</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'foreground'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigmas</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../../_modules/inkmap/coverage.html#measurement_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.coverage.measurement_weight" title="Link to this definition"></a></dt>
+<dd><p>Blur-aware weight in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>: how safe each pixel is to <em>measure</em>.</p>
+<p>Coverage says a pixel lies entirely under foreground. That is necessary but not
+sufficient: the point spread function leaks neighbouring signal into interior
+pixels, and that contamination has a different footprint from partial area
+coverage – so no coverage-based weighting removes it. The fix is spatial: require
+a pixel’s whole neighbourhood to be foreground, out to the radius the blur reaches.</p>
+<p>Implemented as grayscale morphological erosion of the coverage map, which is exactly
+“the minimum coverage within radius r” – continuous rather than a hard mask, so a
+pixel one step from an edge is down-weighted rather than trusted or discarded.</p>
+<p>Give either <code class="docutils literal notranslate"><span class="pre">radius</span></code> (pixels, wins if both are given) or <code class="docutils literal notranslate"><span class="pre">blur_sigma</span></code>, from
+which the radius is <code class="docutils literal notranslate"><span class="pre">sigmas</span> <span class="pre">*</span> <span class="pre">blur_sigma</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.coverage.observed_coverage">
+<span class="sig-prename descclassname"><span class="pre">inkmap.coverage.</span></span><span class="sig-name descname"><span class="pre">observed_coverage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gray</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="types.html#inkmap.types.Placement" title="inkmap.types.Placement"><span class="pre">Placement</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">polarity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="types.html#inkmap.types.Polarity" title="inkmap.types.Polarity"><span class="pre">Polarity</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Polarity.FOREGROUND_IS_DARK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yule_nielsen_n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../../_modules/inkmap/coverage.html#observed_coverage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.coverage.observed_coverage" title="Link to this definition"></a></dt>
+<dd><p>Apparent coverage read from the photograph itself (Murray-Davies).</p>
+<p>Endmember values are estimated from the mark’s own pixels – its background region
+gives the substrate endpoint, its foreground core the solid endpoint – so no
+external calibration target is needed. Percentiles rather than extremes, so a
+specular highlight cannot define an endpoint.</p>
+<p><code class="docutils literal notranslate"><span class="pre">yule_nielsen_n</span></code> &gt; 1 compensates for lateral light scattering in the substrate,
+which otherwise inflates apparent coverage above geometric coverage. n = 1 is plain
+Murray-Davies; the right value is substrate- and wavelength-specific and should be
+fitted, not guessed.</p>
+<p>The result is <em>apparent</em>, not geometric, coverage. Do not silently substitute it
+for <a class="reference internal" href="#inkmap.coverage.coverage_map" title="inkmap.coverage.coverage_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">coverage_map()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.coverage.region_map">
+<span class="sig-prename descclassname"><span class="pre">inkmap.coverage.</span></span><span class="sig-name descname"><span class="pre">region_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">placement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="types.html#inkmap.types.Placement" title="inkmap.types.Placement"><span class="pre">Placement</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">coverage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">margin_units</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../../_modules/inkmap/coverage.html#region_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.coverage.region_map" title="Link to this definition"></a></dt>
+<dd><p>Four-way <code class="xref py py-class docutils literal notranslate"><span class="pre">Region</span></code> label array from a coverage map and a placement.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="config.html" class="btn btn-neutral float-left" title="inkmap.config" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="data.html" class="btn btn-neutral float-right" title="inkmap.data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

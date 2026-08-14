@@ -1,0 +1,4 @@
+inkmap.types
+============
+.. automodule:: inkmap.types
+   :members:

@@ -1,0 +1,283 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>&lt;no title&gt; &mdash; inkmap 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            inkmap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap.html">inkmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/config.html">inkmap.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/coverage.html">inkmap.coverage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/data.html">inkmap.data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/geometry.html">inkmap.geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/locate.html">inkmap.locate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/locate/barcode.html">inkmap.locate.barcode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/locate/qr.html">inkmap.locate.qr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/models.html">inkmap.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/models/base.html">inkmap.models.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/models/freeform.html">inkmap.models.freeform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/models/grid.html">inkmap.models.grid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/photometry.html">inkmap.photometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/synth.html">inkmap.synth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/types.html">inkmap.types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/viz.html">inkmap.viz</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">inkmap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">&lt;no title&gt;</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/table_of_contents.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap.html">inkmap</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap.html#terminology">Terminology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap.html#inkmap.InkMap"><code class="docutils literal notranslate"><span class="pre">InkMap</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap.html#inkmap.Measurability"><code class="docutils literal notranslate"><span class="pre">Measurability</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap.html#inkmap.Measurement"><code class="docutils literal notranslate"><span class="pre">Measurement</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap.html#inkmap.Model"><code class="docutils literal notranslate"><span class="pre">Model</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap.html#inkmap.Placement"><code class="docutils literal notranslate"><span class="pre">Placement</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap.html#inkmap.Polarity"><code class="docutils literal notranslate"><span class="pre">Polarity</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap.html#inkmap.Region"><code class="docutils literal notranslate"><span class="pre">Region</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap.html#inkmap.confidence"><code class="docutils literal notranslate"><span class="pre">confidence()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap.html#inkmap.coverage_map"><code class="docutils literal notranslate"><span class="pre">coverage_map()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap.html#inkmap.find"><code class="docutils literal notranslate"><span class="pre">find()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap.html#inkmap.find_all"><code class="docutils literal notranslate"><span class="pre">find_all()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap.html#inkmap.foreground"><code class="docutils literal notranslate"><span class="pre">foreground()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap.html#inkmap.locate"><code class="docutils literal notranslate"><span class="pre">locate()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap.html#inkmap.measurability"><code class="docutils literal notranslate"><span class="pre">measurability()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap.html#inkmap.measure"><code class="docutils literal notranslate"><span class="pre">measure()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap.html#inkmap.measurement_mask"><code class="docutils literal notranslate"><span class="pre">measurement_mask()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap.html#inkmap.measurement_weight"><code class="docutils literal notranslate"><span class="pre">measurement_weight()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap.html#inkmap.observed_coverage"><code class="docutils literal notranslate"><span class="pre">observed_coverage()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap.html#inkmap.place"><code class="docutils literal notranslate"><span class="pre">place()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap.html#inkmap.srgb_to_linear"><code class="docutils literal notranslate"><span class="pre">srgb_to_linear()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/config.html">inkmap.config</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/config.html#inkmap.config.BLACK_CLIP_LEVEL"><code class="docutils literal notranslate"><span class="pre">BLACK_CLIP_LEVEL</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/config.html#inkmap.config.DEFAULT_BLUR_SIGMA"><code class="docutils literal notranslate"><span class="pre">DEFAULT_BLUR_SIGMA</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/config.html#inkmap.config.DEFAULT_LOCATORS"><code class="docutils literal notranslate"><span class="pre">DEFAULT_LOCATORS</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/config.html#inkmap.config.ECC_MIN_CORRELATION"><code class="docutils literal notranslate"><span class="pre">ECC_MIN_CORRELATION</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/config.html#inkmap.config.ECC_MIN_SCALE"><code class="docutils literal notranslate"><span class="pre">ECC_MIN_SCALE</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/config.html#inkmap.config.ECC_TEMPLATE_BLUR_FRAC"><code class="docutils literal notranslate"><span class="pre">ECC_TEMPLATE_BLUR_FRAC</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/config.html#inkmap.config.EDGE_MARGIN_SIGMAS"><code class="docutils literal notranslate"><span class="pre">EDGE_MARGIN_SIGMAS</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/config.html#inkmap.config.MARGIN_UNITS"><code class="docutils literal notranslate"><span class="pre">MARGIN_UNITS</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/config.html#inkmap.config.MIN_SCALE_OVER_SIGMA"><code class="docutils literal notranslate"><span class="pre">MIN_SCALE_OVER_SIGMA</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/config.html#inkmap.config.PURE_COVERAGE_TOL"><code class="docutils literal notranslate"><span class="pre">PURE_COVERAGE_TOL</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/config.html#inkmap.config.SATURATION_LEVEL"><code class="docutils literal notranslate"><span class="pre">SATURATION_LEVEL</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/config.html#inkmap.config.SUPERSAMPLES"><code class="docutils literal notranslate"><span class="pre">SUPERSAMPLES</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/config.html#inkmap.config.TEMPLATE_MARGIN_UNITS"><code class="docutils literal notranslate"><span class="pre">TEMPLATE_MARGIN_UNITS</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/coverage.html">inkmap.coverage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/coverage.html#two-routes-to-coverage">Two routes to coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/coverage.html#inkmap.coverage.confidence"><code class="docutils literal notranslate"><span class="pre">confidence()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/coverage.html#inkmap.coverage.coverage_map"><code class="docutils literal notranslate"><span class="pre">coverage_map()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/coverage.html#inkmap.coverage.estimate_blur_sigma"><code class="docutils literal notranslate"><span class="pre">estimate_blur_sigma()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/coverage.html#inkmap.coverage.measurement_weight"><code class="docutils literal notranslate"><span class="pre">measurement_weight()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/coverage.html#inkmap.coverage.observed_coverage"><code class="docutils literal notranslate"><span class="pre">observed_coverage()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/coverage.html#inkmap.coverage.region_map"><code class="docutils literal notranslate"><span class="pre">region_map()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/data.html">inkmap.data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/data.html#inkmap.data.MANIFEST"><code class="docutils literal notranslate"><span class="pre">MANIFEST</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/data.html#inkmap.data.attribution_text"><code class="docutils literal notranslate"><span class="pre">attribution_text()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/data.html#inkmap.data.cache_dir"><code class="docutils literal notranslate"><span class="pre">cache_dir()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/data.html#inkmap.data.fetch"><code class="docutils literal notranslate"><span class="pre">fetch()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/data.html#inkmap.data.items"><code class="docutils literal notranslate"><span class="pre">items()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/geometry.html">inkmap.geometry</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/geometry.html#inkmap.geometry.cell_centers"><code class="docutils literal notranslate"><span class="pre">cell_centers()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/geometry.html#inkmap.geometry.margin_quad"><code class="docutils literal notranslate"><span class="pre">margin_quad()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/geometry.html#inkmap.geometry.model_quad"><code class="docutils literal notranslate"><span class="pre">model_quad()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/geometry.html#inkmap.geometry.pixels_per_unit"><code class="docutils literal notranslate"><span class="pre">pixels_per_unit()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/geometry.html#inkmap.geometry.quad_to_transform"><code class="docutils literal notranslate"><span class="pre">quad_to_transform()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/geometry.html#inkmap.geometry.refine_transform"><code class="docutils literal notranslate"><span class="pre">refine_transform()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/geometry.html#inkmap.geometry.transform_to_quad"><code class="docutils literal notranslate"><span class="pre">transform_to_quad()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/locate.html">inkmap.locate</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/locate.html#inkmap.locate.LOCATORS"><code class="docutils literal notranslate"><span class="pre">LOCATORS</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/locate.html#inkmap.locate.locate"><code class="docutils literal notranslate"><span class="pre">locate()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/locate.html#inkmap.locate.locate_barcode_zxing"><code class="docutils literal notranslate"><span class="pre">locate_barcode_zxing()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/locate.html#inkmap.locate.locate_qr_aruco"><code class="docutils literal notranslate"><span class="pre">locate_qr_aruco()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/locate.html#inkmap.locate.locate_qr_opencv"><code class="docutils literal notranslate"><span class="pre">locate_qr_opencv()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/locate.html#inkmap.locate.locate_qr_zxing"><code class="docutils literal notranslate"><span class="pre">locate_qr_zxing()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/locate.html#inkmap.locate.place"><code class="docutils literal notranslate"><span class="pre">place()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/locate/barcode.html">inkmap.locate.barcode</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/locate/barcode.html#inkmap.locate.barcode.locate_barcode_zxing"><code class="docutils literal notranslate"><span class="pre">locate_barcode_zxing()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/locate/barcode.html#inkmap.locate.barcode.profile_to_bars"><code class="docutils literal notranslate"><span class="pre">profile_to_bars()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/locate/qr.html">inkmap.locate.qr</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/locate/qr.html#getting-the-module-matrix">Getting the module matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/locate/qr.html#inkmap.locate.qr.locate_qr_aruco"><code class="docutils literal notranslate"><span class="pre">locate_qr_aruco()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/locate/qr.html#inkmap.locate.qr.locate_qr_opencv"><code class="docutils literal notranslate"><span class="pre">locate_qr_opencv()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/locate/qr.html#inkmap.locate.qr.locate_qr_zxing"><code class="docutils literal notranslate"><span class="pre">locate_qr_zxing()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/locate/qr.html#inkmap.locate.qr.sample_matrix"><code class="docutils literal notranslate"><span class="pre">sample_matrix()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/models.html">inkmap.models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/models.html#inkmap.models.BarsModel"><code class="docutils literal notranslate"><span class="pre">BarsModel</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/models.html#inkmap.models.BaseModel"><code class="docutils literal notranslate"><span class="pre">BaseModel</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/models.html#inkmap.models.GlyphModel"><code class="docutils literal notranslate"><span class="pre">GlyphModel</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/models.html#inkmap.models.MatrixModel"><code class="docutils literal notranslate"><span class="pre">MatrixModel</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/models.html#inkmap.models.Model"><code class="docutils literal notranslate"><span class="pre">Model</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/models.html#inkmap.models.PolygonModel"><code class="docutils literal notranslate"><span class="pre">PolygonModel</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/models.html#inkmap.models.RasterModel"><code class="docutils literal notranslate"><span class="pre">RasterModel</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/models.html#inkmap.models.render_model"><code class="docutils literal notranslate"><span class="pre">render_model()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/models.html#inkmap.models.text_model"><code class="docutils literal notranslate"><span class="pre">text_model()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/models/base.html">inkmap.models.base</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/models/base.html#model-space">Model space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/models/base.html#why-occupancy-and-not-give-me-a-bitmap">Why <code class="docutils literal notranslate"><span class="pre">occupancy</span></code> and not “give me a bitmap”</a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/models/base.html#inkmap.models.base.BaseModel"><code class="docutils literal notranslate"><span class="pre">BaseModel</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/models/base.html#inkmap.models.base.Model"><code class="docutils literal notranslate"><span class="pre">Model</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/models/base.html#inkmap.models.base.render_model"><code class="docutils literal notranslate"><span class="pre">render_model()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/models/freeform.html">inkmap.models.freeform</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/models/freeform.html#inkmap.models.freeform.GlyphModel"><code class="docutils literal notranslate"><span class="pre">GlyphModel</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/models/freeform.html#inkmap.models.freeform.PolygonModel"><code class="docutils literal notranslate"><span class="pre">PolygonModel</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/models/freeform.html#inkmap.models.freeform.RasterModel"><code class="docutils literal notranslate"><span class="pre">RasterModel</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/models/freeform.html#inkmap.models.freeform.text_model"><code class="docutils literal notranslate"><span class="pre">text_model()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/models/grid.html">inkmap.models.grid</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/models/grid.html#inkmap.models.grid.BarsModel"><code class="docutils literal notranslate"><span class="pre">BarsModel</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/models/grid.html#inkmap.models.grid.MatrixModel"><code class="docutils literal notranslate"><span class="pre">MatrixModel</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/photometry.html">inkmap.photometry</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/photometry.html#inkmap.photometry.Measurability"><code class="docutils literal notranslate"><span class="pre">Measurability</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/photometry.html#inkmap.photometry.Measurement"><code class="docutils literal notranslate"><span class="pre">Measurement</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/photometry.html#inkmap.photometry.illumination_field"><code class="docutils literal notranslate"><span class="pre">illumination_field()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/photometry.html#inkmap.photometry.measurability"><code class="docutils literal notranslate"><span class="pre">measurability()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/photometry.html#inkmap.photometry.measure"><code class="docutils literal notranslate"><span class="pre">measure()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/photometry.html#inkmap.photometry.measurement_margin"><code class="docutils literal notranslate"><span class="pre">measurement_margin()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/photometry.html#inkmap.photometry.measurement_mask"><code class="docutils literal notranslate"><span class="pre">measurement_mask()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/photometry.html#inkmap.photometry.srgb_to_linear"><code class="docutils literal notranslate"><span class="pre">srgb_to_linear()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/synth.html">inkmap.synth</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/synth.html#inkmap.synth.Scene"><code class="docutils literal notranslate"><span class="pre">Scene</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/synth.html#inkmap.synth.default_matrix"><code class="docutils literal notranslate"><span class="pre">default_matrix()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/synth.html#inkmap.synth.degrade"><code class="docutils literal notranslate"><span class="pre">degrade()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/synth.html#inkmap.synth.qr_model"><code class="docutils literal notranslate"><span class="pre">qr_model()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/synth.html#inkmap.synth.render"><code class="docutils literal notranslate"><span class="pre">render()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/types.html">inkmap.types</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/types.html#inkmap.types.InkMap"><code class="docutils literal notranslate"><span class="pre">InkMap</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/types.html#inkmap.types.Placement"><code class="docutils literal notranslate"><span class="pre">Placement</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/types.html#inkmap.types.Polarity"><code class="docutils literal notranslate"><span class="pre">Polarity</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/types.html#inkmap.types.Region"><code class="docutils literal notranslate"><span class="pre">Region</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/inkmap/viz.html">inkmap.viz</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/viz.html#inkmap.viz.REGION_COLORS"><code class="docutils literal notranslate"><span class="pre">REGION_COLORS</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/viz.html#inkmap.viz.colorize_coverage"><code class="docutils literal notranslate"><span class="pre">colorize_coverage()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/viz.html#inkmap.viz.colorize_regions"><code class="docutils literal notranslate"><span class="pre">colorize_regions()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/viz.html#inkmap.viz.overlay"><code class="docutils literal notranslate"><span class="pre">overlay()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/inkmap/viz.html#inkmap.viz.panel"><code class="docutils literal notranslate"><span class="pre">panel()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

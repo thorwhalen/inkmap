@@ -1,0 +1,4 @@
+inkmap.geometry
+===============
+.. automodule:: inkmap.geometry
+   :members:

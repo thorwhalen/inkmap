@@ -1,0 +1,401 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>inkmap &mdash; inkmap 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            inkmap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/inkmap.html">inkmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/inkmap/config.html">inkmap.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/inkmap/coverage.html">inkmap.coverage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/inkmap/data.html">inkmap.data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/inkmap/geometry.html">inkmap.geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/inkmap/locate.html">inkmap.locate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/inkmap/locate/barcode.html">inkmap.locate.barcode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/inkmap/locate/qr.html">inkmap.locate.qr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/inkmap/models.html">inkmap.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/inkmap/models/base.html">inkmap.models.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/inkmap/models/freeform.html">inkmap.models.freeform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/inkmap/models/grid.html">inkmap.models.grid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/inkmap/photometry.html">inkmap.photometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/inkmap/synth.html">inkmap.synth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/inkmap/types.html">inkmap.types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../module_docs/inkmap/viz.html">inkmap.viz</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">inkmap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">inkmap</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for inkmap</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;inkmap -- per-pixel foreground coverage for photographed marks.</span>
+
+<span class="sd">Given a photograph of a printed mark and a *model* of its shape, say for every pixel</span>
+<span class="sd">how much of it is foreground (the mark) and how much is background (the substrate) --</span>
+<span class="sd">as a continuous fraction, not a boolean.</span>
+
+<span class="sd">The model is the seam. QR symbols, barcodes, printed letters and arbitrary artwork all</span>
+<span class="sd">go through one pipeline, because all a model has to do is answer &quot;is this point, in my</span>
+<span class="sd">own coordinate system, foreground?&quot;::</span>
+
+<span class="sd">    import inkmap</span>
+<span class="sd">    from inkmap import models</span>
+
+<span class="sd">    inkmap.find(photo)                                        # auto-detect QR/barcode</span>
+<span class="sd">    inkmap.find(photo, model=models.text_model(&quot;ABC&quot;), quad=q)  # a printed word</span>
+<span class="sd">    inkmap.find(photo, model=models.RasterModel(art), quad=q)   # anything you can draw</span>
+
+<span class="sd">The simplest call::</span>
+
+<span class="sd">    coverage = inkmap.foreground(photo)   # (H, W) float32 in [0, 1]</span>
+
+<span class="sd">With geometry::</span>
+
+<span class="sd">    ink = inkmap.find(photo)              # an InkMap, or None</span>
+<span class="sd">    ink.placement.quad                    # (4, 2) corners -- a quadrilateral, not a</span>
+<span class="sd">                                          # rectangle: perspective is expected</span>
+<span class="sd">    ink.coverage                          # (H, W) float32 area coverage</span>
+<span class="sd">    ink.region                            # OUTSIDE / MARGIN / BACKGROUND / FOREGROUND</span>
+<span class="sd">    ink.weight                            # (H, W) float32 safe-to-measure weighting</span>
+
+<span class="sd">Measuring::</span>
+
+<span class="sd">    mask = inkmap.measurement_mask(ink)   # pure pixels, eroded clear of edges</span>
+<span class="sd">    result = inkmap.measure(photo, ink)</span>
+<span class="sd">    result.contrast                       # foreground minus background, linearised</span>
+<span class="sd">    result.measurability.ok               # False if the image cannot support this</span>
+
+<span class="sd">Terminology</span>
+<span class="sd">-----------</span>
+<span class="sd">The two classes are **foreground** and **background**, never dark and light: dark/light</span>
+<span class="sd">describe appearance, and appearance inverts (white-on-black print, reflectance-reversed</span>
+<span class="sd">symbols, inverted imaging), so an appearance name would mean the mark in one image and</span>
+<span class="sd">the substrate in the next. :class:`Polarity` carries that mapping explicitly. The</span>
+<span class="sd">continuous value is **coverage**, after ISO 12647-2:2013 3.1 *area coverage*. See</span>
+<span class="sd">``docs/terminology.md``.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">coverage</span> <span class="k">as</span> <span class="n">_coverage</span><span class="p">,</span> <span class="n">geometry</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">photometry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.coverage</span><span class="w"> </span><span class="kn">import</span> <span class="n">confidence</span><span class="p">,</span> <span class="n">coverage_map</span><span class="p">,</span> <span class="n">measurement_weight</span><span class="p">,</span> <span class="n">observed_coverage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.locate</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOCATORS</span><span class="p">,</span> <span class="n">locate</span><span class="p">,</span> <span class="n">place</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.photometry</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Measurability</span><span class="p">,</span>
+    <span class="n">Measurement</span><span class="p">,</span>
+    <span class="n">measurability</span><span class="p">,</span>
+    <span class="n">measure</span><span class="p">,</span>
+    <span class="n">measurement_mask</span><span class="p">,</span>
+    <span class="n">srgb_to_linear</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">InkMap</span><span class="p">,</span> <span class="n">Placement</span><span class="p">,</span> <span class="n">Polarity</span><span class="p">,</span> <span class="n">Region</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_version</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the installed version, so it cannot drift from pyproject.toml.&quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">importlib.metadata</span><span class="w"> </span><span class="kn">import</span> <span class="n">PackageNotFoundError</span><span class="p">,</span> <span class="n">version</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">version</span><span class="p">(</span><span class="s2">&quot;inkmap&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">PackageNotFoundError</span><span class="p">:</span>  <span class="c1"># running from a source tree, not installed</span>
+        <span class="k">return</span> <span class="s2">&quot;0.0.0.dev0&quot;</span>
+
+
+<span class="n">__version__</span> <span class="o">=</span> <span class="n">_version</span><span class="p">()</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># facade</span>
+    <span class="s2">&quot;foreground&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;find&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;find_all&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;place&quot;</span><span class="p">,</span>
+    <span class="c1"># types</span>
+    <span class="s2">&quot;InkMap&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Placement&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Region&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Polarity&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Model&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Measurement&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Measurability&quot;</span><span class="p">,</span>
+    <span class="c1"># measurement</span>
+    <span class="s2">&quot;measure&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;measurement_mask&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;measurability&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;srgb_to_linear&quot;</span><span class="p">,</span>
+    <span class="c1"># pieces</span>
+    <span class="s2">&quot;coverage_map&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;observed_coverage&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;confidence&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;measurement_weight&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;locate&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LOCATORS&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;models&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;geometry&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;photometry&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;config&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_as_bgr</span><span class="p">(</span><span class="n">image</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Accept a path, a grayscale array, or a BGR/BGRA array; return BGR uint8.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">image</span><span class="p">),</span> <span class="n">cv2</span><span class="o">.</span><span class="n">IMREAD_COLOR</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">img</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;could not read image: </span><span class="si">{</span><span class="n">image</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">img</span>
+    <span class="k">if</span> <span class="n">image</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_GRAY2BGR</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGRA2BGR</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">image</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">analyze</span><span class="p">(</span>
+    <span class="n">image</span><span class="p">,</span>
+    <span class="n">placements</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">polarity</span><span class="p">:</span> <span class="n">Polarity</span> <span class="o">=</span> <span class="n">Polarity</span><span class="o">.</span><span class="n">FOREGROUND_IS_DARK</span><span class="p">,</span>
+    <span class="n">samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">SUPERSAMPLES</span><span class="p">,</span>
+    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;modelled&quot;</span><span class="p">,</span>
+    <span class="n">refine</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">estimate_blur</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">margin_units</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">MARGIN_UNITS</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">InkMap</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Turn located placements into ink maps. The half of the pipeline after locating.</span>
+
+<span class="sd">    Separated from :func:`find_all` so that a placement obtained any other way -- from</span>
+<span class="sd">    :func:`place`, from your own detector, from a previous run -- gets exactly the same</span>
+<span class="sd">    treatment.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bgr</span> <span class="o">=</span> <span class="n">_as_bgr</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+    <span class="n">gray</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">bgr</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2GRAY</span><span class="p">)</span>
+
+    <span class="n">out</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">InkMap</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">placement</span> <span class="ow">in</span> <span class="n">placements</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">refine</span><span class="p">:</span>
+            <span class="n">placement</span> <span class="o">=</span> <span class="n">_refine</span><span class="p">(</span><span class="n">gray</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span>
+        <span class="n">cov</span> <span class="o">=</span> <span class="n">_coverage_for</span><span class="p">(</span>
+            <span class="n">gray</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">samples</span><span class="o">=</span><span class="n">samples</span><span class="p">,</span> <span class="n">polarity</span><span class="o">=</span><span class="n">polarity</span>
+        <span class="p">)</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">_coverage</span><span class="o">.</span><span class="n">estimate_blur_sigma</span><span class="p">(</span><span class="n">gray</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span> <span class="k">if</span> <span class="n">estimate_blur</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">InkMap</span><span class="p">(</span>
+                <span class="n">coverage</span><span class="o">=</span><span class="n">cov</span><span class="p">,</span>
+                <span class="n">region</span><span class="o">=</span><span class="n">_coverage</span><span class="o">.</span><span class="n">region_map</span><span class="p">(</span><span class="n">placement</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">margin_units</span><span class="o">=</span><span class="n">margin_units</span><span class="p">),</span>
+                <span class="n">placement</span><span class="o">=</span><span class="n">placement</span><span class="p">,</span>
+                <span class="n">polarity</span><span class="o">=</span><span class="n">polarity</span><span class="p">,</span>
+                <span class="n">weight</span><span class="o">=</span><span class="n">_coverage</span><span class="o">.</span><span class="n">measurement_weight</span><span class="p">(</span>
+                    <span class="n">cov</span><span class="p">,</span>
+                    <span class="n">blur_sigma</span><span class="o">=</span><span class="n">sigma</span>
+                    <span class="k">if</span> <span class="n">sigma</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                    <span class="k">else</span> <span class="n">config</span><span class="o">.</span><span class="n">DEFAULT_BLUR_SIGMA</span><span class="p">,</span>
+                    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;foreground&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">blur_sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span>
+
+
+<div class="viewcode-block" id="find_all">
+<a class="viewcode-back" href="../module_docs/inkmap.html#inkmap.find_all">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">find_all</span><span class="p">(</span>
+    <span class="n">image</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Model</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">quad</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">locators</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">DEFAULT_LOCATORS</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">InkMap</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find every mark in ``image`` and compute its foreground coverage.</span>
+
+<span class="sd">    With ``model`` and ``quad``, skips detection entirely and analyses that one</span>
+<span class="sd">    placement -- the path for marks no detector knows about. With neither, runs the</span>
+<span class="sd">    locator cascade (QR and linear barcodes out of the box).</span>
+
+<span class="sd">    ``refine`` (default on) aligns the rendered model to the photograph, pinning the</span>
+<span class="sd">    transform to sub-pixel accuracy; it is far more accurate than locator corners alone</span>
+<span class="sd">    and costs a few milliseconds.</span>
+
+<span class="sd">    ``source`` picks where coverage comes from: ``&quot;modelled&quot;`` (default) computes it</span>
+<span class="sd">    from the model -- exact and lighting-independent, answering &quot;where should the</span>
+<span class="sd">    foreground be&quot;. ``&quot;observed&quot;`` reads it from the photograph, answering &quot;where is</span>
+<span class="sd">    the foreground actually&quot;, and so is the one that can see a printing defect.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">quad</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;pass quad= alongside model= (four image points, model&#39;s corner order); &quot;</span>
+                <span class="s2">&quot;use inkmap.place() directly if you want the Placement itself&quot;</span>
+            <span class="p">)</span>
+        <span class="n">placements</span> <span class="o">=</span> <span class="p">[</span><span class="n">place</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">quad</span><span class="p">)]</span>
+    <span class="k">elif</span> <span class="n">quad</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;quad= needs model=&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">bgr</span> <span class="o">=</span> <span class="n">_as_bgr</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+        <span class="n">gray</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">bgr</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2GRAY</span><span class="p">)</span>
+        <span class="n">placements</span> <span class="o">=</span> <span class="n">locate</span><span class="p">(</span><span class="n">bgr</span><span class="p">,</span> <span class="n">gray</span><span class="p">,</span> <span class="n">locators</span><span class="o">=</span><span class="n">locators</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">analyze</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="find">
+<a class="viewcode-back" href="../module_docs/inkmap.html#inkmap.find">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">find</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InkMap</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The largest mark in ``image``, or ``None``. See :func:`find_all`.&quot;&quot;&quot;</span>
+    <span class="n">maps</span> <span class="o">=</span> <span class="n">find_all</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">maps</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">maps</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">m</span><span class="p">:</span> <span class="n">cv2</span><span class="o">.</span><span class="n">contourArea</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">placement</span><span class="o">.</span><span class="n">quad</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)))</span></div>
+
+
+
+<div class="viewcode-block" id="foreground">
+<a class="viewcode-back" href="../module_docs/inkmap.html#inkmap.foreground">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">foreground</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Foreground coverage of the largest mark, ``(H, W) float32`` in ``[0, 1]``.</span>
+
+<span class="sd">    All-zero if nothing is found -- the one-liner never raises on a miss, so it can be</span>
+<span class="sd">    mapped over a directory. Use :func:`find` to tell &quot;no mark&quot; from &quot;a mark with no</span>
+<span class="sd">    foreground&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ink</span> <span class="o">=</span> <span class="n">find</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ink</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">_as_bgr</span><span class="p">(</span><span class="n">image</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ink</span><span class="o">.</span><span class="n">coverage</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_refine</span><span class="p">(</span><span class="n">gray</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">placement</span><span class="p">:</span> <span class="n">Placement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Placement</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sub-pixel-refine a placement&#39;s transform, keeping the original on failure.&quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">replace</span>
+
+    <span class="n">transform</span><span class="p">,</span> <span class="n">score</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">refine_transform</span><span class="p">(</span>
+        <span class="n">gray</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">transform</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">replace</span><span class="p">(</span>
+        <span class="n">placement</span><span class="p">,</span>
+        <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
+        <span class="n">quad</span><span class="o">=</span><span class="n">geometry</span><span class="o">.</span><span class="n">transform_to_quad</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+        <span class="n">refined</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">score</span><span class="p">)</span> <span class="ow">and</span> <span class="n">score</span> <span class="o">&gt;=</span> <span class="n">config</span><span class="o">.</span><span class="n">ECC_MIN_CORRELATION</span><span class="p">),</span>
+        <span class="n">score</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">score</span><span class="p">)</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">score</span><span class="p">),</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_coverage_for</span><span class="p">(</span>
+    <span class="n">gray</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">placement</span><span class="p">:</span> <span class="n">Placement</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">polarity</span><span class="p">:</span> <span class="n">Polarity</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">source</span> <span class="o">==</span> <span class="s2">&quot;modelled&quot;</span><span class="p">:</span>
+        <span class="n">cov</span> <span class="o">=</span> <span class="n">coverage_map</span><span class="p">(</span>
+            <span class="n">placement</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span> <span class="n">gray</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">samples</span><span class="o">=</span><span class="n">samples</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">polarity</span> <span class="ow">is</span> <span class="n">Polarity</span><span class="o">.</span><span class="n">FOREGROUND_IS_LIGHT</span><span class="p">:</span>
+            <span class="n">inside</span> <span class="o">=</span> <span class="n">_coverage</span><span class="o">.</span><span class="n">_inside</span><span class="p">(</span><span class="n">placement</span><span class="p">,</span> <span class="n">gray</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">inside</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">cov</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cov</span>
+    <span class="k">if</span> <span class="n">source</span> <span class="o">==</span> <span class="s2">&quot;observed&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">observed_coverage</span><span class="p">(</span><span class="n">gray</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">polarity</span><span class="o">=</span><span class="n">polarity</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;source must be &#39;modelled&#39; or &#39;observed&#39;, got </span><span class="si">{</span><span class="n">source</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

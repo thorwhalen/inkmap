@@ -1,0 +1,20 @@
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   module_docs/inkmap
+   module_docs/inkmap/config
+   module_docs/inkmap/coverage
+   module_docs/inkmap/data
+   module_docs/inkmap/geometry
+   module_docs/inkmap/locate
+   module_docs/inkmap/locate/barcode
+   module_docs/inkmap/locate/qr
+   module_docs/inkmap/models
+   module_docs/inkmap/models/base
+   module_docs/inkmap/models/freeform
+   module_docs/inkmap/models/grid
+   module_docs/inkmap/photometry
+   module_docs/inkmap/synth
+   module_docs/inkmap/types
+   module_docs/inkmap/viz

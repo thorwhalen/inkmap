@@ -1,0 +1,4 @@
+inkmap.synth
+============
+.. automodule:: inkmap.synth
+   :members:

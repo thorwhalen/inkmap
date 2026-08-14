@@ -1,0 +1,209 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>inkmap.locate &mdash; inkmap 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="inkmap.locate.barcode" href="locate/barcode.html" />
+    <link rel="prev" title="inkmap.geometry" href="geometry.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            inkmap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../inkmap.html">inkmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">inkmap.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coverage.html">inkmap.coverage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data.html">inkmap.data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">inkmap.geometry</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">inkmap.locate</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#inkmap.locate.LOCATORS"><code class="docutils literal notranslate"><span class="pre">LOCATORS</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inkmap.locate.locate"><code class="docutils literal notranslate"><span class="pre">locate()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inkmap.locate.locate_barcode_zxing"><code class="docutils literal notranslate"><span class="pre">locate_barcode_zxing()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inkmap.locate.locate_qr_aruco"><code class="docutils literal notranslate"><span class="pre">locate_qr_aruco()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inkmap.locate.locate_qr_opencv"><code class="docutils literal notranslate"><span class="pre">locate_qr_opencv()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inkmap.locate.locate_qr_zxing"><code class="docutils literal notranslate"><span class="pre">locate_qr_zxing()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inkmap.locate.place"><code class="docutils literal notranslate"><span class="pre">place()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="locate/barcode.html">inkmap.locate.barcode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="locate/qr.html">inkmap.locate.qr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">inkmap.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models/base.html">inkmap.models.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models/freeform.html">inkmap.models.freeform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models/grid.html">inkmap.models.grid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="photometry.html">inkmap.photometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="synth.html">inkmap.synth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="types.html">inkmap.types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="viz.html">inkmap.viz</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">inkmap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">inkmap.locate</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/module_docs/inkmap/locate.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-inkmap.locate">
+<span id="inkmap-locate"></span><h1>inkmap.locate<a class="headerlink" href="#module-inkmap.locate" title="Link to this heading"></a></h1>
+<p>Locators: finding where a model sits in an image.</p>
+<p>A locator is a plain function <code class="docutils literal notranslate"><span class="pre">(bgr,</span> <span class="pre">gray)</span> <span class="pre">-&gt;</span> <span class="pre">list[Placement]</span></code>, so registering your
+own needs no subclassing:</p>
+<blockquote>
+<div><p>from inkmap import locate</p>
+<p>locate.LOCATORS[“mine”] = my_locator
+inkmap.find_all(photo, locators=[“mine”, “qr_zxing”])</p>
+</div></blockquote>
+<p>For the many cases where the mark cannot be auto-detected – a letter, a logo, a shape
+with no decoder in the world – <a class="reference internal" href="#inkmap.locate.place" title="inkmap.locate.place"><code class="xref py py-func docutils literal notranslate"><span class="pre">place()</span></code></a> is the universal entry point: you supply
+the model and where its corners are, and the rest of the package proceeds identically.
+That is the seam that makes this work for “anything the user provides a model for”.</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.locate.LOCATORS">
+<span class="sig-prename descclassname"><span class="pre">inkmap.locate.</span></span><span class="sig-name descname"><span class="pre">LOCATORS</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="types.html#inkmap.types.Placement" title="inkmap.types.Placement"><span class="pre">Placement</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'barcode_zxing':</span> <span class="pre">&lt;function</span> <span class="pre">locate_barcode_zxing&gt;,</span> <span class="pre">'qr_aruco':</span> <span class="pre">&lt;function</span> <span class="pre">locate_qr_aruco&gt;,</span> <span class="pre">'qr_opencv':</span> <span class="pre">&lt;function</span> <span class="pre">locate_qr_opencv&gt;,</span> <span class="pre">'qr_zxing':</span> <span class="pre">&lt;function</span> <span class="pre">locate_qr_zxing&gt;}</span></span><a class="headerlink" href="#inkmap.locate.LOCATORS" title="Link to this definition"></a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">LOCATORS[&quot;mine&quot;]</span> <span class="pre">=</span> <span class="pre">my_locator</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Registry of locator strategies. Add your own</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.locate.locate">
+<span class="sig-prename descclassname"><span class="pre">inkmap.locate.</span></span><span class="sig-name descname"><span class="pre">locate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bgr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gray</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">locators</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="types.html#inkmap.types.Placement" title="inkmap.types.Placement"><span class="pre">Placement</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">('qr_zxing',</span> <span class="pre">'qr_aruco',</span> <span class="pre">'qr_opencv',</span> <span class="pre">'barcode_zxing')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_hit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="types.html#inkmap.types.Placement" title="inkmap.types.Placement"><span class="pre">Placement</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/inkmap/locate.html#locate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.locate.locate" title="Link to this definition"></a></dt>
+<dd><p>Run locator strategies and merge their results, de-duplicating by position.</p>
+<p>Strategies are tried in order. With <code class="docutils literal notranslate"><span class="pre">first_hit=True</span></code> the cascade stops at the
+first strategy that finds anything – cheaper, and usually right when you know there
+is one mark. Otherwise every strategy runs and results merge, which is what earns
+the recall when an image holds several marks that no single detector finds all of.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.locate.locate_barcode_zxing">
+<span class="sig-prename descclassname"><span class="pre">inkmap.locate.</span></span><span class="sig-name descname"><span class="pre">locate_barcode_zxing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bgr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gray</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="types.html#inkmap.types.Placement" title="inkmap.types.Placement"><span class="pre">Placement</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/inkmap/locate/barcode.html#locate_barcode_zxing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.locate.locate_barcode_zxing" title="Link to this definition"></a></dt>
+<dd><p>Locate linear barcodes with zxing-cpp and model their bar pattern.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.locate.locate_qr_aruco">
+<span class="sig-prename descclassname"><span class="pre">inkmap.locate.</span></span><span class="sig-name descname"><span class="pre">locate_qr_aruco</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bgr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gray</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="types.html#inkmap.types.Placement" title="inkmap.types.Placement"><span class="pre">Placement</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/inkmap/locate/qr.html#locate_qr_aruco"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.locate.locate_qr_aruco" title="Link to this definition"></a></dt>
+<dd><p>OpenCV’s <code class="docutils literal notranslate"><span class="pre">QRCodeDetectorAruco</span></code> – finds the finder patterns as Aruco-like
+markers. Notably more robust than the classic detector on real photographs.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.locate.locate_qr_opencv">
+<span class="sig-prename descclassname"><span class="pre">inkmap.locate.</span></span><span class="sig-name descname"><span class="pre">locate_qr_opencv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bgr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gray</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="types.html#inkmap.types.Placement" title="inkmap.types.Placement"><span class="pre">Placement</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/inkmap/locate/qr.html#locate_qr_opencv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.locate.locate_qr_opencv" title="Link to this definition"></a></dt>
+<dd><p>OpenCV’s classic <code class="docutils literal notranslate"><span class="pre">QRCodeDetector</span></code>. Corners are inclusive pixel indices.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.locate.locate_qr_zxing">
+<span class="sig-prename descclassname"><span class="pre">inkmap.locate.</span></span><span class="sig-name descname"><span class="pre">locate_qr_zxing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bgr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gray</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="types.html#inkmap.types.Placement" title="inkmap.types.Placement"><span class="pre">Placement</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/inkmap/locate/qr.html#locate_qr_zxing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.locate.locate_qr_zxing" title="Link to this definition"></a></dt>
+<dd><p>zxing-cpp. Highest recall of the three, and its corners are the continuous outer
+boundary (spanning exactly <code class="docutils literal notranslate"><span class="pre">N</span> <span class="pre">*</span> <span class="pre">scale</span></code>), not inclusive pixel indices.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.locate.place">
+<span class="sig-prename descclassname"><span class="pre">inkmap.locate.</span></span><span class="sig-name descname"><span class="pre">place</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="models/base.html#inkmap.models.base.Model" title="inkmap.models.base.Model"><span class="pre">Model</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">quad</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">inclusive_pixel_corners</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'manual'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">metadata</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="types.html#inkmap.types.Placement" title="inkmap.types.Placement"><span class="pre">Placement</span></a></span></span><a class="reference internal" href="../../_modules/inkmap/locate.html#place"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.locate.place" title="Link to this definition"></a></dt>
+<dd><p>Place a model at a known quadrilateral – the universal escape hatch.</p>
+<p><code class="docutils literal notranslate"><span class="pre">quad</span></code> is four <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> image points in the <em>model’s</em> own corner order: the
+point corresponding to model-space <code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">0)</span></code> first, then clockwise. Order matters
+and is not inferred: sorting corners by image position silently mislabels them once
+the mark is rotated past 45 degrees.</p>
+<p>Use this for anything without a decoder – printed letters, logos, engraved marks –
+or when you already know where the mark is and only want the coverage machinery.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="geometry.html" class="btn btn-neutral float-left" title="inkmap.geometry" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="locate/barcode.html" class="btn btn-neutral float-right" title="inkmap.locate.barcode" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

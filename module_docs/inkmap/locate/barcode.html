@@ -1,0 +1,159 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>inkmap.locate.barcode &mdash; inkmap 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="inkmap.locate.qr" href="qr.html" />
+    <link rel="prev" title="inkmap.locate" href="../locate.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            inkmap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../inkmap.html">inkmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config.html">inkmap.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../coverage.html">inkmap.coverage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data.html">inkmap.data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry.html">inkmap.geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../locate.html">inkmap.locate</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">inkmap.locate.barcode</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#inkmap.locate.barcode.locate_barcode_zxing"><code class="docutils literal notranslate"><span class="pre">locate_barcode_zxing()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inkmap.locate.barcode.profile_to_bars"><code class="docutils literal notranslate"><span class="pre">profile_to_bars()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="qr.html">inkmap.locate.qr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">inkmap.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models/base.html">inkmap.models.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models/freeform.html">inkmap.models.freeform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models/grid.html">inkmap.models.grid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../photometry.html">inkmap.photometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../synth.html">inkmap.synth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../types.html">inkmap.types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../viz.html">inkmap.viz</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">inkmap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">inkmap.locate.barcode</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/module_docs/inkmap/locate/barcode.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-inkmap.locate.barcode">
+<span id="inkmap-locate-barcode"></span><h1>inkmap.locate.barcode<a class="headerlink" href="#module-inkmap.locate.barcode" title="Link to this heading"></a></h1>
+<p>Locating linear (1-D) barcodes.</p>
+<p>Geometry comes from zxing-cpp, which handles EAN-13/8, UPC-A/E, Code 128, Code 39,
+Code 93, ITF, Codabar and DataBar. The <em>bar pattern</em> is then read off the image rather
+than re-encoded from the decoded text, for the same reason as QR: encoders make choices
+(Code 128 code-set switching, check-digit placement, ITF padding) that the decoded
+string does not pin down, so re-encoding can silently produce a different pattern.</p>
+<p>Reading it from the image needs the module width – the narrowest bar. That is
+estimated from the run lengths of the thresholded profile, which is what a real decoder
+does, and it is the one number that turns a picture of stripes into a model.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.locate.barcode.locate_barcode_zxing">
+<span class="sig-prename descclassname"><span class="pre">inkmap.locate.barcode.</span></span><span class="sig-name descname"><span class="pre">locate_barcode_zxing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bgr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gray</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../types.html#inkmap.types.Placement" title="inkmap.types.Placement"><span class="pre">Placement</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../_modules/inkmap/locate/barcode.html#locate_barcode_zxing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.locate.barcode.locate_barcode_zxing" title="Link to this definition"></a></dt>
+<dd><p>Locate linear barcodes with zxing-cpp and model their bar pattern.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.locate.barcode.profile_to_bars">
+<span class="sig-prename descclassname"><span class="pre">inkmap.locate.barcode.</span></span><span class="sig-name descname"><span class="pre">profile_to_bars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../../../_modules/inkmap/locate/barcode.html#profile_to_bars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.locate.barcode.profile_to_bars" title="Link to this definition"></a></dt>
+<dd><p>Quantise a 1-D profile into a bar pattern.</p>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">(bars,</span> <span class="pre">module_px)</span></code> where <code class="docutils literal notranslate"><span class="pre">bars</span></code> is boolean over module positions and
+<code class="docutils literal notranslate"><span class="pre">module_px</span></code> is the estimated narrowest-bar width in profile samples. Thresholds at
+the midpoint of the profile’s range, per ISO/IEC 15416 3.5, then takes the module
+width as a low percentile of run lengths – low rather than the minimum, because a
+single noisy sample creates a spurious one-sample run.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../locate.html" class="btn btn-neutral float-left" title="inkmap.locate" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qr.html" class="btn btn-neutral float-right" title="inkmap.locate.qr" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

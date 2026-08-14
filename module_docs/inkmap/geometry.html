@@ -1,0 +1,226 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>inkmap.geometry &mdash; inkmap 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="inkmap.locate" href="locate.html" />
+    <link rel="prev" title="inkmap.data" href="data.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            inkmap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../inkmap.html">inkmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">inkmap.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coverage.html">inkmap.coverage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data.html">inkmap.data</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">inkmap.geometry</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#inkmap.geometry.cell_centers"><code class="docutils literal notranslate"><span class="pre">cell_centers()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inkmap.geometry.margin_quad"><code class="docutils literal notranslate"><span class="pre">margin_quad()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inkmap.geometry.model_quad"><code class="docutils literal notranslate"><span class="pre">model_quad()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inkmap.geometry.pixels_per_unit"><code class="docutils literal notranslate"><span class="pre">pixels_per_unit()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inkmap.geometry.quad_to_transform"><code class="docutils literal notranslate"><span class="pre">quad_to_transform()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inkmap.geometry.refine_transform"><code class="docutils literal notranslate"><span class="pre">refine_transform()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inkmap.geometry.transform_to_quad"><code class="docutils literal notranslate"><span class="pre">transform_to_quad()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="locate.html">inkmap.locate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="locate/barcode.html">inkmap.locate.barcode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="locate/qr.html">inkmap.locate.qr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">inkmap.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models/base.html">inkmap.models.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models/freeform.html">inkmap.models.freeform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models/grid.html">inkmap.models.grid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="photometry.html">inkmap.photometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="synth.html">inkmap.synth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="types.html">inkmap.types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="viz.html">inkmap.viz</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">inkmap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">inkmap.geometry</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/module_docs/inkmap/geometry.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-inkmap.geometry">
+<span id="inkmap-geometry"></span><h1>inkmap.geometry<a class="headerlink" href="#module-inkmap.geometry" title="Link to this heading"></a></h1>
+<p>Model space &lt;-&gt; image space: transforms, and refining them against the photograph.</p>
+<p>The central object is a homography mapping <em>model coordinates</em> to image pixels. Get it
+right and every mask, sample and margin polygon follows exactly. Get it wrong by a
+pixel and every downstream number inherits the error, while the mask still looks
+plausible.</p>
+<p>Three half-pixel conventions have to agree, and each is invisible on inspection:</p>
+<ol class="arabic simple">
+<li><p><strong>Pixel centre vs pixel corner.</strong> OpenCV treats integer coordinate <code class="docutils literal notranslate"><span class="pre">x</span></code> as the
+<em>centre</em> of a pixel spanning <code class="docutils literal notranslate"><span class="pre">[x-0.5,</span> <span class="pre">x+0.5)</span></code>. Rasterising <code class="docutils literal notranslate"><span class="pre">[x,</span> <span class="pre">x+1)</span></code> instead –
+the natural array-indexing reading – offsets the entire coverage map by half a
+pixel.</p></li>
+<li><p><strong>The template raster.</strong> A model rendered at <code class="docutils literal notranslate"><span class="pre">s</span></code> px per unit puts template pixel
+<code class="docutils literal notranslate"><span class="pre">t</span></code> over <code class="docutils literal notranslate"><span class="pre">[t/s,</span> <span class="pre">(t+1)/s)</span></code> in model units, so its <em>centre</em> is <code class="docutils literal notranslate"><span class="pre">(t+0.5)/s</span></code>.
+Omitting that half-pixel puts a fixed ~0.7 px bias into every refinement.</p></li>
+<li><p><strong>Detector corner conventions differ.</strong> OpenCV’s QR corners are the integer index of
+the last <em>contained</em> pixel; zxing-cpp returns the continuous outer boundary. Measured
+directly, not read from docs – hence <code class="docutils literal notranslate"><span class="pre">inclusive_pixel_corners</span></code>.</p></li>
+</ol>
+<p>A symptom worth recognising: if refinement error grows with the mark’s rotation angle
+in the pattern <code class="docutils literal notranslate"><span class="pre">R(d)</span> <span class="pre">-</span> <span class="pre">d</span></code>, the residual <code class="docutils literal notranslate"><span class="pre">d</span></code> is a coordinate-convention offset, not
+noise.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.geometry.cell_centers">
+<span class="sig-prename descclassname"><span class="pre">inkmap.geometry.</span></span><span class="sig-name descname"><span class="pre">cell_centers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../../_modules/inkmap/geometry.html#cell_centers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.geometry.cell_centers" title="Link to this definition"></a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">(n_rows,</span> <span class="pre">n_cols,</span> <span class="pre">2)</span></code> image coordinates of unit-cell centres.</p>
+<p>Meaningful for grid models. ISO/IEC 18004’s reference decode algorithm samples a
+small area at each grid intersection – deliberately avoiding edges rather than
+modelling them – and this is where to do the same.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.geometry.margin_quad">
+<span class="sig-prename descclassname"><span class="pre">inkmap.geometry.</span></span><span class="sig-name descname"><span class="pre">margin_quad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="models/base.html#inkmap.models.base.Model" title="inkmap.models.base.Model"><span class="pre">Model</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../../_modules/inkmap/geometry.html#margin_quad"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.geometry.margin_quad" title="Link to this definition"></a></dt>
+<dd><p>Image-space quad of the model plus a clear margin of <code class="docutils literal notranslate"><span class="pre">units</span></code> model units.</p>
+<p>ISO/IEC 18004 mandates a 4-module quiet zone for QR; linear symbologies specify
+light margins; printed text has its own whitespace. The margin is guaranteed
+background, which makes it a reference region that – unlike background <em>inside</em>
+the mark – carries no risk of spread from adjacent foreground.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.geometry.model_quad">
+<span class="sig-prename descclassname"><span class="pre">inkmap.geometry.</span></span><span class="sig-name descname"><span class="pre">model_quad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="models/base.html#inkmap.models.base.Model" title="inkmap.models.base.Model"><span class="pre">Model</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../../_modules/inkmap/geometry.html#model_quad"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.geometry.model_quad" title="Link to this definition"></a></dt>
+<dd><p>The model’s four extent corners in model coordinates, top-left first.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.geometry.pixels_per_unit">
+<span class="sig-prename descclassname"><span class="pre">inkmap.geometry.</span></span><span class="sig-name descname"><span class="pre">pixels_per_unit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="models/base.html#inkmap.models.base.Model" title="inkmap.models.base.Model"><span class="pre">Model</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../../_modules/inkmap/geometry.html#pixels_per_unit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.geometry.pixels_per_unit" title="Link to this definition"></a></dt>
+<dd><p>Mean image pixels per model unit implied by a transform.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.geometry.quad_to_transform">
+<span class="sig-prename descclassname"><span class="pre">inkmap.geometry.</span></span><span class="sig-name descname"><span class="pre">quad_to_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quad</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="models/base.html#inkmap.models.base.Model" title="inkmap.models.base.Model"><span class="pre">Model</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">inclusive_pixel_corners</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../../_modules/inkmap/geometry.html#quad_to_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.geometry.quad_to_transform" title="Link to this definition"></a></dt>
+<dd><p>Homography mapping model coordinates onto an image quad.</p>
+<p><code class="docutils literal notranslate"><span class="pre">quad</span></code> must be in the <em>model’s</em> own corner order (its top-left first), which is
+what the locators natively produce – do not re-sort it.</p>
+<p>Set <code class="docutils literal notranslate"><span class="pre">inclusive_pixel_corners=True</span></code> for detectors whose corners are the integer
+index of the last contained pixel rather than the continuous outer edge. The quad
+is then expanded half a pixel outward, removing a systematic one-pixel scale error
+– which is a third of a unit at 3 px per unit.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.geometry.refine_transform">
+<span class="sig-prename descclassname"><span class="pre">inkmap.geometry.</span></span><span class="sig-name descname"><span class="pre">refine_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gray</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="models/base.html#inkmap.models.base.Model" title="inkmap.models.base.Model"><span class="pre">Model</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-07</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blur_frac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_correlation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">margin_units</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/inkmap/geometry.html#refine_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.geometry.refine_transform" title="Link to this definition"></a></dt>
+<dd><p>Refine a model-&gt;image transform by ECC-aligning the rendered model.</p>
+<p>Four detector corners are four observations; the model’s whole shape is thousands.
+Aligning the rendered pattern therefore pins the 8-DoF homography far more tightly
+– measured at 0.02-0.03 px corner RMS versus ~1 px from detector corners.</p>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">(transform,</span> <span class="pre">correlation)</span></code>, falling back to the input unchanged when the
+optimiser fails or the correlation lands below <code class="docutils literal notranslate"><span class="pre">min_correlation</span></code> – a refinement
+that did not converge is worse than none.</p>
+<p>Two details do most of the work. The template is rendered at the <em>observed</em> scale;
+rendering at a fixed small scale aliases the comparison and makes the result
+measurably worse than no refinement at all. And the template carries a clear margin,
+because blurring a template that stops at the mark’s edge makes the kernel reflect
+interior content back across the border, inventing an edge profile the photograph
+does not have – ECC then shifts the whole fit to match the artefact.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.geometry.transform_to_quad">
+<span class="sig-prename descclassname"><span class="pre">inkmap.geometry.</span></span><span class="sig-name descname"><span class="pre">transform_to_quad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="models/base.html#inkmap.models.base.Model" title="inkmap.models.base.Model"><span class="pre">Model</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../../_modules/inkmap/geometry.html#transform_to_quad"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.geometry.transform_to_quad" title="Link to this definition"></a></dt>
+<dd><p>Image-space corners implied by a transform, in model order.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="data.html" class="btn btn-neutral float-left" title="inkmap.data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="locate.html" class="btn btn-neutral float-right" title="inkmap.locate" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

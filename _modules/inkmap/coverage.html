@@ -1,0 +1,483 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>inkmap.coverage &mdash; inkmap 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            inkmap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap.html">inkmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/config.html">inkmap.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/coverage.html">inkmap.coverage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/data.html">inkmap.data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/geometry.html">inkmap.geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/locate.html">inkmap.locate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/locate/barcode.html">inkmap.locate.barcode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/locate/qr.html">inkmap.locate.qr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/models.html">inkmap.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/models/base.html">inkmap.models.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/models/freeform.html">inkmap.models.freeform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/models/grid.html">inkmap.models.grid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/photometry.html">inkmap.photometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/synth.html">inkmap.synth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/types.html">inkmap.types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/viz.html">inkmap.viz</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">inkmap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../inkmap.html">inkmap</a></li>
+      <li class="breadcrumb-item active">inkmap.coverage</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for inkmap.coverage</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Per-pixel foreground coverage: the 0..1 value, and which one you want.</span>
+
+<span class="sd">Three different 0..1 quantities get conflated by &quot;how foreground is this pixel&quot;. They</span>
+<span class="sd">answer different questions, and mixing them produces numbers that mean nothing:</span>
+
+<span class="sd">**Coverage** (:func:`coverage_map`, :func:`observed_coverage`) is *physical*: the</span>
+<span class="sd">fraction of the pixel&#39;s area lying under foreground. ISO 12647-2:2013 3.1 calls this</span>
+<span class="sd">**area coverage**. A pixel straddling a mark&#39;s edge genuinely is 0.37 foreground. The</span>
+<span class="sd">same quantity is the matting **alpha** (identical, for opaque marks), the</span>
+<span class="sd">remote-sensing **fractional abundance** of an endmember in a **mixed pixel**, and the</span>
+<span class="sd">medical-imaging **partial volume fraction**.</span>
+
+<span class="sd">**Confidence** (:func:`confidence`) is *epistemic*: how sure we are of the label. This</span>
+<span class="sd">is what the user&#39;s &quot;probability that the pixel is foreground&quot; means when the underlying</span>
+<span class="sd">reality is genuinely binary. A pixel deep inside a mark has coverage 1.0 and confidence</span>
+<span class="sd">1.0; one in a blown-out highlight may have modelled coverage 1.0 and confidence near 0.</span>
+
+<span class="sd">**Weight** (:func:`measurement_weight`) is *operational*: how safe the pixel is to</span>
+<span class="sd">measure, given that blur spreads signal across boundaries. It is the only one that</span>
+<span class="sd">should gate a physical measurement.</span>
+
+<span class="sd">Two routes to coverage</span>
+<span class="sd">----------------------</span>
+<span class="sd">*Modelled* (:func:`coverage_map`): the shape is known, so back-project a supersampled</span>
+<span class="sd">grid of each pixel through the transform and ask the model. Exact up to the</span>
+<span class="sd">supersampling rate, immune to lighting, and the right default. It answers &quot;where should</span>
+<span class="sd">the foreground be&quot;.</span>
+
+<span class="sd">*Observed* (:func:`observed_coverage`): normalise the photograph between a background</span>
+<span class="sd">endpoint and a solid-foreground endpoint. This is the Murray-Davies inversion, and it</span>
+<span class="sd">answers &quot;where is the foreground actually&quot; -- so it is the one that can see a printing</span>
+<span class="sd">defect. It returns an *apparent* (optical) coverage, inflated relative to geometric</span>
+<span class="sd">coverage by lateral light scattering in the substrate (the Yule-Nielsen effect), which</span>
+<span class="sd">is why the two routes disagree.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">geometry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Placement</span><span class="p">,</span> <span class="n">Polarity</span><span class="p">,</span> <span class="n">Region</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;coverage_map&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;observed_coverage&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;confidence&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;measurement_weight&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;region_map&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;estimate_blur_sigma&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+<span class="c1"># Modelled coverage</span>
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+
+
+<div class="viewcode-block" id="coverage_map">
+<a class="viewcode-back" href="../../module_docs/inkmap/coverage.html#inkmap.coverage_map">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">coverage_map</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Model</span><span class="p">,</span>
+    <span class="n">transform</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">image_shape</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">SUPERSAMPLES</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Area fraction of each pixel covered by the model&#39;s foreground, in ``[0, 1]``.</span>
+
+<span class="sd">    Each pixel is probed at ``samples**2`` sub-positions on a regular grid at sub-pixel</span>
+<span class="sd">    centres; each probe is back-projected into model coordinates and passed to</span>
+<span class="sd">    :meth:`Model.occupancy`. The mean is the covered area fraction -- ordinary</span>
+<span class="sd">    supersampled area coverage, the same quantity a renderer&#39;s anti-aliasing computes.</span>
+
+<span class="sd">    Values are quantised to ``1/samples**2``, so ``samples`` sets the accuracy floor.</span>
+<span class="sd">    Only the model&#39;s bounding box is evaluated, so a mark occupying 2% of a 12 MP photo</span>
+<span class="sd">    costs 2% of the work.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">image_shape</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="n">bounding_box</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">transform</span><span class="p">,</span> <span class="n">image_shape</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">x1</span> <span class="o">&lt;=</span> <span class="n">x0</span> <span class="ow">or</span> <span class="n">y1</span> <span class="o">&lt;=</span> <span class="n">y0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="n">inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">))</span>
+    <span class="c1"># Pixel-centre convention: integer coordinate x is the CENTRE of a pixel spanning</span>
+    <span class="c1"># [x-0.5, x+0.5). Sampling [x, x+1) instead offsets the whole map half a pixel.</span>
+    <span class="n">offsets</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">/</span> <span class="n">samples</span> <span class="o">-</span> <span class="mf">0.5</span>
+    <span class="n">ys</span><span class="p">,</span> <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="n">y0</span><span class="p">:</span><span class="n">y1</span><span class="p">,</span> <span class="n">x0</span><span class="p">:</span><span class="n">x1</span><span class="p">]</span>
+    <span class="n">xs</span> <span class="o">=</span> <span class="n">xs</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="n">ys</span> <span class="o">=</span> <span class="n">ys</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+
+    <span class="n">dxs</span><span class="p">,</span> <span class="n">dys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">offsets</span><span class="p">,</span> <span class="n">offsets</span><span class="p">)</span>
+    <span class="n">px</span> <span class="o">=</span> <span class="n">xs</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">dxs</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[:,</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">py</span> <span class="o">=</span> <span class="n">ys</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">dys</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[:,</span> <span class="kc">None</span><span class="p">]</span>
+
+    <span class="n">denom</span> <span class="o">=</span> <span class="n">inv</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">px</span> <span class="o">+</span> <span class="n">inv</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">py</span> <span class="o">+</span> <span class="n">inv</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">):</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="p">(</span><span class="n">inv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">px</span> <span class="o">+</span> <span class="n">inv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">py</span> <span class="o">+</span> <span class="n">inv</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="n">denom</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="p">(</span><span class="n">inv</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">px</span> <span class="o">+</span> <span class="n">inv</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">py</span> <span class="o">+</span> <span class="n">inv</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="n">denom</span>
+
+    <span class="n">hits</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">occupancy</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">out</span><span class="p">[</span><span class="n">y0</span><span class="p">:</span><span class="n">y1</span><span class="p">,</span> <span class="n">x0</span><span class="p">:</span><span class="n">x1</span><span class="p">]</span> <span class="o">=</span> <span class="n">hits</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y0</span><span class="p">,</span> <span class="n">x1</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">bounding_box</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Model</span><span class="p">,</span> <span class="n">transform</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">image_shape</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pixel bounding box ``(x0, y0, x1, y1)`` of the model, clipped to the image.&quot;&quot;&quot;</span>
+    <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">image_shape</span>
+    <span class="n">corners</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">transform_to_quad</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+    <span class="n">x0</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">corners</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">())))</span>
+    <span class="n">x1</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">corners</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">y0</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">corners</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">())))</span>
+    <span class="n">y1</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">corners</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span>
+
+
+<div class="viewcode-block" id="region_map">
+<a class="viewcode-back" href="../../module_docs/inkmap/coverage.html#inkmap.region_map">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">region_map</span><span class="p">(</span>
+    <span class="n">placement</span><span class="p">:</span> <span class="n">Placement</span><span class="p">,</span>
+    <span class="n">coverage</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">margin_units</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">MARGIN_UNITS</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Four-way :class:`Region` label array from a coverage map and a placement.&quot;&quot;&quot;</span>
+    <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">coverage</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">),</span> <span class="n">Region</span><span class="o">.</span><span class="n">OUTSIDE</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">margin_units</span><span class="p">:</span>
+        <span class="n">_fill</span><span class="p">(</span>
+            <span class="n">out</span><span class="p">,</span>
+            <span class="n">geometry</span><span class="o">.</span><span class="n">margin_quad</span><span class="p">(</span>
+                <span class="n">placement</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="n">margin_units</span>
+            <span class="p">),</span>
+            <span class="n">Region</span><span class="o">.</span><span class="n">MARGIN</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="n">_fill</span><span class="p">(</span>
+        <span class="n">out</span><span class="p">,</span>
+        <span class="n">geometry</span><span class="o">.</span><span class="n">transform_to_quad</span><span class="p">(</span><span class="n">placement</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">model</span><span class="p">),</span>
+        <span class="n">Region</span><span class="o">.</span><span class="n">BACKGROUND</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">inside</span> <span class="o">=</span> <span class="n">out</span> <span class="o">==</span> <span class="n">Region</span><span class="o">.</span><span class="n">BACKGROUND</span>
+    <span class="n">out</span><span class="p">[</span><span class="n">inside</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">coverage</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="p">)]</span> <span class="o">=</span> <span class="n">Region</span><span class="o">.</span><span class="n">FOREGROUND</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_fill</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">quad</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">quad</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">cv2</span><span class="o">.</span><span class="n">fillPoly</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="p">[</span><span class="n">pts</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+<span class="c1"># Observed coverage</span>
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+
+
+<div class="viewcode-block" id="observed_coverage">
+<a class="viewcode-back" href="../../module_docs/inkmap/coverage.html#inkmap.observed_coverage">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">observed_coverage</span><span class="p">(</span>
+    <span class="n">gray</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">placement</span><span class="p">:</span> <span class="n">Placement</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">polarity</span><span class="p">:</span> <span class="n">Polarity</span> <span class="o">=</span> <span class="n">Polarity</span><span class="o">.</span><span class="n">FOREGROUND_IS_DARK</span><span class="p">,</span>
+    <span class="n">yule_nielsen_n</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">percentile</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apparent coverage read from the photograph itself (Murray-Davies).</span>
+
+<span class="sd">    Endmember values are estimated from the mark&#39;s own pixels -- its background region</span>
+<span class="sd">    gives the substrate endpoint, its foreground core the solid endpoint -- so no</span>
+<span class="sd">    external calibration target is needed. Percentiles rather than extremes, so a</span>
+<span class="sd">    specular highlight cannot define an endpoint.</span>
+
+<span class="sd">    ``yule_nielsen_n`` &gt; 1 compensates for lateral light scattering in the substrate,</span>
+<span class="sd">    which otherwise inflates apparent coverage above geometric coverage. n = 1 is plain</span>
+<span class="sd">    Murray-Davies; the right value is substrate- and wavelength-specific and should be</span>
+<span class="sd">    fitted, not guessed.</span>
+
+<span class="sd">    The result is *apparent*, not geometric, coverage. Do not silently substitute it</span>
+<span class="sd">    for :func:`coverage_map`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fore_ref</span><span class="p">,</span> <span class="n">back_ref</span> <span class="o">=</span> <span class="n">_endmembers</span><span class="p">(</span><span class="n">gray</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">polarity</span><span class="p">,</span> <span class="n">percentile</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">fore_ref</span> <span class="o">-</span> <span class="n">back_ref</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-6</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">gray</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">gray</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">yule_nielsen_n</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="n">inv_n</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">yule_nielsen_n</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">inv_n</span><span class="p">)</span>
+        <span class="n">fore_ref</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">fore_ref</span><span class="p">,</span> <span class="mf">1e-6</span><span class="p">),</span> <span class="n">inv_n</span><span class="p">))</span>
+        <span class="n">back_ref</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">back_ref</span><span class="p">,</span> <span class="mf">1e-6</span><span class="p">),</span> <span class="n">inv_n</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">back_ref</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">fore_ref</span> <span class="o">-</span> <span class="n">back_ref</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_endmembers</span><span class="p">(</span>
+    <span class="n">gray</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">placement</span><span class="p">:</span> <span class="n">Placement</span><span class="p">,</span> <span class="n">polarity</span><span class="p">:</span> <span class="n">Polarity</span><span class="p">,</span> <span class="n">percentile</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``(foreground_level, background_level)`` estimated from the mark&#39;s own pixels.&quot;&quot;&quot;</span>
+    <span class="n">ideal</span> <span class="o">=</span> <span class="n">coverage_map</span><span class="p">(</span>
+        <span class="n">placement</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span> <span class="n">gray</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">samples</span><span class="o">=</span><span class="mi">4</span>
+    <span class="p">)</span>
+    <span class="n">inside</span> <span class="o">=</span> <span class="n">_inside</span><span class="p">(</span><span class="n">placement</span><span class="p">,</span> <span class="n">gray</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">core</span> <span class="o">=</span> <span class="n">ideal</span> <span class="o">&gt;=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">config</span><span class="o">.</span><span class="n">PURE_COVERAGE_TOL</span>
+    <span class="n">clear</span> <span class="o">=</span> <span class="p">(</span><span class="n">ideal</span> <span class="o">&lt;=</span> <span class="n">config</span><span class="o">.</span><span class="n">PURE_COVERAGE_TOL</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">inside</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">core</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">clear</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">gray</span><span class="o">.</span><span class="n">min</span><span class="p">()),</span> <span class="nb">float</span><span class="p">(</span><span class="n">gray</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+
+    <span class="n">dark</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">gray</span><span class="p">[</span><span class="n">core</span><span class="p">],</span> <span class="mi">100</span> <span class="o">-</span> <span class="n">percentile</span><span class="p">))</span>
+    <span class="n">light</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">gray</span><span class="p">[</span><span class="n">clear</span><span class="p">],</span> <span class="n">percentile</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">polarity</span> <span class="ow">is</span> <span class="n">Polarity</span><span class="o">.</span><span class="n">FOREGROUND_IS_DARK</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">dark</span><span class="p">,</span> <span class="n">light</span>
+    <span class="k">return</span> <span class="n">light</span><span class="p">,</span> <span class="n">dark</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_inside</span><span class="p">(</span><span class="n">placement</span><span class="p">:</span> <span class="n">Placement</span><span class="p">,</span> <span class="n">image_shape</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">image_shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    <span class="n">_fill</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">geometry</span><span class="o">.</span><span class="n">transform_to_quad</span><span class="p">(</span><span class="n">placement</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">model</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+
+
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+<span class="c1"># Confidence</span>
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+
+
+<div class="viewcode-block" id="confidence">
+<a class="viewcode-back" href="../../module_docs/inkmap/coverage.html#inkmap.confidence">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">confidence</span><span class="p">(</span>
+    <span class="n">gray</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">placement</span><span class="p">:</span> <span class="n">Placement</span><span class="p">,</span>
+    <span class="n">coverage</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">polarity</span><span class="p">:</span> <span class="n">Polarity</span> <span class="o">=</span> <span class="n">Polarity</span><span class="o">.</span><span class="n">FOREGROUND_IS_DARK</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;How much to trust the coverage value at each pixel, in ``[0, 1]``.</span>
+
+<span class="sd">    Distinct from coverage. Three things erode it, combined multiplicatively:</span>
+
+<span class="sd">    * **Model/image disagreement** -- where the observed value contradicts the modelled</span>
+<span class="sd">      coverage, one of them is wrong. This is what catches foreground that failed to</span>
+<span class="sd">      print, a torn label, or a mis-fitted transform.</span>
+<span class="sd">    * **Clipping** -- saturated or crushed pixels carry no photometric information.</span>
+<span class="sd">    * **Edge proximity** -- mixed pixels are inherently less certain, and their value</span>
+<span class="sd">      depends on sub-pixel geometry known only to ~0.5 px.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">observed</span> <span class="o">=</span> <span class="n">observed_coverage</span><span class="p">(</span><span class="n">gray</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">polarity</span><span class="o">=</span><span class="n">polarity</span><span class="p">)</span>
+    <span class="n">agreement</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">observed</span> <span class="o">-</span> <span class="n">coverage</span><span class="p">)</span>
+    <span class="n">valid</span> <span class="o">=</span> <span class="p">(</span><span class="n">gray</span> <span class="o">&lt;</span> <span class="n">config</span><span class="o">.</span><span class="n">SATURATION_LEVEL</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">gray</span> <span class="o">&gt;</span> <span class="n">config</span><span class="o">.</span><span class="n">BLACK_CLIP_LEVEL</span><span class="p">)</span>
+    <span class="n">purity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">coverage</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="mf">2.0</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">agreement</span> <span class="o">*</span> <span class="n">purity</span> <span class="o">*</span> <span class="n">valid</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">float32</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+<span class="c1"># Measurement weight</span>
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+
+
+<div class="viewcode-block" id="measurement_weight">
+<a class="viewcode-back" href="../../module_docs/inkmap/coverage.html#inkmap.measurement_weight">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">measurement_weight</span><span class="p">(</span>
+    <span class="n">coverage</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">blur_sigma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">radius</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">inside</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;foreground&quot;</span><span class="p">,</span>
+    <span class="n">sigmas</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">EDGE_MARGIN_SIGMAS</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Blur-aware weight in ``[0, 1]``: how safe each pixel is to *measure*.</span>
+
+<span class="sd">    Coverage says a pixel lies entirely under foreground. That is necessary but not</span>
+<span class="sd">    sufficient: the point spread function leaks neighbouring signal into interior</span>
+<span class="sd">    pixels, and that contamination has a different footprint from partial area</span>
+<span class="sd">    coverage -- so no coverage-based weighting removes it. The fix is spatial: require</span>
+<span class="sd">    a pixel&#39;s whole neighbourhood to be foreground, out to the radius the blur reaches.</span>
+
+<span class="sd">    Implemented as grayscale morphological erosion of the coverage map, which is exactly</span>
+<span class="sd">    &quot;the minimum coverage within radius r&quot; -- continuous rather than a hard mask, so a</span>
+<span class="sd">    pixel one step from an edge is down-weighted rather than trusted or discarded.</span>
+
+<span class="sd">    Give either ``radius`` (pixels, wins if both are given) or ``blur_sigma``, from</span>
+<span class="sd">    which the radius is ``sigmas * blur_sigma``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;foreground&quot;</span><span class="p">:</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="n">coverage</span>
+    <span class="k">elif</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;background&quot;</span><span class="p">:</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">coverage</span>
+        <span class="k">if</span> <span class="n">inside</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">field</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">inside</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;kind must be &#39;foreground&#39; or &#39;background&#39;, got </span><span class="si">{</span><span class="n">kind</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">radius</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">blur_sigma</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">blur_sigma</span><span class="p">):</span>
+            <span class="n">blur_sigma</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">DEFAULT_BLUR_SIGMA</span>
+        <span class="n">radius</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">sigmas</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">blur_sigma</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)))</span>
+    <span class="n">radius</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">radius</span><span class="p">))</span>
+
+    <span class="n">kernel</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">getStructuringElement</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">MORPH_ELLIPSE</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">radius</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,)</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">erode</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">kernel</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+<span class="c1"># Blur estimation</span>
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+
+
+<div class="viewcode-block" id="estimate_blur_sigma">
+<a class="viewcode-back" href="../../module_docs/inkmap/coverage.html#inkmap.estimate_blur_sigma">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">estimate_blur_sigma</span><span class="p">(</span><span class="n">gray</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">placement</span><span class="p">:</span> <span class="n">Placement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Estimate imaging blur sigma, in pixels, from the mark&#39;s own edges.</span>
+
+<span class="sd">    Sizing the measurement margin needs this. Estimated by finding the sigma whose</span>
+<span class="sd">    blurred ideal coverage best matches the photograph.</span>
+
+<span class="sd">    Returns ``nan`` when the minimum lands at the top of the search range: that is the</span>
+<span class="sd">    search running out of room, not a measurement -- the modelled shape and the</span>
+<span class="sd">    photograph do not correspond -- and reporting the boundary value would silently size</span>
+<span class="sd">    the measurement margin from noise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ideal</span> <span class="o">=</span> <span class="n">coverage_map</span><span class="p">(</span>
+        <span class="n">placement</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span> <span class="n">gray</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">samples</span><span class="o">=</span><span class="mi">4</span>
+    <span class="p">)</span>
+    <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="n">bounding_box</span><span class="p">(</span><span class="n">placement</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span> <span class="n">gray</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">x1</span> <span class="o">-</span> <span class="n">x0</span> <span class="o">&lt;</span> <span class="mi">16</span> <span class="ow">or</span> <span class="n">y1</span> <span class="o">-</span> <span class="n">y0</span> <span class="o">&lt;</span> <span class="mi">16</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">config</span><span class="o">.</span><span class="n">DEFAULT_BLUR_SIGMA</span>
+
+    <span class="n">ideal_c</span> <span class="o">=</span> <span class="n">ideal</span><span class="p">[</span><span class="n">y0</span><span class="p">:</span><span class="n">y1</span><span class="p">,</span> <span class="n">x0</span><span class="p">:</span><span class="n">x1</span><span class="p">]</span>
+    <span class="n">obs</span> <span class="o">=</span> <span class="n">gray</span><span class="p">[</span><span class="n">y0</span><span class="p">:</span><span class="n">y1</span><span class="p">,</span> <span class="n">x0</span><span class="p">:</span><span class="n">x1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">lo</span><span class="p">,</span> <span class="n">hi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">95</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">hi</span> <span class="o">-</span> <span class="n">lo</span> <span class="o">&lt;</span> <span class="mf">1e-6</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">config</span><span class="o">.</span><span class="n">DEFAULT_BLUR_SIGMA</span>
+    <span class="n">obs_n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">((</span><span class="n">hi</span> <span class="o">-</span> <span class="n">obs</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">hi</span> <span class="o">-</span> <span class="n">lo</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+
+    <span class="n">scale</span> <span class="o">=</span> <span class="n">placement</span><span class="o">.</span><span class="n">pixels_per_feature</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">scale</span> <span class="o">*</span> <span class="mf">0.8</span><span class="p">),</span> <span class="mi">16</span><span class="p">)</span>
+    <span class="n">errs</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">cv2</span><span class="o">.</span><span class="n">GaussianBlur</span><span class="p">(</span><span class="n">ideal_c</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">s</span><span class="p">)</span> <span class="o">-</span> <span class="n">obs_n</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">grid</span>
+    <span class="p">]</span>
+    <span class="n">best</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">errs</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">best</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">grid</span><span class="p">[</span><span class="n">best</span><span class="p">])</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

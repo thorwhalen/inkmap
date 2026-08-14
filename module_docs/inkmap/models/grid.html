@@ -1,0 +1,176 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>inkmap.models.grid &mdash; inkmap 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="inkmap.photometry" href="../photometry.html" />
+    <link rel="prev" title="inkmap.models.freeform" href="freeform.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            inkmap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../inkmap.html">inkmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config.html">inkmap.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../coverage.html">inkmap.coverage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data.html">inkmap.data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry.html">inkmap.geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../locate.html">inkmap.locate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../locate/barcode.html">inkmap.locate.barcode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../locate/qr.html">inkmap.locate.qr</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">inkmap.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="base.html">inkmap.models.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="freeform.html">inkmap.models.freeform</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">inkmap.models.grid</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#inkmap.models.grid.BarsModel"><code class="docutils literal notranslate"><span class="pre">BarsModel</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#inkmap.models.grid.BarsModel.feature_size"><code class="docutils literal notranslate"><span class="pre">BarsModel.feature_size</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#inkmap.models.grid.MatrixModel"><code class="docutils literal notranslate"><span class="pre">MatrixModel</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#inkmap.models.grid.MatrixModel.feature_size"><code class="docutils literal notranslate"><span class="pre">MatrixModel.feature_size</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../photometry.html">inkmap.photometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../synth.html">inkmap.synth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../types.html">inkmap.types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../viz.html">inkmap.viz</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">inkmap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">inkmap.models.grid</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/module_docs/inkmap/models/grid.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-inkmap.models.grid">
+<span id="inkmap-models-grid"></span><h1>inkmap.models.grid<a class="headerlink" href="#module-inkmap.models.grid" title="Link to this heading"></a></h1>
+<p>Models whose foreground is defined on a regular grid: QR symbols and barcodes.</p>
+<p>Both answer occupancy by indexing, so their coverage is exact up to the supersampling
+rate – there is no intermediate bitmap to quantise them twice.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="inkmap.models.grid.BarsModel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">inkmap.models.grid.</span></span><span class="sig-name descname"><span class="pre">BarsModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bars</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~typing.Any]</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/inkmap/models/grid.html#BarsModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.models.grid.BarsModel" title="Link to this definition"></a></dt>
+<dd><p>A 1-D run of foreground/background bars, extruded vertically – a linear barcode.</p>
+<p><code class="docutils literal notranslate"><span class="pre">bars</span></code> is a boolean array over the narrowest module width, <code class="docutils literal notranslate"><span class="pre">True</span></code> for a bar.
+Model space is <code class="docutils literal notranslate"><span class="pre">(len(bars),</span> <span class="pre">height)</span></code>; <code class="docutils literal notranslate"><span class="pre">height</span></code> is in the same module units, so
+a 95-module EAN-13 printed twice as tall as it is wide would use <code class="docutils literal notranslate"><span class="pre">height=190</span></code>.
+Height rarely matters for coverage (the pattern is constant along <code class="docutils literal notranslate"><span class="pre">v</span></code>) but it
+fixes the aspect ratio for rendering and refinement.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="inkmap.models.grid.BarsModel.feature_size">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">feature_size</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#inkmap.models.grid.BarsModel.feature_size" title="Link to this definition"></a></dt>
+<dd><p>One module – the narrowest bar, which is what must be resolved.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="inkmap.models.grid.MatrixModel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">inkmap.models.grid.</span></span><span class="sig-name descname"><span class="pre">MatrixModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cells</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~typing.Any]</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/inkmap/models/grid.html#MatrixModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.models.grid.MatrixModel" title="Link to this definition"></a></dt>
+<dd><p>A 2-D grid of foreground/background cells – a QR symbol’s module matrix.</p>
+<p><code class="docutils literal notranslate"><span class="pre">cells[row,</span> <span class="pre">col]</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code> where the cell is foreground. Model space is
+<code class="docutils literal notranslate"><span class="pre">(n_cols,</span> <span class="pre">n_rows)</span></code> in cells, origin at the mark’s own top-left, so cell
+<code class="docutils literal notranslate"><span class="pre">(i,</span> <span class="pre">j)</span></code> occupies <code class="docutils literal notranslate"><span class="pre">u</span> <span class="pre">in</span> <span class="pre">[j,</span> <span class="pre">j+1)</span></code>, <code class="docutils literal notranslate"><span class="pre">v</span> <span class="pre">in</span> <span class="pre">[i,</span> <span class="pre">i+1)</span></code>.</p>
+<p>Also serves Data Matrix, Aztec, and any other matrix symbology: only the cell
+grid matters here, not how it was decoded.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="inkmap.models.grid.MatrixModel.feature_size">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">feature_size</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#inkmap.models.grid.MatrixModel.feature_size" title="Link to this definition"></a></dt>
+<dd><p>One cell – for a matrix symbology the cell <em>is</em> the smallest feature.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="freeform.html" class="btn btn-neutral float-left" title="inkmap.models.freeform" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../photometry.html" class="btn btn-neutral float-right" title="inkmap.photometry" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

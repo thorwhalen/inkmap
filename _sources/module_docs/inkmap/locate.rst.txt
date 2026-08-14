@@ -1,0 +1,4 @@
+inkmap.locate
+=============
+.. automodule:: inkmap.locate
+   :members:
