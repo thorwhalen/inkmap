@@ -4,8 +4,8 @@
 
    module_docs/inkmap
    module_docs/inkmap/config
+   module_docs/inkmap/corpus
    module_docs/inkmap/coverage
-   module_docs/inkmap/data
    module_docs/inkmap/geometry
    module_docs/inkmap/locate
    module_docs/inkmap/locate/barcode

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>inkmap.locate.barcode &mdash; inkmap 0.1.1 documentation</title>
+  <title>inkmap.locate.barcode &mdash; inkmap 0.1.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../_static/documentation_options.js?v=92734c54"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -48,8 +48,8 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/inkmap.html">inkmap</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/inkmap/config.html">inkmap.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/inkmap/corpus.html">inkmap.corpus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/inkmap/coverage.html">inkmap.coverage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/inkmap/data.html">inkmap.data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/inkmap/geometry.html">inkmap.geometry</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/inkmap/locate.html">inkmap.locate</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/inkmap/locate/barcode.html">inkmap.locate.barcode</a></li>
@@ -149,16 +149,62 @@
     <span class="k">return</span> <span class="n">strip</span><span class="p">[</span><span class="n">cut</span><span class="p">:</span><span class="o">-</span><span class="n">cut</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
 
+<span class="c1">#: Symbologies whose total module count is fixed by the specification. Using the spec</span>
+<span class="c1">#: beats estimating: a module-width estimate that is 10% low inflates the module count</span>
+<span class="c1">#: by 10%, and every bar after the first is then placed wrong.</span>
+<span class="n">FIXED_MODULE_COUNTS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;ean13&quot;</span><span class="p">:</span> <span class="mi">95</span><span class="p">,</span>
+    <span class="s2">&quot;upca&quot;</span><span class="p">:</span> <span class="mi">95</span><span class="p">,</span>
+    <span class="s2">&quot;ean8&quot;</span><span class="p">:</span> <span class="mi">67</span><span class="p">,</span>
+    <span class="s2">&quot;upce&quot;</span><span class="p">:</span> <span class="mi">51</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_fit_module_width</span><span class="p">(</span><span class="n">runs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">span</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find the module width that best explains the run lengths as integer multiples.</span>
+
+<span class="sd">    Every run in a linear barcode is a whole number of modules wide, so the correct</span>
+<span class="sd">    width is the one that makes ``run / width`` closest to integers across all runs.</span>
+<span class="sd">    Minimising that residual is far more robust than reading a percentile of the run</span>
+<span class="sd">    lengths: one noisy sample creates a spurious short run and drags a percentile down,</span>
+<span class="sd">    and a width that is 10% low inflates the module count by 10%.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">runs</span><span class="o">.</span><span class="n">size</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">seed</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">runs</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">seed</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="n">seed</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">runs</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">seed</span> <span class="o">&lt;</span> <span class="mf">0.8</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">candidates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">seed</span> <span class="o">*</span> <span class="mf">0.6</span><span class="p">,</span> <span class="n">seed</span> <span class="o">*</span> <span class="mf">2.2</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
+    <span class="n">best</span><span class="p">,</span> <span class="n">best_cost</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+    <span class="k">for</span> <span class="n">width</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">width</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">quotient</span> <span class="o">=</span> <span class="n">runs</span> <span class="o">/</span> <span class="n">width</span>
+        <span class="c1"># Ignore quotients that round to zero: those are noise, not modules.</span>
+        <span class="n">keep</span> <span class="o">=</span> <span class="n">quotient</span> <span class="o">&gt;</span> <span class="mf">0.5</span>
+        <span class="k">if</span> <span class="n">keep</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">residual</span> <span class="o">=</span> <span class="n">quotient</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">quotient</span><span class="p">[</span><span class="n">keep</span><span class="p">])</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="n">span</span> <span class="o">/</span> <span class="n">width</span>
+        <span class="n">cost</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">residual</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="o">+</span> <span class="p">(</span><span class="n">total</span> <span class="o">-</span> <span class="nb">round</span><span class="p">(</span><span class="n">total</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">total</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cost</span> <span class="o">&lt;</span> <span class="n">best_cost</span><span class="p">:</span>
+            <span class="n">best</span><span class="p">,</span> <span class="n">best_cost</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">width</span><span class="p">),</span> <span class="n">cost</span>
+    <span class="k">return</span> <span class="n">best</span>
+
+
 <div class="viewcode-block" id="profile_to_bars">
 <a class="viewcode-back" href="../../../module_docs/inkmap/locate/barcode.html#inkmap.locate.profile_to_bars">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">profile_to_bars</span><span class="p">(</span><span class="n">profile</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">profile_to_bars</span><span class="p">(</span>
+    <span class="n">profile</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Quantise a 1-D profile into a bar pattern.</span>
 
-<span class="sd">    Returns ``(bars, module_px)`` where ``bars`` is boolean over module positions and</span>
-<span class="sd">    ``module_px`` is the estimated narrowest-bar width in profile samples. Thresholds at</span>
-<span class="sd">    the midpoint of the profile&#39;s range, per ISO/IEC 15416 3.5, then takes the module</span>
-<span class="sd">    width as a low percentile of run lengths -- low rather than the minimum, because a</span>
-<span class="sd">    single noisy sample creates a spurious one-sample run.</span>
+<span class="sd">    Returns ``(bars, module_px)``. Thresholds at the midpoint of the profile&#39;s range,</span>
+<span class="sd">    per ISO/IEC 15416 3.5. ``n_modules`` pins the module count when the symbology fixes</span>
+<span class="sd">    it; otherwise the module width is fitted from the run lengths.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">profile</span><span class="o">.</span><span class="n">size</span> <span class="o">&lt;</span> <span class="mi">8</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
@@ -173,21 +219,71 @@
     <span class="k">if</span> <span class="n">runs</span><span class="o">.</span><span class="n">size</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
 
-    <span class="n">module_px</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">runs</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">module_px</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
-        <span class="n">module_px</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">runs</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
-    <span class="k">if</span> <span class="n">module_px</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">n_modules</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">module_px</span> <span class="o">=</span> <span class="n">_fit_module_width</span><span class="p">(</span><span class="n">runs</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">dark</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">module_px</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">n_modules</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">dark</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="n">module_px</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mi">20</span> <span class="o">&lt;=</span> <span class="n">n_modules</span> <span class="o">&lt;=</span> <span class="mi">2000</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">module_px</span> <span class="o">=</span> <span class="n">dark</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="n">n_modules</span>
 
-    <span class="n">n_modules</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">dark</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="n">module_px</span><span class="p">))</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="mi">20</span> <span class="o">&lt;=</span> <span class="n">n_modules</span> <span class="o">&lt;=</span> <span class="mi">2000</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">None</span>
-
-    <span class="c1"># Resample the binary profile onto the module grid, at module centres.</span>
+    <span class="c1"># Sample at module centres.</span>
     <span class="n">centers</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_modules</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">dark</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="n">n_modules</span><span class="p">)</span>
     <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">centers</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dark</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">dark</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">module_px</span></div>
+    <span class="k">return</span> <span class="n">dark</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="n">module_px</span><span class="p">)</span></div>
 
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_decodes_to</span><span class="p">(</span><span class="n">bars</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Render a bar pattern cleanly and check a decoder reads the expected payload.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">zxingcpp</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="n">scale</span><span class="p">,</span> <span class="n">quiet</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">12</span>
+    <span class="n">strip</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="o">~</span><span class="n">bars</span><span class="p">,</span> <span class="n">scale</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">*</span> <span class="mi">255</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">strip</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">copyMakeBorder</span><span class="p">(</span>
+        <span class="n">image</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">quiet</span> <span class="o">*</span> <span class="n">scale</span><span class="p">,</span> <span class="n">quiet</span> <span class="o">*</span> <span class="n">scale</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">BORDER_CONSTANT</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">255</span>
+    <span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span> <span class="o">==</span> <span class="n">payload</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">zxingcpp</span><span class="o">.</span><span class="n">read_barcodes</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">recover_bars</span><span class="p">(</span>
+    <span class="n">profile</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">n_modules</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Recover the bar pattern from a profile, verifying it against the payload.</span>
+
+<span class="sd">    Variable-length symbologies (Code 128, Code 39, ITF) do not pin the module count, so</span>
+<span class="sd">    it has to be fitted -- and a fit that is one module out places every bar after the</span>
+<span class="sd">    first incorrectly while still looking like a barcode. Since the decoder already told</span>
+<span class="sd">    us the payload, the recovered pattern can be *checked*: render it and see whether it</span>
+<span class="sd">    decodes back. If not, try neighbouring module counts.</span>
+
+<span class="sd">    This is not circular. The payload came from the decoder reading the photograph; the</span>
+<span class="sd">    pattern is being reconstructed from our own geometry. Agreement means the geometry</span>
+<span class="sd">    is right, and disagreement is a genuine failure signal rather than a guess.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">first</span> <span class="o">=</span> <span class="n">profile_to_bars</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="n">n_modules</span><span class="o">=</span><span class="n">n_modules</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">first</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">bars</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">first</span>
+    <span class="k">if</span> <span class="n">payload</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">n_modules</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">_decodes_to</span><span class="p">(</span><span class="n">bars</span><span class="p">,</span> <span class="n">payload</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">bars</span>
+
+    <span class="n">base</span> <span class="o">=</span> <span class="n">bars</span><span class="o">.</span><span class="n">size</span>
+    <span class="k">for</span> <span class="n">delta</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">):</span>
+        <span class="n">candidate</span> <span class="o">=</span> <span class="n">profile_to_bars</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="n">n_modules</span><span class="o">=</span><span class="n">base</span> <span class="o">+</span> <span class="n">delta</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">candidate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">_decodes_to</span><span class="p">(</span><span class="n">candidate</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">payload</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">candidate</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">bars</span>
 
 
 <div class="viewcode-block" id="locate_barcode_zxing">
@@ -234,10 +330,13 @@
 
         <span class="c1"># Oversample the profile so the narrowest bar spans several samples.</span>
         <span class="n">profile</span> <span class="o">=</span> <span class="n">_sample_profile</span><span class="p">(</span><span class="n">gray</span><span class="p">,</span> <span class="n">quad</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mi">4096</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="n">span</span> <span class="o">*</span> <span class="mi">4</span><span class="p">))))</span>
-        <span class="n">found</span> <span class="o">=</span> <span class="n">profile_to_bars</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">found</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">bars</span> <span class="o">=</span> <span class="n">recover_bars</span><span class="p">(</span>
+            <span class="n">profile</span><span class="p">,</span>
+            <span class="n">n_modules</span><span class="o">=</span><span class="n">FIXED_MODULE_COUNTS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">fmt</span><span class="p">),</span>
+            <span class="n">payload</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">bars</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">continue</span>
-        <span class="n">bars</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">found</span>
 
         <span class="n">model</span> <span class="o">=</span> <span class="n">BarsModel</span><span class="p">(</span>
             <span class="n">bars</span><span class="p">,</span>

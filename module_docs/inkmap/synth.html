@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>inkmap.synth &mdash; inkmap 0.1.1 documentation</title>
+  <title>inkmap.synth &mdash; inkmap 0.1.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../_static/documentation_options.js?v=92734c54"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -51,8 +51,8 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../inkmap.html">inkmap</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">inkmap.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="corpus.html">inkmap.corpus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="coverage.html">inkmap.coverage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data.html">inkmap.data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="geometry.html">inkmap.geometry</a></li>
 <li class="toctree-l1"><a class="reference internal" href="locate.html">inkmap.locate</a></li>
 <li class="toctree-l1"><a class="reference internal" href="locate/barcode.html">inkmap.locate.barcode</a></li>
@@ -117,7 +117,7 @@ model through a known transform to get true coverage, then form the clean image 
 and any degradation applied afterwards (blur, noise, gradient, glare, JPEG) leaves the
 ground truth correct.</p>
 <p>Works for any model, so a text or logo pipeline is validated the same way as a QR one.
-Real photographs remain essential for <em>detection</em> rate – see <a class="reference internal" href="data.html#module-inkmap.data" title="inkmap.data"><code class="xref py py-mod docutils literal notranslate"><span class="pre">inkmap.data</span></code></a>.</p>
+Real photographs remain essential for <em>detection</em> rate – see <a class="reference internal" href="corpus.html#module-inkmap.corpus" title="inkmap.corpus"><code class="xref py py-mod docutils literal notranslate"><span class="pre">inkmap.corpus</span></code></a>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="inkmap.synth.Scene">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">inkmap.synth.</span></span><span class="sig-name descname"><span class="pre">Scene</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coverage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="models/base.html#inkmap.models.base.Model" title="inkmap.models.base.Model"><span class="pre">Model</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">~typing.Any]</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/inkmap/synth.html#Scene"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.synth.Scene" title="Link to this definition"></a></dt>

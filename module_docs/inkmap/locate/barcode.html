@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>inkmap.locate.barcode &mdash; inkmap 0.1.1 documentation</title>
+  <title>inkmap.locate.barcode &mdash; inkmap 0.1.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../_static/documentation_options.js?v=92734c54"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -51,8 +51,8 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../inkmap.html">inkmap</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">inkmap.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../corpus.html">inkmap.corpus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../coverage.html">inkmap.coverage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../data.html">inkmap.data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../geometry.html">inkmap.geometry</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../locate.html">inkmap.locate</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">inkmap.locate.barcode</a><ul>
@@ -114,13 +114,11 @@ does, and it is the one number that turns a picture of stripes into a model.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="inkmap.locate.barcode.profile_to_bars">
-<span class="sig-prename descclassname"><span class="pre">inkmap.locate.barcode.</span></span><span class="sig-name descname"><span class="pre">profile_to_bars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../../../_modules/inkmap/locate/barcode.html#profile_to_bars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.locate.barcode.profile_to_bars" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">inkmap.locate.barcode.</span></span><span class="sig-name descname"><span class="pre">profile_to_bars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_modules</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../../../_modules/inkmap/locate/barcode.html#profile_to_bars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#inkmap.locate.barcode.profile_to_bars" title="Link to this definition"></a></dt>
 <dd><p>Quantise a 1-D profile into a bar pattern.</p>
-<p>Returns <code class="docutils literal notranslate"><span class="pre">(bars,</span> <span class="pre">module_px)</span></code> where <code class="docutils literal notranslate"><span class="pre">bars</span></code> is boolean over module positions and
-<code class="docutils literal notranslate"><span class="pre">module_px</span></code> is the estimated narrowest-bar width in profile samples. Thresholds at
-the midpoint of the profile’s range, per ISO/IEC 15416 3.5, then takes the module
-width as a low percentile of run lengths – low rather than the minimum, because a
-single noisy sample creates a spurious one-sample run.</p>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">(bars,</span> <span class="pre">module_px)</span></code>. Thresholds at the midpoint of the profile’s range,
+per ISO/IEC 15416 3.5. <code class="docutils literal notranslate"><span class="pre">n_modules</span></code> pins the module count when the symbology fixes
+it; otherwise the module width is fitted from the run lengths.</p>
 </dd></dl>
 
 </section>

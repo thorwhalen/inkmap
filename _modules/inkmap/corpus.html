@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>inkmap.data &mdash; inkmap 0.1.1 documentation</title>
+  <title>inkmap.corpus &mdash; inkmap 0.1.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../_static/documentation_options.js?v=92734c54"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -48,8 +48,8 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap.html">inkmap</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/config.html">inkmap.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/corpus.html">inkmap.corpus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/coverage.html">inkmap.coverage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/data.html">inkmap.data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/geometry.html">inkmap.geometry</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/locate.html">inkmap.locate</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/inkmap/locate/barcode.html">inkmap.locate.barcode</a></li>
@@ -80,7 +80,7 @@
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
           <li class="breadcrumb-item"><a href="../inkmap.html">inkmap</a></li>
-      <li class="breadcrumb-item active">inkmap.data</li>
+      <li class="breadcrumb-item active">inkmap.corpus</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -89,16 +89,19 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for inkmap.data</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;The real-photograph test corpus: 189 photographed marks in the wild (QR codes), from Wikimedia Commons.</span>
+  <h1>Source code for inkmap.corpus</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;The real-photograph test corpus: 384 photographed marks in the wild, from Wikimedia Commons.</span>
+
+<span class="sd">189 QR codes, 56 linear barcodes and 139 images of printed text -- signs, posters,</span>
+<span class="sd">packaging, business cards, stickers, billboards, menus, tickets, screens, inscriptions.</span>
 
 <span class="sd">Synthetic scenes (:mod:`inkmap.synth`) are the only way to validate a *coverage* value,</span>
 <span class="sd">because no photograph comes with per-pixel ink ground truth. But synthetic scenes cannot</span>
-<span class="sd">tell you whether detection works on a QR code printed on a curved bottle under a</span>
-<span class="sd">sodium lamp. The two test sets answer different questions and you need both.</span>
+<span class="sd">tell you whether detection survives a mark printed on a curved bottle under a sodium</span>
+<span class="sd">lamp. The two test sets answer different questions and you need both.</span>
 
-<span class="sd">Only the manifest ships with the package -- titles, URLs, licences and attribution, about</span>
-<span class="sd">100 KB. The images themselves are fetched on demand and cached, because ~120 MB of</span>
+<span class="sd">Only the manifest ships with the package -- titles, URLs, licences and attribution,</span>
+<span class="sd">about 200 KB. The images are fetched on demand and cached, because a few hundred MB of</span>
 <span class="sd">photographs has no business inside a wheel, and because redistributing them would mean</span>
 <span class="sd">carrying every attribution requirement into this repository.</span>
 
@@ -106,10 +109,11 @@
 <span class="sd">:func:`attribution_text` will render it -- if you publish results using these images,</span>
 <span class="sd">use it.</span>
 
-<span class="sd">    from inkmap import data</span>
+<span class="sd">    from inkmap import corpus</span>
 
-<span class="sd">    paths = data.fetch()             # download + cache, returns local paths</span>
-<span class="sd">    for path, meta in data.items():  # iterate cached images with their metadata</span>
+<span class="sd">    corpus.kinds()                          # {&#39;qr&#39;: 189, &#39;barcode&#39;: 56, &#39;text&#39;: 139}</span>
+<span class="sd">    paths = corpus.fetch(kind=&quot;barcode&quot;)    # download + cache, returns local paths</span>
+<span class="sd">    for path, meta in corpus.items(kind=&quot;qr&quot;):</span>
 <span class="sd">        ...</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
@@ -123,37 +127,49 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterator</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;MANIFEST&quot;</span><span class="p">,</span> <span class="s2">&quot;cache_dir&quot;</span><span class="p">,</span> <span class="s2">&quot;fetch&quot;</span><span class="p">,</span> <span class="s2">&quot;items&quot;</span><span class="p">,</span> <span class="s2">&quot;attribution_text&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;MANIFEST&quot;</span><span class="p">,</span> <span class="s2">&quot;kinds&quot;</span><span class="p">,</span> <span class="s2">&quot;cache_dir&quot;</span><span class="p">,</span> <span class="s2">&quot;fetch&quot;</span><span class="p">,</span> <span class="s2">&quot;items&quot;</span><span class="p">,</span> <span class="s2">&quot;attribution_text&quot;</span><span class="p">]</span>
 
-<span class="n">_MANIFEST_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;assets&quot;</span> <span class="o">/</span> <span class="s2">&quot;commons_qr.json&quot;</span>
+<span class="n">_MANIFEST_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span> <span class="o">/</span> <span class="s2">&quot;commons_marks.json&quot;</span>
 <span class="n">_USER_AGENT</span> <span class="o">=</span> <span class="s2">&quot;inkmap/0.1 (https://github.com/thorwhalen/inkmap)&quot;</span>
 
-<span class="c1">#: Manifest records: file, title, url, source, license, artist.</span>
+<span class="c1">#: Manifest records: kind (qr/barcode/text), file, title, url, source, license, artist.</span>
 <span class="n">MANIFEST</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">_MANIFEST_PATH</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
 
 
 <div class="viewcode-block" id="cache_dir">
-<a class="viewcode-back" href="../../module_docs/inkmap/data.html#inkmap.data.cache_dir">[docs]</a>
+<a class="viewcode-back" href="../../module_docs/inkmap/corpus.html#inkmap.corpus.cache_dir">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">cache_dir</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Where fetched images live.</span>
 
-<span class="sd">    Honours ``INKMAP_DATA_DIR``, else the XDG cache location. Test data is neither code</span>
+<span class="sd">    Honours ``INKMAP_CORPUS_DIR``, else the XDG cache location. Test data is neither code</span>
 <span class="sd">    nor user configuration, so it does not belong beside the package: a wheel install</span>
 <span class="sd">    would make the package directory read-only, and a reinstall would silently discard</span>
 <span class="sd">    a 120 MB download.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;INKMAP_DATA_DIR&quot;</span><span class="p">)</span>
+    <span class="n">env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;INKMAP_CORPUS_DIR&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">env</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">env</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
     <span class="n">base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;XDG_CACHE_HOME&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;.cache&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">base</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;inkmap&quot;</span> <span class="o">/</span> <span class="s2">&quot;commons_qr&quot;</span></div>
+    <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">base</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;inkmap&quot;</span> <span class="o">/</span> <span class="s2">&quot;commons_marks&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="kinds">
+<a class="viewcode-back" href="../../module_docs/inkmap/corpus.html#inkmap.corpus.kinds">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">kinds</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;How many records of each mark kind the manifest holds.&quot;&quot;&quot;</span>
+    <span class="n">counts</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">MANIFEST</span><span class="p">:</span>
+        <span class="n">counts</span><span class="p">[</span><span class="n">record</span><span class="p">[</span><span class="s2">&quot;kind&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s2">&quot;kind&quot;</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">counts</span></div>
 
 
 
 <div class="viewcode-block" id="fetch">
-<a class="viewcode-back" href="../../module_docs/inkmap/data.html#inkmap.data.fetch">[docs]</a>
+<a class="viewcode-back" href="../../module_docs/inkmap/corpus.html#inkmap.corpus.fetch">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">fetch</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
+    <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">dest</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">pace</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.1</span><span class="p">,</span>
@@ -168,8 +184,9 @@
     <span class="n">dest</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span> <span class="k">if</span> <span class="n">dest</span> <span class="k">else</span> <span class="n">cache_dir</span><span class="p">()</span>
     <span class="n">dest</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
+    <span class="n">records</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">MANIFEST</span> <span class="k">if</span> <span class="n">kind</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;kind&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">kind</span><span class="p">]</span>
     <span class="n">paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">MANIFEST</span><span class="p">[:</span><span class="n">limit</span><span class="p">]:</span>
+    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">records</span><span class="p">[:</span><span class="n">limit</span><span class="p">]:</span>
         <span class="n">target</span> <span class="o">=</span> <span class="n">dest</span> <span class="o">/</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">target</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">target</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
@@ -198,11 +215,15 @@
 
 
 <div class="viewcode-block" id="items">
-<a class="viewcode-back" href="../../module_docs/inkmap/data.html#inkmap.data.items">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">items</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">dest</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield ``(path, record)`` for every corpus image already cached.&quot;&quot;&quot;</span>
+<a class="viewcode-back" href="../../module_docs/inkmap/corpus.html#inkmap.corpus.items">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">items</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dest</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield ``(path, record)`` for every cached corpus image, optionally by kind.&quot;&quot;&quot;</span>
     <span class="n">dest</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span> <span class="k">if</span> <span class="n">dest</span> <span class="k">else</span> <span class="n">cache_dir</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">MANIFEST</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">kind</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;kind&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">kind</span><span class="p">:</span>
+            <span class="k">continue</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">dest</span> <span class="o">/</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="k">yield</span> <span class="n">path</span><span class="p">,</span> <span class="n">record</span></div>
@@ -210,7 +231,7 @@
 
 
 <div class="viewcode-block" id="attribution_text">
-<a class="viewcode-back" href="../../module_docs/inkmap/data.html#inkmap.data.attribution_text">[docs]</a>
+<a class="viewcode-back" href="../../module_docs/inkmap/corpus.html#inkmap.corpus.attribution_text">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">attribution_text</span><span class="p">(</span><span class="n">records</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Render the attribution block required by the CC BY / CC BY-SA images.&quot;&quot;&quot;</span>
     <span class="n">records</span> <span class="o">=</span> <span class="n">MANIFEST</span> <span class="k">if</span> <span class="n">records</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">records</span>

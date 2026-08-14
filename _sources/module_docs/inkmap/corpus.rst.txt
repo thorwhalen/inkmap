@@ -1,0 +1,4 @@
+inkmap.corpus
+=============
+.. automodule:: inkmap.corpus
+   :members:
