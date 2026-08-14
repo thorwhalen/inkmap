@@ -1,0 +1,24 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.eggs/
+
+.venv/
+venv/
+.env
+
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+.DS_Store
+.idea/
+.vscode/
+
+# Fetched test images are cached outside the repo, but guard against a stray --dest.
+/qrdata/
+scrap/

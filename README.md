@@ -1,0 +1,209 @@
+# inkmap
+
+Per-pixel foreground coverage for photographed marks.
+
+Given a photo of a printed mark and a **model** of its shape, say — for every pixel —
+how much of it is foreground (the mark) and how much is background (the substrate). Not
+a boolean mask: a continuous 0–1 area fraction, accurate enough to measure on.
+
+```bash
+pip install inkmap
+```
+
+```python
+import inkmap
+
+coverage = inkmap.foreground("photo.jpg")   # (H, W) float32 in [0, 1]
+```
+
+## The idea
+
+Decoding a QR code is a solved problem. Reading text is a solved problem. **Measuring**
+the mark itself is not: if you need to know the reflectance, density, or colour of the
+printed material — as opposed to what it says — you need to know exactly which pixels
+are mark, which are substrate, and which are neither.
+
+The shape is the input, not a special case. A model answers one question — *is this
+point, in my own coordinate system, foreground?* — and everything else (locating,
+sub-pixel refinement, rasterising, measuring) is written against that one question. So
+QR symbols, barcodes, printed letters and arbitrary artwork all go through one pipeline.
+
+```python
+from inkmap import models
+
+inkmap.find(photo)                                        # auto-detect QR / barcode
+inkmap.find(photo, model=models.text_model("ABC"), quad=q)  # printed text
+inkmap.find(photo, model=models.RasterModel(logo), quad=q)  # anything you can draw
+inkmap.find(photo, model=models.PolygonModel(outlines), quad=q)   # exact vector shape
+```
+
+Writing your own is two members and no base class:
+
+```python
+class Disc:
+    extent = (20.0, 20.0)      # model space is 20 x 20 units
+    feature_size = 10.0        # smallest feature that must be resolved
+
+    def occupancy(self, u, v):                    # vectorised
+        return (u - 10) ** 2 + (v - 10) ** 2 < 81
+
+inkmap.find(photo, model=Disc(), quad=corners)
+```
+
+## What you get back
+
+```python
+ink = inkmap.find("photo.jpg")        # an InkMap, or None
+
+ink.placement.quad                    # (4, 2) corners — a quadrilateral, not a
+                                      # rectangle; perspective is expected
+ink.placement.transform               # (3, 3) model space -> image pixels
+ink.placement.pixels_per_feature      # the resolution figure that governs everything
+
+ink.coverage                          # (H, W) float32 — foreground area fraction
+ink.region                            # OUTSIDE / MARGIN / BACKGROUND / FOREGROUND
+ink.weight                            # (H, W) float32 — safe-to-measure weighting
+```
+
+Then measure:
+
+```python
+result = inkmap.measure("photo.jpg", ink)
+
+result.foreground_mean                # sRGB-linearised mean over safe pixels
+result.background_mean
+result.contrast
+result.measurability.ok               # False if this image can't support it
+```
+
+`measure` accepts any frame registered to the one you located in, so geometry can be
+established once on the sharpest image and reused across exposures, channels or
+modalities.
+
+## The three 0–1 channels
+
+Conflating these is the fastest route to a wrong measurement:
+
+| | what it is | use it for |
+|---|---|---|
+| `coverage` | **geometric** — fraction of the pixel's area under foreground | reporting, print QC, finding mixed pixels |
+| `weight` | **blur-aware** — coverage eroded by how far the PSF actually reaches | **the only channel that should gate a measurement** |
+| `confidence` | **epistemic** — how much to trust the label here | quality gating, artefact rejection |
+
+If the underlying reality is binary, "probability this pixel is foreground" is
+`confidence`. If it isn't — a pixel genuinely straddling an edge — the degree of
+membership is `coverage`. They are different numbers and both are worth having.
+
+Measured on synthetic scenes with exact ground truth, recovering a foreground-only
+signal at 6 px per feature:
+
+| pixel selection | no blur | σ=1 | σ=2 | σ=3 |
+|---|---|---|---|---|
+| `coverage > 0.5` (what a threshold gives you) | −3.3% | −12.2% | −23.3% | −32.4% |
+| `coverage == 1.0` (geometrically pure) | −0.0% | −8.0% | −19.9% | −30.1% |
+| **`weight`** (PSF-eroded) | **+0.0%** | **−0.2%** | **−0.6%** | **−1.5%** |
+
+Geometric purity is *not* sufficient: blur drags background signal into pixels entirely
+under foreground, and that contamination has a different footprint from partial
+coverage — so no coverage-based weighting removes it. Only spatial erosion does. See
+[docs/validation.md](docs/validation.md).
+
+## Terminology
+
+The classes are **foreground** and **background**, never dark/light — appearance
+inverts (white-on-black print, reflectance-reversed symbols, inverted imaging), so an
+appearance-based name would mean the mark in one image and the substrate in the next.
+`Polarity` carries that mapping explicitly:
+
+```python
+from inkmap import Polarity
+inkmap.find(photo, polarity=Polarity.FOREGROUND_IS_LIGHT)
+```
+
+The continuous value is **coverage**, after ISO 12647-2 *area coverage*. Full
+cross-field mapping to ISO/IEC 18004, 15415, DIBCO, printing, matting, remote sensing
+and medical-imaging vocabulary: [docs/terminology.md](docs/terminology.md).
+
+## How it works
+
+1. **Locate** — a cascade of `zxing-cpp`, OpenCV's Aruco-based QR detector and OpenCV's
+   classic detector, plus linear barcodes. On 189 real photographs: zxing 74%, aruco
+   68%, OpenCV 43%, **union 80%**. For marks nothing can auto-detect, `inkmap.place()`
+   takes the corners from you.
+2. **Recover the model** — from a bit-exact rectification where a decoder offers one,
+   otherwise sampled from the image. *Never* by re-encoding a decoded payload:
+   error-correction level and mask pattern are not recoverable from the text, so
+   re-encoding can silently produce a different pattern.
+3. **Refine** — align the rendered model to the photograph with ECC. Four locator
+   corners are four observations; the model has thousands. Takes corner error from
+   ~1 px to **0.02–0.03 px**.
+4. **Rasterise** — supersample each pixel, back-project through the transform, ask the
+   model. Exact up to quantisation, and independent of lighting.
+5. **Erode to a weight** — by 2–3× the estimated blur σ.
+
+Decoding is optional throughout. A mark whose material barely deposited will not
+decode, and that is exactly the case that must still work.
+
+## Extending it
+
+```python
+inkmap.LOCATORS["mine"] = my_locator          # (bgr, gray) -> list[Placement]
+inkmap.find(photo, locators=["mine", "qr_zxing"])
+```
+
+Tunable defaults live in `inkmap.config` — supersampling, ECC parameters, erosion
+margin, saturation levels — as documented constants rather than inline magic numbers.
+
+## Test data
+
+189 real photographs of marks in the wild (CC0 / public domain / CC BY / CC BY-SA),
+fetched on demand and cached:
+
+```python
+from inkmap import data
+paths = data.fetch()
+print(data.attribution_text())
+```
+
+Synthetic scenes with **exact** ground-truth coverage — the only way to validate a 0–1
+output, since no photograph comes with per-pixel truth:
+
+```python
+from inkmap import synth
+
+scene = synth.render(my_model, perspective=0.05, blur=1.2, glare=0.3, jpeg_quality=80)
+scene.image      # the degraded photograph
+scene.coverage   # exact ground truth, by construction
+```
+
+## Looking at results
+
+Coverage maps look plausible when subtly wrong, so check them:
+
+```python
+from inkmap import viz
+import cv2
+
+# original | overlay | coverage | weight
+cv2.imwrite("check.png", viz.panel(photo, ink))
+cv2.imwrite("grid.png", viz.overlay(photo, ink, draw_grid=True))
+```
+
+## Install notes
+
+Hard dependencies are `numpy`, `opencv-python-headless` and `zxing-cpp` — all
+permissively licensed (BSD / Apache-2.0), all pure wheels, no system libraries.
+
+If you already have `opencv-python` or `opencv-contrib-python`, install with
+`--no-deps` and keep yours: all four `opencv-*` distributions provide the same `cv2`
+and conflict when more than one is installed.
+
+`segno` is needed only to build a QR for an arbitrary payload (`inkmap[synth]`);
+Pillow only for `GlyphModel` (`inkmap[text]`).
+
+Deliberately **not** used: `qrdet` / `qreader`, which are MIT on the tin but depend on
+`ultralytics`, which is AGPL-3.0.
+
+## License
+
+MIT

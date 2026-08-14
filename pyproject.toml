@@ -1,0 +1,189 @@
+[build-system]
+requires = [
+    "hatchling",
+]
+build-backend = "hatchling.build"
+
+[project]
+name = "inkmap"
+version = "0.1.0"
+description = "Per-pixel foreground coverage for photographed marks -- QR, barcodes, text, any shape you can model"
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = [
+    "segmentation",
+    "coverage",
+    "foreground",
+    "ink",
+    "subpixel",
+    "photometry",
+    "qrcode",
+    "barcode",
+    "ocr",
+    "image-processing",
+    "computer-vision",
+]
+authors = [
+    { name = "Thor Whalen" },
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Image Processing",
+]
+# numpy + one OpenCV distribution + zxing-cpp. The headless OpenCV build is chosen
+# deliberately: it is the same cv2 without the GUI/GTK system libraries, which a
+# library has no business dragging in. If you already have opencv-python or
+# opencv-contrib-python installed, install inkmap with --no-deps and keep yours --
+# all four opencv-* distributions provide the same `cv2` module and conflict when
+# more than one is present.
+dependencies = [
+    "numpy>=1.23",
+    "opencv-python-headless>=4.7",
+    "zxing-cpp>=2.0",
+]
+
+[project.license]
+text = "MIT"
+
+[project.urls]
+Homepage = "https://github.com/thorwhalen/inkmap"
+
+[project.optional-dependencies]
+synth = [
+    "segno>=1.5",
+]
+text = [
+    "pillow>=9.0",
+]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.1.0",
+    "segno>=1.5",
+    "pillow>=9.0",
+]
+docs = [
+    "sphinx>=6.0",
+    "sphinx-rtd-theme>=1.0",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+exclude = [
+    "**/*.ipynb",
+    # Markdown is excluded because `ruff format` rewrites fenced code blocks, and it
+    # breaks prose that reads across a line (an aligned trailing comment continued on
+    # the next line becomes a stray comment). Docs are written for reading.
+    "**/*.md",
+    ".git",
+    ".venv",
+    "build",
+    "dist",
+    "tests",
+    "examples",
+    "scrap",
+]
+
+[tool.ruff.lint]
+select = [
+    "D100",
+]
+ignore = [
+    "D203",
+    "E501",
+    "B905",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/*" = [
+    "D",
+]
+"**/examples/*" = [
+    "D",
+]
+"**/scrap/*" = [
+    "D",
+]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = [
+    "tests",
+]
+doctest_optionflags = [
+    "NORMALIZE_WHITESPACE",
+    "ELLIPSIS",
+]
+
+[tool.wads.ci]
+project_name = ""
+
+[tool.wads.ci.commands]
+pre_test = []
+test = []
+post_test = []
+lint = []
+format = []
+
+[tool.wads.ci.env]
+required_envvars = []
+test_envvars = []
+extra_envvars = []
+
+[tool.wads.ci.env.defaults]
+
+[tool.wads.ci.quality.ruff]
+enabled = true
+
+[tool.wads.ci.quality.black]
+enabled = false
+
+[tool.wads.ci.quality.mypy]
+enabled = false
+
+[tool.wads.ci.testing]
+enabled = true
+python_versions = [
+    "3.10",
+    "3.12",
+]
+pytest_args = [
+    "-v",
+    "--tb=short",
+]
+coverage_enabled = true
+coverage_threshold = 0
+coverage_report_format = [
+    "term",
+    "xml",
+]
+exclude_paths = [
+    "examples",
+    "scrap",
+]
+test_on_windows = true
+
+[tool.wads.ci.build]
+sdist = true
+wheel = true
+
+[tool.wads.ci.publish]
+enabled = true
+skip_ci_marker = "[skip ci]"
+publish_marker = "[publish]"
+
+[tool.wads.ci.docs]
+enabled = true
+builder = "epythet"
+ignore_paths = [
+    "tests/",
+    "scrap/",
+    "examples/",
+]
