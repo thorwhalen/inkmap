@@ -13,7 +13,7 @@ import cv2
 import numpy as np
 
 import inkmap
-from inkmap import data
+from inkmap import corpus as data
 
 warnings.filterwarnings("ignore")
 MAX_SIDE = 1600  # downscale huge originals; a 4000 px billboard adds nothing but time

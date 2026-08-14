@@ -467,3 +467,68 @@ def test_render_is_deterministic_given_a_seed():
     a = synth.render(perspective=0.05, noise=5, rng=42)
     b = synth.render(perspective=0.05, noise=5, rng=42)
     assert np.array_equal(a.image, b.image)
+
+
+# --------------------------------------------------------------------------- #
+# Barcode model recovery -- regression for a bug found on real photographs
+# --------------------------------------------------------------------------- #
+
+needs_pybarcode = pytest.mark.skipif(
+    __import__("importlib.util", fromlist=["util"]).find_spec("barcode") is None,
+    reason="python-barcode not installed",
+)
+
+
+def _render_barcode(symbology: str, data: str):
+    import io
+
+    import barcode
+    from barcode.writer import ImageWriter
+    from PIL import Image
+
+    buf = io.BytesIO()
+    barcode.get(symbology, data, writer=ImageWriter()).write(
+        buf,
+        options={
+            "module_width": 0.4,
+            "module_height": 12.0,
+            "quiet_zone": 6.0,
+            "write_text": False,
+            "dpi": 300,
+        },
+    )
+    return np.array(Image.open(buf).convert("L"))
+
+
+@needs_pil
+@needs_pybarcode
+@pytest.mark.parametrize(
+    "symbology,data,expected_modules",
+    [("ean13", "5901234123457", 95), ("ean8", "96385074", 67), ("upca", "036000291452", 95)],
+)
+def test_fixed_width_symbologies_recover_the_spec_module_count(
+    symbology, data, expected_modules
+):
+    """The count is fixed by the specification, so estimating it is a needless risk.
+
+    Regression: a percentile-based module-width estimate returned 105 modules for a
+    95-module EAN-13. Every bar after the first was then placed wrong, while the mask
+    still looked like a barcode -- real-photograph round-trip decode was 5%.
+    """
+    image = _render_barcode(symbology, data)
+    ink = inkmap.find(cv2.cvtColor(image, cv2.COLOR_GRAY2BGR), locators=["barcode_zxing"])
+    assert ink is not None, f"{symbology} not located"
+    assert ink.model.bars.size == expected_modules
+
+
+@needs_pil
+@needs_pybarcode
+@pytest.mark.parametrize("data", ["INKMAP-TEST", "0123456789"])
+def test_variable_width_symbology_is_verified_against_the_payload(data):
+    """Code 128 has no fixed module count, so the fit is checked by re-decoding."""
+    from inkmap.locate.barcode import _decodes_to
+
+    image = _render_barcode("code128", data)
+    ink = inkmap.find(cv2.cvtColor(image, cv2.COLOR_GRAY2BGR), locators=["barcode_zxing"])
+    assert ink is not None
+    assert _decodes_to(ink.model.bars, data), "recovered bars do not decode to the payload"

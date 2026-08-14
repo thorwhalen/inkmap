@@ -13,7 +13,7 @@ and any degradation applied afterwards (blur, noise, gradient, glare, JPEG) leav
 ground truth correct.
 
 Works for any model, so a text or logo pipeline is validated the same way as a QR one.
-Real photographs remain essential for *detection* rate -- see :mod:`inkmap.data`.
+Real photographs remain essential for *detection* rate -- see :mod:`inkmap.corpus`.
 """
 
 from __future__ import annotations
@@ -32,7 +32,7 @@ from .models import MatrixModel, Model
 
 __all__ = ["Scene", "render", "qr_model", "default_matrix", "degrade"]
 
-_DEFAULT_MATRIX_PATH = Path(__file__).parent / "assets" / "default_qr.txt"
+_DEFAULT_MATRIX_PATH = Path(__file__).parent / "data" / "default_qr.txt"
 
 
 @dataclass(frozen=True)

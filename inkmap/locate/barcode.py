@@ -56,14 +56,60 @@ def _sample_profile(
     return strip[cut:-cut].mean(axis=0)
 
 
-def profile_to_bars(profile: np.ndarray) -> tuple[np.ndarray, float] | None:
+#: Symbologies whose total module count is fixed by the specification. Using the spec
+#: beats estimating: a module-width estimate that is 10% low inflates the module count
+#: by 10%, and every bar after the first is then placed wrong.
+FIXED_MODULE_COUNTS = {
+    "ean13": 95,
+    "upca": 95,
+    "ean8": 67,
+    "upce": 51,
+}
+
+
+def _fit_module_width(runs: np.ndarray, span: float) -> float | None:
+    """Find the module width that best explains the run lengths as integer multiples.
+
+    Every run in a linear barcode is a whole number of modules wide, so the correct
+    width is the one that makes ``run / width`` closest to integers across all runs.
+    Minimising that residual is far more robust than reading a percentile of the run
+    lengths: one noisy sample creates a spurious short run and drags a percentile down,
+    and a width that is 10% low inflates the module count by 10%.
+    """
+    if runs.size < 3:
+        return None
+    seed = float(np.percentile(runs, 10))
+    if seed < 1.0:
+        seed = float(runs.min())
+    if seed < 0.8:
+        return None
+
+    candidates = np.linspace(seed * 0.6, seed * 2.2, 400)
+    best, best_cost = None, np.inf
+    for width in candidates:
+        if width < 0.5:
+            continue
+        quotient = runs / width
+        # Ignore quotients that round to zero: those are noise, not modules.
+        keep = quotient > 0.5
+        if keep.sum() < 3:
+            continue
+        residual = quotient[keep] - np.round(quotient[keep])
+        total = span / width
+        cost = float(np.mean(residual**2)) + (total - round(total)) ** 2 / max(total, 1)
+        if cost < best_cost:
+            best, best_cost = float(width), cost
+    return best
+
+
+def profile_to_bars(
+    profile: np.ndarray, *, n_modules: int | None = None
+) -> tuple[np.ndarray, float] | None:
     """Quantise a 1-D profile into a bar pattern.
 
-    Returns ``(bars, module_px)`` where ``bars`` is boolean over module positions and
-    ``module_px`` is the estimated narrowest-bar width in profile samples. Thresholds at
-    the midpoint of the profile's range, per ISO/IEC 15416 3.5, then takes the module
-    width as a low percentile of run lengths -- low rather than the minimum, because a
-    single noisy sample creates a spurious one-sample run.
+    Returns ``(bars, module_px)``. Thresholds at the midpoint of the profile's range,
+    per ISO/IEC 15416 3.5. ``n_modules`` pins the module count when the symbology fixes
+    it; otherwise the module width is fitted from the run lengths.
     """
     if profile.size < 8:
         return None
@@ -78,20 +124,70 @@ def profile_to_bars(profile: np.ndarray) -> tuple[np.ndarray, float] | None:
     if runs.size < 3:
         return None
 
-    module_px = float(np.percentile(runs, 10))
-    if module_px < 1.0:
-        module_px = float(runs.min())
-    if module_px < 1.0:
-        return None
+    if n_modules is None:
+        module_px = _fit_module_width(runs.astype(float), float(dark.size))
+        if module_px is None:
+            return None
+        n_modules = int(round(dark.size / module_px))
+        if not 20 <= n_modules <= 2000:
+            return None
+    else:
+        module_px = dark.size / n_modules
 
-    n_modules = int(round(dark.size / module_px))
-    if not 20 <= n_modules <= 2000:
-        return None
-
-    # Resample the binary profile onto the module grid, at module centres.
+    # Sample at module centres.
     centers = (np.arange(n_modules) + 0.5) * (dark.size / n_modules)
     idx = np.clip(centers.astype(int), 0, dark.size - 1)
-    return dark[idx], module_px
+    return dark[idx], float(module_px)
+
+
+def _decodes_to(bars: np.ndarray, payload: str) -> bool:
+    """Render a bar pattern cleanly and check a decoder reads the expected payload."""
+    try:
+        import zxingcpp
+    except ImportError:
+        return False
+    scale, quiet = 4, 12
+    strip = np.repeat(~bars, scale)[None, :].astype(np.uint8) * 255
+    image = np.repeat(strip, 60, axis=0)
+    image = cv2.copyMakeBorder(
+        image, 20, 20, quiet * scale, quiet * scale, cv2.BORDER_CONSTANT, value=255
+    )
+    try:
+        return any(r.text == payload for r in zxingcpp.read_barcodes(image))
+    except Exception:
+        return False
+
+
+def recover_bars(
+    profile: np.ndarray, *, n_modules: int | None = None, payload: str | None = None
+) -> np.ndarray | None:
+    """Recover the bar pattern from a profile, verifying it against the payload.
+
+    Variable-length symbologies (Code 128, Code 39, ITF) do not pin the module count, so
+    it has to be fitted -- and a fit that is one module out places every bar after the
+    first incorrectly while still looking like a barcode. Since the decoder already told
+    us the payload, the recovered pattern can be *checked*: render it and see whether it
+    decodes back. If not, try neighbouring module counts.
+
+    This is not circular. The payload came from the decoder reading the photograph; the
+    pattern is being reconstructed from our own geometry. Agreement means the geometry
+    is right, and disagreement is a genuine failure signal rather than a guess.
+    """
+    first = profile_to_bars(profile, n_modules=n_modules)
+    if first is None:
+        return None
+    bars, _ = first
+    if payload is None or n_modules is not None or _decodes_to(bars, payload):
+        return bars
+
+    base = bars.size
+    for delta in (1, -1, 2, -2, 3, -3):
+        candidate = profile_to_bars(profile, n_modules=base + delta)
+        if candidate is None:
+            continue
+        if _decodes_to(candidate[0], payload):
+            return candidate[0]
+    return bars
 
 
 def locate_barcode_zxing(bgr: np.ndarray, gray: np.ndarray) -> list[Placement]:
@@ -136,10 +232,13 @@ def locate_barcode_zxing(bgr: np.ndarray, gray: np.ndarray) -> list[Placement]:
 
         # Oversample the profile so the narrowest bar spans several samples.
         profile = _sample_profile(gray, quad, width=int(min(4096, max(256, span * 4))))
-        found = profile_to_bars(profile)
-        if found is None:
+        bars = recover_bars(
+            profile,
+            n_modules=FIXED_MODULE_COUNTS.get(fmt),
+            payload=getattr(res, "text", None),
+        )
+        if bars is None:
             continue
-        bars, _ = found
 
         model = BarsModel(
             bars,

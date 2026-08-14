@@ -126,23 +126,66 @@ and medical-imaging vocabulary: [docs/terminology.md](docs/terminology.md).
 
 ## How it works
 
+```
+photograph ──► locate ──► recover model ──► refine transform ──► rasterise ──► erode
+```
+
 1. **Locate** — a cascade of `zxing-cpp`, OpenCV's Aruco-based QR detector and OpenCV's
    classic detector, plus linear barcodes. On 189 real photographs: zxing 74%, aruco
    68%, OpenCV 43%, **union 80%**. For marks nothing can auto-detect, `inkmap.place()`
    takes the corners from you.
 2. **Recover the model** — from a bit-exact rectification where a decoder offers one,
    otherwise sampled from the image. *Never* by re-encoding a decoded payload:
-   error-correction level and mask pattern are not recoverable from the text, so
-   re-encoding can silently produce a different pattern.
+   error-correction level, mask pattern and code-set choices are not recoverable from
+   the text, so re-encoding can silently produce a different pattern.
 3. **Refine** — align the rendered model to the photograph with ECC. Four locator
    corners are four observations; the model has thousands. Takes corner error from
-   ~1 px to **0.02–0.03 px**.
+   ~1 px to **0.02–0.03 px** (4–53× depending on conditions).
 4. **Rasterise** — supersample each pixel, back-project through the transform, ask the
-   model. Exact up to quantisation, and independent of lighting.
-5. **Erode to a weight** — by 2–3× the estimated blur σ.
+   model `occupancy(u, v)`. Exact up to the supersampling rate, and independent of
+   lighting. Coverage MAE against exact ground truth is **0.0000–0.0005**.
+5. **Erode to a weight** — by ~2× the estimated blur σ, because geometric purity is not
+   enough (see the table above).
 
 Decoding is optional throughout. A mark whose material barely deposited will not
 decode, and that is exactly the case that must still work.
+
+Sub-pixel geometry turns out to hinge on **three half-pixel conventions agreeing** —
+pixel-centre vs pixel-corner rasterisation, the template raster, and the fact that
+different locators disagree about what a "corner" is. Getting them wrong cost 50× in
+accuracy during development, and none of it is visible on inspection: the mask still
+looks like a mask. The diagnostic, if you ever chase this: *if the error grows with the
+mark's rotation angle following `R(d) − d`, the residual `d` is a convention offset, not
+noise.*
+
+## How well it works
+
+Validated three ways, because no single way is sufficient — synthetic scenes (exact
+ground truth by construction), real photographs (round-trip through an independent
+decoder), and DIBCO (hand-labelled per-pixel ink truth).
+
+| | detection | round-trip geometry | round-trip when *measurable* |
+|---|---|---|---|
+| **QR** (189 real photos) | 80% | 77% | **96%** |
+| **Barcode** (56 real photos) | 95% | 48% | **89%** |
+| **Text** (86 real words) | — (no locator; you supply the quad) | — | see below |
+
+The conditional matters: **when inkmap judges an image measurable, an independent decoder
+confirms the geometry 96% of the time.** Failures concentrate where the library already
+says not to trust it.
+
+On **real ink with hand-labelled ground truth** (DIBCO), eroding a *perfect* mask by one
+pixel shifts the measured foreground mean by **17% of the foreground/background
+contrast** — so the contamination argument is not an artefact of synthetic data.
+
+**Text is the honest weak spot.** Placement works (IoU 0.76 with an image-derived shape)
+but a glyph model with the wrong font does not (IoU 0.17). Measured directly: with the
+correct font IoU is 0.997–1.000; with a wrong one, 0.46–0.80. For text, pass the actual
+font or take the shape from the image.
+
+📄 **[Methods and results](docs/methods-and-results.md)** ([PDF](docs/methods-and-results.pdf))
+— the full write-up: approach, algorithms, every number, the datasets, the limits, and a
+barcode defect the evaluation caught and forced a fix for (round-trip 5% → 48%).
 
 ## Extending it
 
@@ -154,15 +197,25 @@ inkmap.find(photo, locators=["mine", "qr_zxing"])
 Tunable defaults live in `inkmap.config` — supersampling, ECC parameters, erosion
 margin, saturation levels — as documented constants rather than inline magic numbers.
 
+## Skills for AI agents
+
+If you drive inkmap from an agent, the shipped skill
+[`inkmap-usage`](inkmap/data/skills/inkmap-usage/SKILL.md) is the short version of
+everything that is easy to get wrong: choosing a model, the corner-order trap, which of
+the three 0–1 channels to use for what, and gating on measurability. Install it with
+[`skill`](https://github.com/thorwhalen/skill), or just read it.
+
 ## Test data
 
-189 real photographs of marks in the wild (CC0 / public domain / CC BY / CC BY-SA),
-fetched on demand and cached:
+384 real photographs of marks in the wild — 189 QR, 56 barcodes, 139 printed text —
+(CC0 / public domain / CC BY / CC BY-SA), fetched on demand and cached:
 
 ```python
-from inkmap import data
-paths = data.fetch()
-print(data.attribution_text())
+from inkmap import corpus
+
+corpus.kinds()                        # {'qr': 189, 'barcode': 56, 'text': 139}
+paths = corpus.fetch(kind="barcode")
+print(corpus.attribution_text())      # attribution is required for CC BY / CC BY-SA
 ```
 
 Synthetic scenes with **exact** ground-truth coverage — the only way to validate a 0–1
