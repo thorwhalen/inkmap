@@ -16,8 +16,10 @@ That is the seam that makes this work for "anything the user provides a model fo
 
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import Callable, Iterable, Sequence
 
+import cv2
 import numpy as np
 
 from .. import config, geometry
@@ -33,6 +35,7 @@ __all__ = [
     "Locator",
     "locate",
     "place",
+    "validated_scale",
     "locate_qr_opencv",
     "locate_qr_aruco",
     "locate_qr_zxing",
@@ -84,6 +87,8 @@ def locate(
     *,
     locators: Sequence[str | Locator] = config.DEFAULT_LOCATORS,
     first_hit: bool = False,
+    scale: float | None = None,
+    full_res_retry: bool = True,
 ) -> list[Placement]:
     """Run locator strategies and merge their results, de-duplicating by position.
 
@@ -91,7 +96,79 @@ def locate(
     first strategy that finds anything -- cheaper, and usually right when you know there
     is one mark. Otherwise every strategy runs and results merge, which is what earns
     the recall when an image holds several marks that no single detector finds all of.
+
+    **Coarse-to-fine.** ``scale`` (``0 < scale <= 1``) runs the cascade on a copy of the
+    frame downscaled by that factor (``cv2.INTER_AREA``), then maps every placement back
+    to full-resolution pixels. Locating costs roughly in proportion to pixel count, so
+    on a 4000 x 3000 photograph 0.5 is about 4x faster and 0.35 about 7x. ``None`` (the
+    default) or ``1`` locate at full resolution, exactly as without the argument. Pick
+    the scale from the codes' size: their modules should still span about 2 px or more
+    after downscaling.
+
+    The mapping is one affine ``A`` (small -> full pixels), in the pixel-centre
+    convention ``cv2.resize`` uses, ``x_full = (x_small + 0.5) / scale - 0.5``, applied
+    to both ``quad`` and ``transform`` (``A @ transform``). Model, locator name and
+    payload are kept; ``metadata["locate_scale"]`` records the scale used. Corner
+    conventions differ by locator (OpenCV's are inclusive pixel indices, zxing's are
+    the continuous outer boundary), so a locator's own half-pixel bias is magnified by
+    ``1 / scale`` on the way up -- a pixel or so at 0.5. That does not matter downstream
+    when :func:`inkmap.analyze` refines (its default), which pins the transform to
+    sub-pixel accuracy at full resolution anyway. The module matrix of a QR found by
+    zxing is sampled from the downscaled frame, so keep its modules >= 2 px there.
+
+    A coarse pass can find a mark it cannot decode -- typically a small code far from
+    the camera. With ``full_res_retry`` (default on; only meaningful with ``scale <
+    1``), each coarse placement whose ``payload`` is ``None`` is re-located on a padded
+    full-resolution crop around it, and replaced by what that finds there (marked
+    ``metadata["locate_retry"] = True``, ``locate_scale`` 1.0). The crops are small, so
+    this costs little. A mark the coarse pass misses entirely is not recovered: lower
+    the downscaling instead.
     """
+    scale = validated_scale(scale)
+    if scale is None:
+        return _locate_at(bgr, gray, locators=locators, first_hit=first_hit)
+
+    height, width = gray.shape[:2]
+    size = (max(1, round(width * scale)), max(1, round(height * scale)))
+    small_bgr = cv2.resize(bgr, size, interpolation=cv2.INTER_AREA)
+    small_gray = cv2.resize(gray, size, interpolation=cv2.INTER_AREA)
+    up = _upscaling(size[0] / width, size[1] / height)
+
+    coarse = _locate_at(small_bgr, small_gray, locators=locators, first_hit=first_hit)
+    out = []
+    for placement in coarse:
+        placement = _mapped(placement, up, locate_scale=scale)
+        if full_res_retry and placement.payload is None:
+            placement = (
+                _retry_at_full_resolution(
+                    placement, bgr, gray, locators=locators, first_hit=first_hit
+                )
+                or placement
+            )
+        out.append(placement)
+    return out
+
+
+def validated_scale(scale: float | None) -> float | None:
+    """Check a locate scale; ``None`` means full resolution (and so does ``1``)."""
+    if scale is None:
+        return None
+    try:
+        value = float(scale)
+    except (TypeError, ValueError):
+        raise ValueError(
+            f"scale must be a number in (0, 1] or None, got {scale!r}"
+        ) from None
+    if not 0.0 < value <= 1.0:  # also rejects nan
+        raise ValueError(
+            f"scale must be in (0, 1] -- the downscaling factor for a coarse locate, "
+            f"e.g. 0.5 -- or None for full resolution; got {scale!r}"
+        )
+    return None if value == 1.0 else value
+
+
+def _locate_at(bgr, gray, *, locators, first_hit) -> list[Placement]:
+    """The cascade itself, at whatever resolution it is handed."""
     found: list[Placement] = []
     for spec in locators:
         fn = LOCATORS[spec] if isinstance(spec, str) else spec
@@ -105,6 +182,86 @@ def locate(
         if first_hit and found:
             break
     return found
+
+
+def _upscaling(sx: float, sy: float) -> np.ndarray:
+    """Affine from downscaled to full-resolution pixels, pixel-centre convention.
+
+    ``cv2.resize`` aligns pixel centres: small pixel ``i`` covers full-resolution
+    ``[i / s, (i + 1) / s)`` in edge coordinates, so its centre ``i`` maps to
+    ``(i + 0.5) / s - 0.5``.
+    """
+    return np.array(
+        [
+            [1.0 / sx, 0.0, 0.5 / sx - 0.5],
+            [0.0, 1.0 / sy, 0.5 / sy - 0.5],
+            [0.0, 0.0, 1.0],
+        ]
+    )
+
+
+def _mapped(placement: Placement, affine: np.ndarray, **metadata) -> Placement:
+    """``placement`` carried through an image-space affine (both quad and transform)."""
+    transform = affine @ np.asarray(placement.transform, dtype=np.float64)
+    transform = transform / transform[2, 2]
+    quad = (
+        np.asarray(placement.quad, dtype=np.float64) @ affine[:2, :2].T + affine[:2, 2]
+    )
+    return replace(
+        placement,
+        transform=transform,
+        quad=quad.astype(np.float32),
+        metadata={**placement.metadata, **metadata},
+    )
+
+
+def _retry_at_full_resolution(
+    placement: Placement,
+    bgr: np.ndarray,
+    gray: np.ndarray,
+    *,
+    locators,
+    first_hit: bool,
+    padding: float = config.LOCATE_RETRY_PADDING,
+) -> Placement | None:
+    """Re-locate an undecoded coarse placement on a full-resolution crop around it.
+
+    Returns the full-resolution placement of the same mark (preferring a decoded one),
+    in full-image coordinates, or ``None`` if the crop yields nothing there.
+    """
+    height, width = gray.shape[:2]
+    lo, hi = placement.quad.min(axis=0), placement.quad.max(axis=0)
+    pad = padding * float(max(hi - lo))
+    x0, y0 = (max(0, int(np.floor(v - pad))) for v in lo)
+    x1 = min(width, int(np.ceil(hi[0] + pad)) + 1)
+    y1 = min(height, int(np.ceil(hi[1] + pad)) + 1)
+    if x1 - x0 < 2 or y1 - y0 < 2:
+        return None
+
+    found = _locate_at(
+        np.ascontiguousarray(bgr[y0:y1, x0:x1]),
+        np.ascontiguousarray(gray[y0:y1, x0:x1]),
+        locators=locators,
+        first_hit=first_hit,
+    )
+    shift = np.array([[1.0, 0.0, x0], [0.0, 1.0, y0], [0.0, 0.0, 1.0]])
+    same_mark = [
+        candidate
+        for candidate in (
+            _mapped(p, shift, locate_scale=1.0, locate_retry=True) for p in found
+        )
+        if _duplicate(candidate, [placement])
+    ]
+    if not same_mark:
+        return None
+    centre = placement.quad.mean(axis=0)
+    return min(
+        same_mark,
+        key=lambda c: (
+            c.payload is None,
+            float(np.linalg.norm(c.quad.mean(axis=0) - centre)),
+        ),
+    )
 
 
 def _duplicate(candidate: Placement, existing: Iterable[Placement]) -> bool:

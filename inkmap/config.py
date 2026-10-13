@@ -77,3 +77,10 @@ BLACK_CLIP_LEVEL = 2
 #: QR codes: zxing 74%, aruco 68%, opencv 43%, union 80% -- the cascade is worth ~37
 #: points of recall over OpenCV alone.
 DEFAULT_LOCATORS = ("qr_zxing", "qr_aruco", "qr_opencv", "barcode_zxing")
+
+#: Coarse-to-fine locating (``locate(..., scale=s)``): a coarse placement that was
+#: found but not decoded is retried on a full-resolution crop around it, padded on each
+#: side by this fraction of the placement's larger bounding-box side. 0.5 comfortably
+#: holds a QR quiet zone (4 modules of a symbol at least 21 wide) plus the coarse
+#: pass's position error, while keeping the crop a small fraction of the frame.
+LOCATE_RETRY_PADDING = 0.5
