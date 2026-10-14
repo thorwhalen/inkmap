@@ -421,7 +421,12 @@ def test_polarity_inversion_swaps_the_classes(qr_scene):
 
 
 def test_locators_registry_is_extensible():
-    assert set(inkmap.LOCATORS) >= {"qr_zxing", "qr_aruco", "qr_opencv", "barcode_zxing"}
+    assert set(inkmap.LOCATORS) >= {
+        "qr_zxing",
+        "qr_aruco",
+        "qr_opencv",
+        "barcode_zxing",
+    }
     calls = []
 
     def custom(bgr, gray):
@@ -440,6 +445,252 @@ def test_a_failing_locator_does_not_break_the_cascade(qr_scene):
         raise RuntimeError("boom")
 
     assert inkmap.find(qr_scene.image, locators=[broken, "qr_zxing"]) is not None
+
+
+# --------------------------------------------------------------------------- #
+# Coarse-to-fine locating
+# --------------------------------------------------------------------------- #
+
+
+def _qr_cells(text: str) -> np.ndarray:
+    """A QR module matrix for ``text`` from OpenCV's encoder (no segno needed)."""
+    image = cv2.QRCodeEncoder.create().encode(text)
+    dark = image < 128
+    rows, cols = np.flatnonzero(dark.any(axis=1)), np.flatnonzero(dark.any(axis=0))
+    return dark[rows[0] : rows[-1] + 1, cols[0] : cols[-1] + 1]
+
+
+def _qr_page(*, pixels_per_unit, shape=(700, 1400), n=4, seed=0, **degradation):
+    """A page with ``n`` distinct QR codes in a row, mildly rotated and in perspective."""
+    rng = np.random.default_rng(seed)
+    height, width = shape
+    page = np.full(shape, 255, dtype=np.uint8)
+    for i in range(n):
+        model = models.MatrixModel(_qr_cells(f"inkmap-page-{i:02d}-xxxxxx"))
+        tile = int(model.extent[0] * pixels_per_unit * 1.6)
+        scene = synth.render(
+            model,
+            size=tile,
+            pixels_per_unit=pixels_per_unit,
+            perspective=0.03,
+            rotation=rng.uniform(-8, 8),
+            rng=rng,
+        )
+        x0 = int((i + 0.5) * width / n - tile / 2)
+        y0 = int(height / 2 - tile / 2)
+        window = page[y0 : y0 + tile, x0 : x0 + tile]
+        np.minimum(window, scene.image, out=window)
+    return synth.degrade(page.astype(np.float32), rng=rng, **degradation)
+
+
+def _nearest(placement, others):
+    centre = placement.quad.mean(axis=0)
+    return min(
+        others, key=lambda o: float(np.linalg.norm(o.quad.mean(axis=0) - centre))
+    )
+
+
+@pytest.fixture(scope="module")
+def qr_page() -> np.ndarray:
+    """10 px/module: 5 px after halving, clear of ``MIN_COARSE_PIXELS_PER_FEATURE``,
+    so these codes stay on the coarse path (no retry)."""
+    return _qr_page(pixels_per_unit=10.0, shape=(600, 1800), blur=0.6, noise=2.0)
+
+
+def _within_mark_difference(ink, reference) -> float:
+    """Mean |coverage difference| over the pixels either mark covers -- not the whole
+    frame, whose blank background would dilute a wrong model into a tiny mean."""
+    inside = (ink.coverage > 0) | (reference.coverage > 0)
+    return float(np.abs(ink.coverage - reference.coverage)[inside].mean())
+
+
+def _assert_coarse_matches_full(page, *, scale=0.5, **kwargs):
+    """``find_all`` with ``locate_scale`` gives the full-resolution models and
+    within-mark coverage; returns the coarse results for further checks."""
+    full = inkmap.find_all(page, **kwargs)
+    coarse = inkmap.find_all(page, locate_scale=scale, **kwargs)
+    assert len(full) == len(coarse) > 0
+    for ink in coarse:
+        reference = min(
+            full,
+            key=lambda m: float(
+                np.linalg.norm(m.placement.quad.mean(0) - ink.placement.quad.mean(0))
+            ),
+        )
+        assert ink.placement.refined
+        a, b = ink.placement.model, reference.placement.model
+        for attr in ("cells", "bars"):
+            if hasattr(a, attr):
+                assert np.array_equal(getattr(a, attr), getattr(b, attr)), attr
+        assert np.abs(ink.placement.quad - reference.placement.quad).max() < 0.1
+        assert _within_mark_difference(ink, reference) < 1e-3
+    return coarse
+
+
+def test_locate_scale_one_is_full_resolution(qr_scene):
+    """``scale=None`` and ``scale=1`` are the full-resolution path, unchanged."""
+    gray = qr_scene.image
+    bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+    base = inkmap.locate(bgr, gray)
+    for scale in (None, 1, 1.0):
+        again = inkmap.locate(bgr, gray, scale=scale)
+        assert len(again) == len(base) > 0
+        for a, b in zip(again, base):
+            assert np.array_equal(a.quad, b.quad)
+            assert np.array_equal(a.transform, b.transform)
+            assert np.array_equal(a.model.cells, b.model.cells)
+            assert (a.locator, a.payload, a.metadata) == (
+                b.locator,
+                b.payload,
+                b.metadata,
+            )
+
+
+def test_coarse_locate_finds_every_code_close_to_full_resolution(qr_page):
+    bgr = cv2.cvtColor(qr_page, cv2.COLOR_GRAY2BGR)
+    full = inkmap.locate(bgr, qr_page)
+    scale = 0.5
+    coarse = inkmap.locate(bgr, qr_page, scale=scale)
+    assert len(full) == len(coarse) == 4
+    assert {p.payload for p in coarse} == {p.payload for p in full}
+    errors = []
+    for placement in coarse:
+        reference = _nearest(placement, full)
+        assert placement.metadata["locate_scale"] == scale
+        assert np.array_equal(placement.model.cells, reference.model.cells)
+        offset = np.abs(placement.quad - reference.quad)
+        # zxing reports integer corners, so one coarse pixel (1 / scale) of
+        # quantisation plus the half-pixel corner convention is inherent per axis...
+        assert offset[[0, 1, 3]].max() <= 1.0 / scale + 0.5
+        # ...and the corner without a finder pattern is extrapolated, at either scale.
+        assert offset[2].max() <= 2.0 / scale
+        errors.append(np.linalg.norm(placement.quad - reference.quad, axis=1))
+        # transform and quad stay consistent after the mapping
+        implied = geometry.transform_to_quad(placement.transform, placement.model)
+        assert np.abs(implied - placement.quad).max() < 1e-2
+    # On average the mapped corners land within ~1.5 full-resolution px.
+    assert float(np.mean(errors)) <= 1.5
+
+
+def test_coarse_find_all_matches_full_resolution_coverage(qr_page):
+    """Refinement pins both to the same sub-pixel geometry, so coverage agrees."""
+    coarse = _assert_coarse_matches_full(qr_page)
+    assert len(coarse) == 4
+
+
+@pytest.mark.parametrize("pixels_per_unit", [4.0, 5.0, 6.0, 7.0])
+def test_undersampled_coarse_codes_get_full_resolution_models(pixels_per_unit):
+    """Below ~4 px/module after downscaling, the module count and matrix read off the
+    coarse frame are wrong although the codes decode (2 px: a 25 x 25 symbol read as
+    21 x 21; 2.5-3.5 px: tens of flipped modules). Those placements are re-located at
+    full resolution, so the models -- and the coverage -- match full resolution."""
+    page = _qr_page(pixels_per_unit=pixels_per_unit, blur=0.6, noise=2.0)
+    bgr = cv2.cvtColor(page, cv2.COLOR_GRAY2BGR)
+    full = inkmap.locate(bgr, page)
+    coarse = inkmap.locate(bgr, page, scale=0.5)
+    assert len(full) == len(coarse) == 4
+    for placement in coarse:
+        assert placement.metadata["locate_retry"] == "undersampled"
+        assert placement.metadata["locate_scale"] == 1.0
+        reference = _nearest(placement, full)
+        assert np.array_equal(placement.model.cells, reference.model.cells)
+
+    # without the retry they stay coarse, and say their model is not to be trusted
+    kept = inkmap.locate(bgr, page, scale=0.5, full_res_retry=False)
+    assert all(p.metadata.get("locate_undersampled") is True for p in kept)
+    assert all(p.metadata["locate_scale"] == 0.5 for p in kept)
+
+
+def test_undersampled_coarse_qr_coverage_matches_full_resolution():
+    _assert_coarse_matches_full(_qr_page(pixels_per_unit=5.0, blur=0.6, noise=2.0))
+
+
+def _barcode_page(text, *, module_px, rotation=7.0, shape=(400, 1000)):
+    """A zxing-encoded EAN-13, ``module_px`` px per module, rotated -- no extra deps."""
+    zxingcpp = pytest.importorskip("zxingcpp")
+    if not hasattr(zxingcpp, "create_barcode"):
+        pytest.skip("this zxing-cpp has no barcode writer")
+    symbol = zxingcpp.create_barcode(text, zxingcpp.BarcodeFormat.EAN13)
+    row = np.asarray(symbol.to_image(scale=1, add_quiet_zones=False))
+    row = row[row.shape[0] // 2]
+    strip = cv2.resize(
+        np.repeat(row[None], 60, axis=0),
+        None,
+        fx=module_px,
+        fy=1,
+        interpolation=cv2.INTER_NEAREST,
+    )
+    page = np.full(shape, 255, dtype=np.uint8)
+    y0, x0 = (shape[0] - strip.shape[0]) // 2, (shape[1] - strip.shape[1]) // 2
+    page[y0 : y0 + strip.shape[0], x0 : x0 + strip.shape[1]] = strip
+    turn = cv2.getRotationMatrix2D((shape[1] / 2, shape[0] / 2), rotation, 1.0)
+    page = cv2.warpAffine(page, turn, shape[::-1], borderValue=255)
+    return synth.degrade(page.astype(np.float32), rng=0, blur=0.6, noise=2.0)
+
+
+def test_undersampled_coarse_barcode_matches_full_resolution():
+    """2 px per module after halving: the bar pattern is re-read at full resolution."""
+    page = _barcode_page("5901234123457", module_px=4)
+    coarse = _assert_coarse_matches_full(page, locators=["barcode_zxing"])
+    assert [ink.placement.metadata["locate_retry"] for ink in coarse] == [
+        "undersampled"
+    ]
+
+
+def test_full_res_retry_recovers_a_payload_the_coarse_pass_missed():
+    """A decoder that needs >= 6 px per module: it locates the coarse codes (5 px per
+    module after downscaling, above the undersampling floor) but cannot decode them,
+    and decodes them at full resolution."""
+    from dataclasses import replace
+
+    def needs_six_px_per_module(bgr, gray):
+        return [
+            p if p.pixels_per_unit >= 6.0 else replace(p, payload=None)
+            for p in inkmap.LOCATORS["qr_zxing"](bgr, gray)
+        ]
+
+    page = _qr_page(pixels_per_unit=10.0, n=2, shape=(500, 1000))
+    bgr = cv2.cvtColor(page, cv2.COLOR_GRAY2BGR)
+    kw = dict(locators=[needs_six_px_per_module], scale=0.5)
+    without = inkmap.locate(bgr, page, full_res_retry=False, **kw)
+    assert len(without) == 2 and all(p.payload is None for p in without)
+    assert not any(p.metadata.get("locate_undersampled") for p in without)
+
+    retried = inkmap.locate(bgr, page, **kw)
+    assert len(retried) == 2
+    reference = inkmap.locate(bgr, page, locators=["qr_zxing"])
+    for placement in retried:
+        target = _nearest(placement, reference)
+        assert placement.payload is not None and placement.payload == target.payload
+        assert placement.metadata["locate_retry"] == "undecoded"
+        assert placement.metadata["locate_scale"] == 1.0
+        # zxing is not exactly translation-invariant: a crop can move a corner by 1 px
+        assert np.abs(placement.quad - target.quad).max() <= 1.0
+
+
+def test_full_res_retry_on_a_code_too_small_to_decode_coarsely():
+    """Realistic case: at 1.4 px/module after downscaling, Aruco finds a code that
+    nothing decodes; the full-resolution retry decodes it."""
+    page = _qr_page(pixels_per_unit=2.8, shape=(500, 1000), seed=0, blur=0.6, noise=2.0)
+    bgr = cv2.cvtColor(page, cv2.COLOR_GRAY2BGR)
+    coarse = inkmap.locate(bgr, page, scale=0.5, full_res_retry=False)
+    if all(p.payload is not None for p in coarse):
+        pytest.skip(
+            "this OpenCV/zxing build decodes every code coarsely; nothing to retry"
+        )
+    retried = inkmap.locate(bgr, page, scale=0.5)
+    assert len(retried) == len(coarse)
+    assert all(p.payload is not None for p in retried)
+    assert any(p.metadata.get("locate_retry") for p in retried)
+
+
+@pytest.mark.parametrize("scale", [0, -0.5, 1.5, float("nan"), "half"])
+def test_invalid_locate_scale_is_rejected(qr_scene, scale):
+    gray = qr_scene.image
+    with pytest.raises(ValueError, match="scale"):
+        inkmap.locate(cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR), gray, scale=scale)
+    with pytest.raises(ValueError, match="scale"):
+        inkmap.find_all(gray, locate_scale=scale)
 
 
 # --------------------------------------------------------------------------- #
@@ -504,7 +755,11 @@ def _render_barcode(symbology: str, data: str):
 @needs_pybarcode
 @pytest.mark.parametrize(
     "symbology,data,expected_modules",
-    [("ean13", "5901234123457", 95), ("ean8", "96385074", 67), ("upca", "036000291452", 95)],
+    [
+        ("ean13", "5901234123457", 95),
+        ("ean8", "96385074", 67),
+        ("upca", "036000291452", 95),
+    ],
 )
 def test_fixed_width_symbologies_recover_the_spec_module_count(
     symbology, data, expected_modules
@@ -516,7 +771,9 @@ def test_fixed_width_symbologies_recover_the_spec_module_count(
     still looked like a barcode -- real-photograph round-trip decode was 5%.
     """
     image = _render_barcode(symbology, data)
-    ink = inkmap.find(cv2.cvtColor(image, cv2.COLOR_GRAY2BGR), locators=["barcode_zxing"])
+    ink = inkmap.find(
+        cv2.cvtColor(image, cv2.COLOR_GRAY2BGR), locators=["barcode_zxing"]
+    )
     assert ink is not None, f"{symbology} not located"
     assert ink.model.bars.size == expected_modules
 
@@ -529,6 +786,10 @@ def test_variable_width_symbology_is_verified_against_the_payload(data):
     from inkmap.locate.barcode import _decodes_to
 
     image = _render_barcode("code128", data)
-    ink = inkmap.find(cv2.cvtColor(image, cv2.COLOR_GRAY2BGR), locators=["barcode_zxing"])
+    ink = inkmap.find(
+        cv2.cvtColor(image, cv2.COLOR_GRAY2BGR), locators=["barcode_zxing"]
+    )
     assert ink is not None
-    assert _decodes_to(ink.model.bars, data), "recovered bars do not decode to the payload"
+    assert _decodes_to(ink.model.bars, data), (
+        "recovered bars do not decode to the payload"
+    )

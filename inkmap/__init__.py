@@ -52,7 +52,7 @@ import numpy as np
 
 from . import config, coverage as _coverage, geometry, models, photometry
 from .coverage import confidence, coverage_map, measurement_weight, observed_coverage
-from .locate import LOCATORS, locate, place
+from .locate import LOCATORS, locate, place, validated_scale
 from .models import Model
 from .photometry import (
     Measurability,
@@ -179,6 +179,7 @@ def find_all(
     model: Model | None = None,
     quad=None,
     locators=config.DEFAULT_LOCATORS,
+    locate_scale: float | None = None,
     **kwargs,
 ) -> list[InkMap]:
     """Find every mark in ``image`` and compute its foreground coverage.
@@ -195,7 +196,15 @@ def find_all(
     from the model -- exact and lighting-independent, answering "where should the
     foreground be". ``"observed"`` reads it from the photograph, answering "where is
     the foreground actually", and so is the one that can see a printing defect.
+
+    ``locate_scale`` (e.g. ``0.5``) locates on a downscaled copy of the frame and maps
+    the placements back -- several times faster on large photographs, with refinement
+    restoring sub-pixel geometry. Codes need about 4 px per module *after* downscaling
+    (``config.MIN_COARSE_PIXELS_PER_FEATURE``); those below are re-located at full
+    resolution. ``None`` (default) locates at full resolution. See
+    :func:`inkmap.locate` (its ``scale``). Ignored when ``model``/``quad`` are given.
     """
+    locate_scale = validated_scale(locate_scale)
     if model is not None:
         if quad is None:
             raise ValueError(
@@ -208,7 +217,7 @@ def find_all(
     else:
         bgr = _as_bgr(image)
         gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
-        placements = locate(bgr, gray, locators=locators)
+        placements = locate(bgr, gray, locators=locators, scale=locate_scale)
 
     return analyze(image, placements, **kwargs)
 

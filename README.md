@@ -187,6 +187,12 @@ font or take the shape from the image.
 — the full write-up: approach, algorithms, every number, the datasets, the limits, and a
 barcode defect the evaluation caught and forced a fix for (round-trip 5% → 48%).
 
+## Large photographs: locate coarse, refine fine
+
+Locating is a large share of the cost on big frames and scales with pixel count, so `find_all(photo, locate_scale=0.5)` (or `locate(bgr, gray, scale=0.5)`) runs the detectors on an `INTER_AREA`-downscaled copy and maps the placements back to full resolution; refinement then pins them to sub-pixel accuracy as usual, so coverage maps match the full-resolution ones. On a 4000 x 3000 photograph of a page with 8 QR codes, locating took 1,129 ms at full resolution, 288 ms at 0.5 and 152 ms at 0.35, with all 8 codes found and decoded (on a slower 2-core server, a synthetic page of the same size: 11.6 s, 2.5 s and 1.1 s).
+
+Use it when your codes are large in the frame: a code's modules should still span about 4 px after downscaling (`config.MIN_COARSE_PIXELS_PER_FEATURE`), i.e. 8 px at full resolution for 0.5 and about 11.5 px for 0.35. Below that the module count and pattern read off the small frame go wrong even though the code still decodes (at 2 px a 25 x 25 QR reads as 21 x 21), and refinement cannot repair a wrong model. So, with `full_res_retry=True` (the default), any coarse placement under that floor, or found but not decoded, is re-located on a full-resolution crop around it (`metadata["locate_retry"]` says why). The crops are small, but if every code needs one the speedup is gone, so pick the scale from your smallest code. With `full_res_retry=False`, placements under the floor are kept and marked `metadata["locate_undersampled"] = True`; do not trust their model. Custom locators run on the downscaled frame and must return coordinates in the frame they are given. A code the coarse pass misses entirely is not recovered, so lower the downscaling instead. The default, `None`, locates at full resolution exactly as before.
+
 ## Extending it
 
 ```python
