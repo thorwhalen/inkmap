@@ -101,28 +101,41 @@ def locate(
     frame downscaled by that factor (``cv2.INTER_AREA``), then maps every placement back
     to full-resolution pixels. Locating costs roughly in proportion to pixel count, so
     on a 4000 x 3000 photograph 0.5 is about 4x faster and 0.35 about 7x. ``None`` (the
-    default) or ``1`` locate at full resolution, exactly as without the argument. Pick
-    the scale from the codes' size: their modules should still span about 2 px or more
-    after downscaling.
+    default) or ``1`` locate at full resolution, exactly as without the argument.
+
+    Every locator -- a registered name or your own callable -- is handed the
+    *downscaled* ``bgr`` and ``gray`` (and, on a retry, a full-resolution crop), and
+    must return placements in the coordinates of the frame it was given; mapping them
+    back to the full frame is done here. A locator that bakes in absolute pixel sizes
+    or positions will misbehave under ``scale``.
 
     The mapping is one affine ``A`` (small -> full pixels), in the pixel-centre
     convention ``cv2.resize`` uses, ``x_full = (x_small + 0.5) / scale - 0.5``, applied
-    to both ``quad`` and ``transform`` (``A @ transform``). Model, locator name and
-    payload are kept; ``metadata["locate_scale"]`` records the scale used. Corner
-    conventions differ by locator (OpenCV's are inclusive pixel indices, zxing's are
-    the continuous outer boundary), so a locator's own half-pixel bias is magnified by
-    ``1 / scale`` on the way up -- a pixel or so at 0.5. That does not matter downstream
-    when :func:`inkmap.analyze` refines (its default), which pins the transform to
-    sub-pixel accuracy at full resolution anyway. The module matrix of a QR found by
-    zxing is sampled from the downscaled frame, so keep its modules >= 2 px there.
+    to both ``quad`` and ``transform`` (``A @ transform``). Locator name and payload are
+    kept; ``metadata["locate_scale"]`` records the scale used. Corner conventions differ
+    by locator (OpenCV's are inclusive pixel indices, zxing's are the continuous outer
+    boundary), so a locator's own half-pixel bias is magnified by ``1 / scale`` on the
+    way up -- a pixel or so at 0.5. That does not matter downstream when
+    :func:`inkmap.analyze` refines (its default), which pins the transform to sub-pixel
+    accuracy at full resolution anyway.
 
-    A coarse pass can find a mark it cannot decode -- typically a small code far from
-    the camera. With ``full_res_retry`` (default on; only meaningful with ``scale <
-    1``), each coarse placement whose ``payload`` is ``None`` is re-located on a padded
-    full-resolution crop around it, and replaced by what that finds there (marked
-    ``metadata["locate_retry"] = True``, ``locate_scale`` 1.0). The crops are small, so
-    this costs little. A mark the coarse pass misses entirely is not recovered: lower
-    the downscaling instead.
+    **The model is the fragile part, not the geometry.** Locators read the model off
+    the frame they are given -- a QR's module count and module matrix, a barcode's bar
+    pattern -- and refinement cannot repair a wrong model, it only fits its geometry.
+    Below about ``config.MIN_COARSE_PIXELS_PER_FEATURE`` (4) pixels per module in the
+    downscaled frame those reads go wrong while the code still decodes: a 25 x 25 QR
+    read as 21 x 21, or tens of flipped modules. So, with ``full_res_retry`` (default
+    on; only meaningful with ``scale < 1``), a coarse placement is re-located on a
+    padded full-resolution crop around it when either its ``payload`` is ``None`` (found
+    but not decoded -- typically a small, far-away code) or its pixels per feature in
+    the downscaled frame are under that floor. The full-resolution result replaces it
+    (``metadata["locate_retry"]`` names the reason, ``"undecoded"`` or
+    ``"undersampled"``, and ``locate_scale`` becomes 1.0). Crops are small, so this
+    costs little; pick ``scale`` so your codes clear the floor (at 0.5, 8 px per module
+    at full resolution) and it never triggers. A coarse placement under the floor that
+    is kept anyway -- ``full_res_retry=False``, or the crop found nothing -- carries
+    ``metadata["locate_undersampled"] = True``: treat its model as unreliable. A mark
+    the coarse pass misses entirely is not recovered: lower the downscaling instead.
     """
     scale = validated_scale(scale)
     if scale is None:
@@ -136,17 +149,42 @@ def locate(
 
     coarse = _locate_at(small_bgr, small_gray, locators=locators, first_hit=first_hit)
     out = []
-    for placement in coarse:
-        placement = _mapped(placement, up, locate_scale=scale)
-        if full_res_retry and placement.payload is None:
-            placement = (
-                _retry_at_full_resolution(
-                    placement, bgr, gray, locators=locators, first_hit=first_hit
-                )
-                or placement
+    for small in coarse:
+        reason = _retry_reason(small)
+        placement = _mapped(small, up, locate_scale=scale)
+        retried = None
+        if reason is not None and full_res_retry:
+            retried = _retry_at_full_resolution(
+                placement, bgr, gray, locators=locators, first_hit=first_hit
+            )
+        if retried is not None:
+            placement = replace(
+                retried, metadata={**retried.metadata, "locate_retry": reason}
+            )
+        elif reason == "undersampled":
+            placement = replace(
+                placement, metadata={**placement.metadata, "locate_undersampled": True}
             )
         out.append(placement)
     return out
+
+
+def _retry_reason(
+    small: Placement,
+    *,
+    min_pixels_per_feature: float = config.MIN_COARSE_PIXELS_PER_FEATURE,
+) -> str | None:
+    """Why a coarse placement (in downscaled pixels) should be re-located, if at all.
+
+    Undersampling is checked before decoding because it is the silent failure: an
+    undecoded code is visibly incomplete, an undersampled one decodes fine and carries
+    a wrong model.
+    """
+    if small.pixels_per_feature < min_pixels_per_feature:
+        return "undersampled"
+    if small.payload is None:
+        return "undecoded"
+    return None
 
 
 def validated_scale(scale: float | None) -> float | None:
@@ -224,7 +262,7 @@ def _retry_at_full_resolution(
     first_hit: bool,
     padding: float = config.LOCATE_RETRY_PADDING,
 ) -> Placement | None:
-    """Re-locate an undecoded coarse placement on a full-resolution crop around it.
+    """Re-locate a coarse placement on a full-resolution crop around it.
 
     Returns the full-resolution placement of the same mark (preferring a decoded one),
     in full-image coordinates, or ``None`` if the crop yields nothing there.
@@ -247,9 +285,7 @@ def _retry_at_full_resolution(
     shift = np.array([[1.0, 0.0, x0], [0.0, 1.0, y0], [0.0, 0.0, 1.0]])
     same_mark = [
         candidate
-        for candidate in (
-            _mapped(p, shift, locate_scale=1.0, locate_retry=True) for p in found
-        )
+        for candidate in (_mapped(p, shift, locate_scale=1.0) for p in found)
         if _duplicate(candidate, [placement])
     ]
     if not same_mark:

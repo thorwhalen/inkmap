@@ -199,7 +199,9 @@ def find_all(
 
     ``locate_scale`` (e.g. ``0.5``) locates on a downscaled copy of the frame and maps
     the placements back -- several times faster on large photographs, with refinement
-    restoring sub-pixel geometry. ``None`` (default) locates at full resolution. See
+    restoring sub-pixel geometry. Codes need about 4 px per module *after* downscaling
+    (``config.MIN_COARSE_PIXELS_PER_FEATURE``); those below are re-located at full
+    resolution. ``None`` (default) locates at full resolution. See
     :func:`inkmap.locate` (its ``scale``). Ignored when ``model``/``quad`` are given.
     """
     locate_scale = validated_scale(locate_scale)

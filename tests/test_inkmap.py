@@ -492,7 +492,39 @@ def _nearest(placement, others):
 
 @pytest.fixture(scope="module")
 def qr_page() -> np.ndarray:
-    return _qr_page(pixels_per_unit=8.0, blur=0.6, noise=2.0)
+    """10 px/module: 5 px after halving, clear of ``MIN_COARSE_PIXELS_PER_FEATURE``,
+    so these codes stay on the coarse path (no retry)."""
+    return _qr_page(pixels_per_unit=10.0, shape=(600, 1800), blur=0.6, noise=2.0)
+
+
+def _within_mark_difference(ink, reference) -> float:
+    """Mean |coverage difference| over the pixels either mark covers -- not the whole
+    frame, whose blank background would dilute a wrong model into a tiny mean."""
+    inside = (ink.coverage > 0) | (reference.coverage > 0)
+    return float(np.abs(ink.coverage - reference.coverage)[inside].mean())
+
+
+def _assert_coarse_matches_full(page, *, scale=0.5, **kwargs):
+    """``find_all`` with ``locate_scale`` gives the full-resolution models and
+    within-mark coverage; returns the coarse results for further checks."""
+    full = inkmap.find_all(page, **kwargs)
+    coarse = inkmap.find_all(page, locate_scale=scale, **kwargs)
+    assert len(full) == len(coarse) > 0
+    for ink in coarse:
+        reference = min(
+            full,
+            key=lambda m: float(
+                np.linalg.norm(m.placement.quad.mean(0) - ink.placement.quad.mean(0))
+            ),
+        )
+        assert ink.placement.refined
+        a, b = ink.placement.model, reference.placement.model
+        for attr in ("cells", "bars"):
+            if hasattr(a, attr):
+                assert np.array_equal(getattr(a, attr), getattr(b, attr)), attr
+        assert np.abs(ink.placement.quad - reference.placement.quad).max() < 0.1
+        assert _within_mark_difference(ink, reference) < 1e-3
+    return coarse
 
 
 def test_locate_scale_one_is_full_resolution(qr_scene):
@@ -542,37 +574,87 @@ def test_coarse_locate_finds_every_code_close_to_full_resolution(qr_page):
 
 def test_coarse_find_all_matches_full_resolution_coverage(qr_page):
     """Refinement pins both to the same sub-pixel geometry, so coverage agrees."""
-    full = inkmap.find_all(qr_page)
-    coarse = inkmap.find_all(qr_page, locate_scale=0.5)
+    coarse = _assert_coarse_matches_full(qr_page)
+    assert len(coarse) == 4
+
+
+@pytest.mark.parametrize("pixels_per_unit", [4.0, 5.0, 6.0, 7.0])
+def test_undersampled_coarse_codes_get_full_resolution_models(pixels_per_unit):
+    """Below ~4 px/module after downscaling, the module count and matrix read off the
+    coarse frame are wrong although the codes decode (2 px: a 25 x 25 symbol read as
+    21 x 21; 2.5-3.5 px: tens of flipped modules). Those placements are re-located at
+    full resolution, so the models -- and the coverage -- match full resolution."""
+    page = _qr_page(pixels_per_unit=pixels_per_unit, blur=0.6, noise=2.0)
+    bgr = cv2.cvtColor(page, cv2.COLOR_GRAY2BGR)
+    full = inkmap.locate(bgr, page)
+    coarse = inkmap.locate(bgr, page, scale=0.5)
     assert len(full) == len(coarse) == 4
-    for ink in coarse:
-        reference = min(
-            full,
-            key=lambda m: float(
-                np.linalg.norm(m.placement.quad.mean(0) - ink.placement.quad.mean(0))
-            ),
-        )
-        assert ink.placement.refined
-        assert np.abs(ink.placement.quad - reference.placement.quad).max() < 0.1
-        assert np.abs(ink.coverage - reference.coverage).mean() < 1e-4
+    for placement in coarse:
+        assert placement.metadata["locate_retry"] == "undersampled"
+        assert placement.metadata["locate_scale"] == 1.0
+        reference = _nearest(placement, full)
+        assert np.array_equal(placement.model.cells, reference.model.cells)
+
+    # without the retry they stay coarse, and say their model is not to be trusted
+    kept = inkmap.locate(bgr, page, scale=0.5, full_res_retry=False)
+    assert all(p.metadata.get("locate_undersampled") is True for p in kept)
+    assert all(p.metadata["locate_scale"] == 0.5 for p in kept)
+
+
+def test_undersampled_coarse_qr_coverage_matches_full_resolution():
+    _assert_coarse_matches_full(_qr_page(pixels_per_unit=5.0, blur=0.6, noise=2.0))
+
+
+def _barcode_page(text, *, module_px, rotation=7.0, shape=(400, 1000)):
+    """A zxing-encoded EAN-13, ``module_px`` px per module, rotated -- no extra deps."""
+    zxingcpp = pytest.importorskip("zxingcpp")
+    if not hasattr(zxingcpp, "create_barcode"):
+        pytest.skip("this zxing-cpp has no barcode writer")
+    symbol = zxingcpp.create_barcode(text, zxingcpp.BarcodeFormat.EAN13)
+    row = np.asarray(symbol.to_image(scale=1, add_quiet_zones=False))
+    row = row[row.shape[0] // 2]
+    strip = cv2.resize(
+        np.repeat(row[None], 60, axis=0),
+        None,
+        fx=module_px,
+        fy=1,
+        interpolation=cv2.INTER_NEAREST,
+    )
+    page = np.full(shape, 255, dtype=np.uint8)
+    y0, x0 = (shape[0] - strip.shape[0]) // 2, (shape[1] - strip.shape[1]) // 2
+    page[y0 : y0 + strip.shape[0], x0 : x0 + strip.shape[1]] = strip
+    turn = cv2.getRotationMatrix2D((shape[1] / 2, shape[0] / 2), rotation, 1.0)
+    page = cv2.warpAffine(page, turn, shape[::-1], borderValue=255)
+    return synth.degrade(page.astype(np.float32), rng=0, blur=0.6, noise=2.0)
+
+
+def test_undersampled_coarse_barcode_matches_full_resolution():
+    """2 px per module after halving: the bar pattern is re-read at full resolution."""
+    page = _barcode_page("5901234123457", module_px=4)
+    coarse = _assert_coarse_matches_full(page, locators=["barcode_zxing"])
+    assert [ink.placement.metadata["locate_retry"] for ink in coarse] == [
+        "undersampled"
+    ]
 
 
 def test_full_res_retry_recovers_a_payload_the_coarse_pass_missed():
-    """A decoder that needs >= 4 px per module: it locates the coarse codes (3 px per
-    module after downscaling) but cannot decode them, and decodes them at full res."""
+    """A decoder that needs >= 6 px per module: it locates the coarse codes (5 px per
+    module after downscaling, above the undersampling floor) but cannot decode them,
+    and decodes them at full resolution."""
     from dataclasses import replace
 
-    def needs_four_px_per_module(bgr, gray):
+    def needs_six_px_per_module(bgr, gray):
         return [
-            p if p.pixels_per_unit >= 4.0 else replace(p, payload=None)
+            p if p.pixels_per_unit >= 6.0 else replace(p, payload=None)
             for p in inkmap.LOCATORS["qr_zxing"](bgr, gray)
         ]
 
-    page = _qr_page(pixels_per_unit=6.0, n=2, shape=(500, 900))
+    page = _qr_page(pixels_per_unit=10.0, n=2, shape=(500, 1000))
     bgr = cv2.cvtColor(page, cv2.COLOR_GRAY2BGR)
-    kw = dict(locators=[needs_four_px_per_module], scale=0.5)
+    kw = dict(locators=[needs_six_px_per_module], scale=0.5)
     without = inkmap.locate(bgr, page, full_res_retry=False, **kw)
     assert len(without) == 2 and all(p.payload is None for p in without)
+    assert not any(p.metadata.get("locate_undersampled") for p in without)
 
     retried = inkmap.locate(bgr, page, **kw)
     assert len(retried) == 2
@@ -580,7 +662,7 @@ def test_full_res_retry_recovers_a_payload_the_coarse_pass_missed():
     for placement in retried:
         target = _nearest(placement, reference)
         assert placement.payload is not None and placement.payload == target.payload
-        assert placement.metadata["locate_retry"] is True
+        assert placement.metadata["locate_retry"] == "undecoded"
         assert placement.metadata["locate_scale"] == 1.0
         # zxing is not exactly translation-invariant: a crop can move a corner by 1 px
         assert np.abs(placement.quad - target.quad).max() <= 1.0

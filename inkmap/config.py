@@ -79,8 +79,16 @@ BLACK_CLIP_LEVEL = 2
 DEFAULT_LOCATORS = ("qr_zxing", "qr_aruco", "qr_opencv", "barcode_zxing")
 
 #: Coarse-to-fine locating (``locate(..., scale=s)``): a coarse placement that was
-#: found but not decoded is retried on a full-resolution crop around it, padded on each
+#: not decoded, or is under ``MIN_COARSE_PIXELS_PER_FEATURE``, is retried on a full-resolution crop around it, padded on each
 #: side by this fraction of the placement's larger bounding-box side. 0.5 comfortably
 #: holds a QR quiet zone (4 modules of a symbol at least 21 wide) plus the coarse
 #: pass's position error, while keeping the crop a small fraction of the frame.
 LOCATE_RETRY_PADDING = 0.5
+
+#: Coarse-to-fine locating: below this many image pixels per model feature (a QR
+#: module, a barcode's narrowest bar) *in the downscaled frame*, the model a locator
+#: reads off that frame is unreliable even when the code decodes -- with modules at
+#: 2 px a 25 x 25 QR is read as 21 x 21, at 2.5-3.5 px tens of its 625 modules flip,
+#: and only from 4 px are they all right (synthetic pages, ``locate(scale=0.5)``).
+#: Such placements are re-located on a full-resolution crop. See ``locate``.
+MIN_COARSE_PIXELS_PER_FEATURE = 4.0
