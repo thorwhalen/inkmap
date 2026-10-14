@@ -1,0 +1,26 @@
+inkmap.config
+=============
+
+.. automodule:: inkmap.config
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      SUPERSAMPLES
+      ECC_TEMPLATE_BLUR_FRAC
+      ECC_MIN_CORRELATION
+      ECC_MIN_SCALE
+      TEMPLATE_MARGIN_UNITS
+      MARGIN_UNITS
+      PURE_COVERAGE_TOL
+      EDGE_MARGIN_SIGMAS
+      DEFAULT_BLUR_SIGMA
+      MIN_SCALE_OVER_SIGMA
+      SATURATION_LEVEL
+      BLACK_CLIP_LEVEL
+      DEFAULT_LOCATORS
+      LOCATE_RETRY_PADDING
+      MIN_COARSE_PIXELS_PER_FEATURE
+   

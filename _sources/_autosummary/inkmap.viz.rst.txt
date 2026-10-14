@@ -1,0 +1,21 @@
+inkmap.viz
+==========
+
+.. automodule:: inkmap.viz
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      REGION_COLORS
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      overlay
+      panel
+      colorize_coverage
+      colorize_regions
+   

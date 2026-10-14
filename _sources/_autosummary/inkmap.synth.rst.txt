@@ -1,0 +1,21 @@
+inkmap.synth
+============
+
+.. automodule:: inkmap.synth
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      render
+      qr_model
+      default_matrix
+      degrade
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Scene
+   

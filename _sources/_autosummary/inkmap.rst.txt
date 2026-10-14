@@ -1,0 +1,51 @@
+﻿inkmap
+======
+
+.. automodule:: inkmap
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      foreground
+      find
+      find_all
+      place
+      measure
+      measurement_mask
+      measurability
+      srgb_to_linear
+      coverage_map
+      observed_coverage
+      confidence
+      measurement_weight
+      locate
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      InkMap
+      Placement
+      Region
+      Polarity
+      Model
+      Measurement
+      Measurability
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   models
+   geometry
+   photometry
+   config
+   corpus
+   coverage
+   synth
+   types
+   viz

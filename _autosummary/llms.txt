@@ -1,0 +1,24 @@
+# inkmap
+
+> Per-pixel foreground coverage for photographed marks -- QR, barcodes, text, any shape you can model
+
+
+## Pages in this subsection
+
+- [inkmap](inkmap.html.md): inkmap – per-pixel foreground coverage for photographed marks.
+- [inkmap.models](inkmap.models.html.md): Shape models: what the foreground is expected to look like.
+- [inkmap.models.base](inkmap.models.base.html.md): What a &#42;model&#42; is, and how it becomes pixels.
+- [inkmap.models.freeform](inkmap.models.freeform.html.md): Models for shapes that are not on a grid: rasters, polygons, and text.
+- [inkmap.models.grid](inkmap.models.grid.html.md): Models whose foreground is defined on a regular grid: QR symbols and barcodes.
+- [inkmap.geometry](inkmap.geometry.html.md): Model space &lt;-&gt; image space: transforms, and refining them against the photograph.
+- [inkmap.photometry](inkmap.photometry.html.md): Turning masks into measurements that are actually valid.
+- [inkmap.config](inkmap.config.html.md): Tunable defaults, in one place.
+- [inkmap.corpus](inkmap.corpus.html.md): The real-photograph test corpus: 384 photographed marks in the wild, from Wikimedia Commons.
+- [inkmap.coverage](inkmap.coverage.html.md): Per-pixel foreground coverage: the 0..1 value, and which one you want.
+- [inkmap.synth](inkmap.synth.html.md): Synthetic scenes with exact ground truth.
+- [inkmap.types](inkmap.types.html.md): The data types the whole package speaks in.
+- [inkmap.viz](inkmap.viz.html.md): Visual overlays, for checking that a result is actually right.
+
+## Optional
+
+- [Top-level llms.txt](../llms.txt): Complete documentation index.

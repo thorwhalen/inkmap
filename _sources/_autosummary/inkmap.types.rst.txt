@@ -1,0 +1,15 @@
+inkmap.types
+============
+
+.. automodule:: inkmap.types
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      InkMap
+      Placement
+      Polarity
+      Region
+   

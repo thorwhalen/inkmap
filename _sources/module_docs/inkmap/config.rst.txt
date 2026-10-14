@@ -1,4 +1,0 @@
-inkmap.config
-=============
-.. automodule:: inkmap.config
-   :members:

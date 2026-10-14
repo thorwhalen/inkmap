@@ -1,4 +1,0 @@
-inkmap.locate.barcode
-=====================
-.. automodule:: inkmap.locate.barcode
-   :members:

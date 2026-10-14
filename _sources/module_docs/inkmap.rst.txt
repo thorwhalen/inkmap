@@ -1,4 +1,0 @@
-inkmap
-======
-.. automodule:: inkmap
-   :members:

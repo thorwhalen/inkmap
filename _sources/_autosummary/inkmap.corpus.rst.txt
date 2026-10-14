@@ -1,0 +1,22 @@
+inkmap.corpus
+=============
+
+.. automodule:: inkmap.corpus
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      MANIFEST
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      kinds
+      cache_dir
+      fetch
+      items
+      attribution_text
+   

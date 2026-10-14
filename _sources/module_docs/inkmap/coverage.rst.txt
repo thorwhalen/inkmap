@@ -1,4 +1,0 @@
-inkmap.coverage
-===============
-.. automodule:: inkmap.coverage
-   :members:

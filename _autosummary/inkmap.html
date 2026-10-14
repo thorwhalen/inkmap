@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+
+<html :class="{ 'dark' : darkMode === true }" data-content_root="../" lang="en" x-data="{ darkMode: $persist(window.matchMedia('(prefers-color-scheme: dark)').matches), activeSection: ''}">
+<head>
+<script>
+    (function () {
+      // Set initial color scheme
+      if ((localStorage.getItem("_x_darkMode") === "true") || (window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark");
+      }
+
+      // Watch for media preference changes
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
+        localStorage.setItem("_x_darkMode", event.matches);
+        document.documentElement.classList.toggle("dark", event.matches);
+      });
+    })();
+  </script>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<meta content="#ffffff" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="#030711" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="inkmap.html.md" rel="alternate" type="text/markdown"/>
+<link href="../llms.txt" rel="describedby" type="text/markdown"/>
+<link href="inkmap.html.md" rel="alternate" type="text/markdown"/>
+<link href="llms.txt" rel="describedby"/>
+<title>inkmap</title>
+<meta content="inkmap" property="og:title"/>
+<meta content="inkmap" name="twitter:title"/>
+<link href="../_static/pygments.css?v=d75fae25" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=d6d7c91b" rel="stylesheet" type="text/css"/>
+<link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
+<link href="../_static/epythet.css?v=ded595e6" rel="stylesheet" type="text/css"/>
+<link href="../search.html" rel="search" title="Search"/>
+<link href="../genindex.html" rel="index" title="Index"/>
+<link href="inkmap.models.html" rel="next" title="inkmap.models"/>
+<link href="../api.html" rel="prev" title="API reference"/>
+</head>
+<body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
+<div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-xs border-border bg-background/90 backdrop-blur"><div class="container flex items-center h-14">
+<div class="hidden mr-4 md:flex">
+<a class="flex items-center mr-6" href="../index.html"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">inkmap</span>
+</a><nav class="flex items-center gap-6 text-sm font-medium">
+<a class="transition-colors hover:text-foreground/80 text-foreground/60" href="https://github.com/thorwhalen/inkmap" rel="noopener nofollow">GitHub</a>
+</nav></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
+<svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
+</svg>
+<span class="sr-only">Toggle navigation menu</span>
+</button>
+<div class="flex items-center justify-between flex-1 gap-2 sm:gap-4 md:justify-end">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="../search.html" class="relative flex items-center group" id="searchbox" method="get">
+<input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
+<kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+<span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+</div>
+<nav class="flex items-center gap-1">
+<button @click="darkMode = !darkMode" class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9" title="Toggle color scheme" type="button">
+<svg class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" fill="currentColor" height="16" viewbox="0 96 960 960" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z"></path>
+</svg>
+<svg class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" fill="currentColor" height="16" viewbox="0 96 960 960" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+</header>
+<div class="flex-1"><div class="container md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
+<a class="justify-start text-sm md:!hidden bg-background" href="../index.html"><span class="font-bold text-clip whitespace-nowrap">inkmap</span>
+</a>
+<div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
+<div class="overflow-y-auto h-full w-full relative pr-6"><nav class="flex md:hidden flex-col font-medium mt-4">
+<a href="https://github.com/thorwhalen/inkmap" rel="nofollow noopener">GitHub</a>
+</nav><nav class="table w-full min-w-full my-6 lg:my-8">
+<ul class="current">
+<li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="../api.html">API reference<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l2 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="current reference internal expandable" href="#">inkmap<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-cloak="" x-show="expanded">
+<li class="toctree-l3"><a class="reference internal" href="inkmap.models.html">inkmap.models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inkmap.geometry.html">inkmap.geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inkmap.photometry.html">inkmap.photometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inkmap.config.html">inkmap.config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inkmap.corpus.html">inkmap.corpus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inkmap.coverage.html">inkmap.coverage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inkmap.synth.html">inkmap.synth</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inkmap.types.html">inkmap.types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inkmap.viz.html">inkmap.viz</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ai-agents.html">For AI agents</a></li>
+</ul>
+</nav>
+</div>
+</div>
+<button @click="showSidebar = false" class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100" type="button">
+<svg class="h-4 w-4" fill="currentColor" height="24" stroke="none" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z"></path>
+</svg>
+</button>
+</aside>
+<main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="../index.html">
+<span class="hidden md:inline">inkmap</span>
+<svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
+</svg>
+</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="../api.html">API reference</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">inkmap</span>
+</nav>
+<div id="content" role="main">
+<section id="module-inkmap">
+<span id="inkmap"></span><h1>inkmap<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#module-inkmap">¶</a></h1>
+<p>inkmap – per-pixel foreground coverage for photographed marks.</p>
+<p>Given a photograph of a printed mark and a <em>model</em> of its shape, say for every pixel
+how much of it is foreground (the mark) and how much is background (the substrate) –
+as a continuous fraction, not a boolean.</p>
+<p>The model is the seam. QR symbols, barcodes, printed letters and arbitrary artwork all
+go through one pipeline, because all a model has to do is answer “is this point, in my
+own coordinate system, foreground?”:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">import</span><span class="w"> </span><span class="nn">inkmap</span>
+</span><span id="line-2"><span class="kn">from</span><span class="w"> </span><span class="nn">inkmap</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+</span><span id="line-3">
+</span><span id="line-4"><span class="n">inkmap</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">photo</span><span class="p">)</span>                                        <span class="c1"># auto-detect QR/barcode</span>
+</span><span id="line-5"><span class="n">inkmap</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">photo</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">text_model</span><span class="p">(</span><span class="s2">"ABC"</span><span class="p">),</span> <span class="n">quad</span><span class="o">=</span><span class="n">q</span><span class="p">)</span>  <span class="c1"># a printed word</span>
+</span><span id="line-6"><span class="n">inkmap</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">photo</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">RasterModel</span><span class="p">(</span><span class="n">art</span><span class="p">),</span> <span class="n">quad</span><span class="o">=</span><span class="n">q</span><span class="p">)</span>   <span class="c1"># anything you can draw</span>
+</span></code></pre></div>
+</div>
+<p>The simplest call:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">coverage</span> <span class="o">=</span> <span class="n">inkmap</span><span class="o">.</span><span class="n">foreground</span><span class="p">(</span><span class="n">photo</span><span class="p">)</span>   <span class="c1"># (H, W) float32 in [0, 1]</span>
+</span></code></pre></div>
+</div>
+<p>With geometry:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">ink</span> <span class="o">=</span> <span class="n">inkmap</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">photo</span><span class="p">)</span>              <span class="c1"># an InkMap, or None</span>
+</span><span id="line-2"><span class="n">ink</span><span class="o">.</span><span class="n">placement</span><span class="o">.</span><span class="n">quad</span>                    <span class="c1"># (4, 2) corners -- a quadrilateral, not a</span>
+</span><span id="line-3">                                      <span class="c1"># rectangle: perspective is expected</span>
+</span><span id="line-4"><span class="n">ink</span><span class="o">.</span><span class="n">coverage</span>                          <span class="c1"># (H, W) float32 area coverage</span>
+</span><span id="line-5"><span class="n">ink</span><span class="o">.</span><span class="n">region</span>                            <span class="c1"># OUTSIDE / MARGIN / BACKGROUND / FOREGROUND</span>
+</span><span id="line-6"><span class="n">ink</span><span class="o">.</span><span class="n">weight</span>                            <span class="c1"># (H, W) float32 safe-to-measure weighting</span>
+</span></code></pre></div>
+</div>
+<p>Measuring:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">mask</span> <span class="o">=</span> <span class="n">inkmap</span><span class="o">.</span><span class="n">measurement_mask</span><span class="p">(</span><span class="n">ink</span><span class="p">)</span>   <span class="c1"># pure pixels, eroded clear of edges</span>
+</span><span id="line-2"><span class="n">result</span> <span class="o">=</span> <span class="n">inkmap</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="n">photo</span><span class="p">,</span> <span class="n">ink</span><span class="p">)</span>
+</span><span id="line-3"><span class="n">result</span><span class="o">.</span><span class="n">contrast</span>                       <span class="c1"># foreground minus background, linearised</span>
+</span><span id="line-4"><span class="n">result</span><span class="o">.</span><span class="n">measurability</span><span class="o">.</span><span class="n">ok</span>               <span class="c1"># False if the image cannot support this</span>
+</span></code></pre></div>
+</div>
+<section id="terminology">
+<h2>Terminology<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#terminology" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#terminology'">¶</a></h2>
+<p>The two classes are <strong>foreground</strong> and <strong>background</strong>, never dark and light: dark/light
+describe appearance, and appearance inverts (white-on-black print, reflectance-reversed
+symbols, inverted imaging), so an appearance name would mean the mark in one image and
+the substrate in the next. <a class="reference internal" href="#inkmap.Polarity" title="inkmap.Polarity"><code class="xref py py-class docutils literal notranslate"><span class="pre">Polarity</span></code></a> carries that mapping explicitly. The
+continuous value is <strong>coverage</strong>, after ISO 12647-2:2013 3.1 <em>area coverage</em>. See
+<code class="docutils literal notranslate"><span class="pre">docs/terminology.md</span></code>.</p>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.foreground" title="inkmap.foreground"><code class="xref py py-obj docutils literal notranslate"><span class="pre">foreground</span></code></a>(image, **kwargs)</p></td>
+<td><p>Foreground coverage of the largest mark, <code class="docutils literal notranslate"><span class="pre">(H,</span> <span class="pre">W)</span> <span class="pre">float32</span></code> in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.find" title="inkmap.find"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find</span></code></a>(image, **kwargs)</p></td>
+<td><p>The largest mark in <code class="docutils literal notranslate"><span class="pre">image</span></code>, or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.find_all" title="inkmap.find_all"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_all</span></code></a>(image, *[, model, quad, locators, ...])</p></td>
+<td><p>Find every mark in <code class="docutils literal notranslate"><span class="pre">image</span></code> and compute its foreground coverage.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.place" title="inkmap.place"><code class="xref py py-obj docutils literal notranslate"><span class="pre">place</span></code></a>(model, quad, *[, ...])</p></td>
+<td><p>Place a model at a known quadrilateral -- the universal escape hatch.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.measure" title="inkmap.measure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">measure</span></code></a>(image, ink_map, *[, linearize, ...])</p></td>
+<td><p>Aggregate <code class="docutils literal notranslate"><span class="pre">image</span></code> over the safe foreground and background pixels of <code class="docutils literal notranslate"><span class="pre">ink_map</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.measurement_mask" title="inkmap.measurement_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">measurement_mask</span></code></a>(ink_map, *[, kind, purity, ...])</p></td>
+<td><p>Pixels safe to measure: geometrically pure, then eroded clear of edges.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.measurability" title="inkmap.measurability"><code class="xref py py-obj docutils literal notranslate"><span class="pre">measurability</span></code></a>(ink_map, *[, min_pixels])</p></td>
+<td><p>Judge whether a foreground/background measurement can be trusted here.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.srgb_to_linear" title="inkmap.srgb_to_linear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">srgb_to_linear</span></code></a>(image)</p></td>
+<td><p>Undo the sRGB transfer function, returning float in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.coverage_map" title="inkmap.coverage_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coverage_map</span></code></a>(model, transform, image_shape, *)</p></td>
+<td><p>Area fraction of each pixel covered by the model's foreground, in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.observed_coverage" title="inkmap.observed_coverage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">observed_coverage</span></code></a>(gray, placement, *[, ...])</p></td>
+<td><p>Apparent coverage read from the photograph itself (Murray-Davies).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.confidence" title="inkmap.confidence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">confidence</span></code></a>(gray, placement, coverage, *[, ...])</p></td>
+<td><p>How much to trust the coverage value at each pixel, in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.measurement_weight" title="inkmap.measurement_weight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">measurement_weight</span></code></a>(coverage, *[, ...])</p></td>
+<td><p>Blur-aware weight in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>: how safe each pixel is to <em>measure</em>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.locate" title="inkmap.locate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">locate</span></code></a>(bgr, gray, *[, locators, first_hit, ...])</p></td>
+<td><p>Run locator strategies and merge their results, de-duplicating by position.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.InkMap" title="inkmap.InkMap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InkMap</span></code></a>(coverage, region, placement[, ...])</p></td>
+<td><p>Per-pixel foreground coverage for one placement, plus the geometry it came from.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.Placement" title="inkmap.Placement"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Placement</span></code></a>(model, transform, quad[, locator, ...])</p></td>
+<td><p>A located instance of a model: which shape, and where it sits in the image.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.Region" title="inkmap.Region"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Region</span></code></a>(*values)</p></td>
+<td><p>Four-way pixel classification.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.Polarity" title="inkmap.Polarity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Polarity</span></code></a>(*values)</p></td>
+<td><p>Which apparent-brightness state the foreground corresponds to.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.Model" title="inkmap.Model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Model</span></code></a>(*args, **kwargs)</p></td>
+<td><p>The shape of a mark, in its own coordinate system.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.Measurement" title="inkmap.Measurement"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Measurement</span></code></a>(foreground_mean, foreground_std, ...)</p></td>
+<td><p>Aggregated signal over foreground and background, with its validity attached.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.Measurability" title="inkmap.Measurability"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Measurability</span></code></a>(ok, pixels_per_feature, ...[, ...])</p></td>
+<td><p>Whether a trustworthy measurement is possible on this image at all.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="inkmap.InkMap">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">InkMap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coverage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polarity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Polarity.FOREGROUND_IS_DARK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blur_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/types.html#InkMap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.InkMap" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.InkMap'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>Per-pixel foreground coverage for one placement, plus the geometry it came from.</p>
+<p><code class="docutils literal notranslate"><span class="pre">coverage</span></code> is <em>geometric</em> area coverage: the fraction of each pixel’s area lying
+under foreground. It is not an optical/reflectance-derived coverage (which lateral
+light scattering in the substrate inflates – the Murray-Davies/Yule-Nielsen
+effect), and it is not a probability. See <a class="reference internal" href="#inkmap.confidence" title="inkmap.confidence"><code class="xref py py-meth docutils literal notranslate"><span class="pre">confidence()</span></code></a> for that.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="inkmap.InkMap.background_mask">
+<span class="sig-name descname"><span class="pre">background_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/types.html#InkMap.background_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.InkMap.background_mask" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.InkMap.background_mask'">¶</a></dt>
+<dd><p>Bare-substrate pixels within the mark’s footprint (not the margin).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="inkmap.InkMap.blur_sigma">
+<span class="sig-name descname"><span class="pre">blur_sigma</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">float</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">None</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.InkMap.blur_sigma" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.InkMap.blur_sigma'">¶</a></dt>
+<dd><p>Estimated image blur (px). <code class="docutils literal notranslate"><span class="pre">nan</span></code> means estimation failed – typically because
+the modelled shape and the photograph do not correspond.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="inkmap.InkMap.coverage">
+<span class="sig-name descname"><span class="pre">coverage</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.InkMap.coverage" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.InkMap.coverage'">¶</a></dt>
+<dd><p>(H, W) float32 in [0, 1]. Zero outside the mark.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="inkmap.InkMap.foreground_mask">
+<span class="sig-name descname"><span class="pre">foreground_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/types.html#InkMap.foreground_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.InkMap.foreground_mask" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.InkMap.foreground_mask'">¶</a></dt>
+<dd><p>Boolean foreground mask by thresholding coverage. Fine for display and
+labelling; for anything photometric use <a class="reference internal" href="#inkmap.measurement_mask" title="inkmap.measurement_mask"><code class="xref py py-func docutils literal notranslate"><span class="pre">inkmap.measurement_mask()</span></code></a>
+instead, which accounts for blur.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="inkmap.InkMap.inside_mask">
+<span class="sig-name descname"><span class="pre">inside_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/types.html#InkMap.inside_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.InkMap.inside_mask" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.InkMap.inside_mask'">¶</a></dt>
+<dd><p>Every pixel within the mark’s footprint. With <code class="docutils literal notranslate"><span class="pre">margin=True</span></code>, include the
+clear surround as well.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="inkmap.InkMap.margin_mask">
+<span class="sig-name descname"><span class="pre">margin_mask</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/types.html#InkMap.margin_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.InkMap.margin_mask" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.InkMap.margin_mask'">¶</a></dt>
+<dd><p>The clear surround – an alternative reference region.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="inkmap.InkMap.region">
+<span class="sig-name descname"><span class="pre">region</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.InkMap.region" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.InkMap.region'">¶</a></dt>
+<dd><p>(H, W) uint8 of <a class="reference internal" href="#inkmap.Region" title="inkmap.Region"><code class="xref py py-class docutils literal notranslate"><span class="pre">Region</span></code></a> values.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="inkmap.InkMap.weight">
+<span class="sig-name descname"><span class="pre">weight</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">None</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.InkMap.weight" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.InkMap.weight'">¶</a></dt>
+<dd><p>(H, W) float32 in [0, 1] – the blur-aware measurement weight, and the <strong>only</strong>
+channel that should gate a physical measurement. Coverage is geometric and ignores
+the point spread function; confidence is epistemic and says nothing about
+partial-area contamination. See <a class="reference internal" href="inkmap.coverage.html#inkmap.coverage.measurement_weight" title="inkmap.coverage.measurement_weight"><code class="xref py py-func docutils literal notranslate"><span class="pre">inkmap.coverage.measurement_weight()</span></code></a>.</p>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="inkmap.Measurability">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">Measurability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ok</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixels_per_feature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blur_sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution_ratio</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_foreground_pixels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_background_pixels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reasons</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/photometry.html#Measurability"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Measurability" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Measurability'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>Whether a trustworthy measurement is possible on this image at all.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="inkmap.Measurability.resolution_ratio">
+<span class="sig-name descname"><span class="pre">resolution_ratio</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">float</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Measurability.resolution_ratio" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Measurability.resolution_ratio'">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">pixels_per_feature</span> <span class="pre">/</span> <span class="pre">blur_sigma</span></code>. Below ~6 the blur is wide relative to the
+mark’s smallest feature and no erosion leaves uncontaminated pixels.</p>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="inkmap.Measurement">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">Measurement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">foreground_mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">foreground_std</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">foreground_median</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background_mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background_std</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background_median</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_foreground</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_background</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">measurability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/photometry.html#Measurement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Measurement" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Measurement'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>Aggregated signal over foreground and background, with its validity attached.</p>
+<p><code class="docutils literal notranslate"><span class="pre">measurability</span></code> is carried along deliberately: a caller that ignores it has to do
+so explicitly.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="inkmap.Measurement.contrast">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">contrast</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">float</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Measurement.contrast" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Measurement.contrast'">¶</a></dt>
+<dd><p>Foreground minus background.</p>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="inkmap.Measurement.ratio">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ratio</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">float</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Measurement.ratio" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Measurement.ratio'">¶</a></dt>
+<dd><p>Foreground over background; <code class="docutils literal notranslate"><span class="pre">nan</span></code> when the background reads zero.</p>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="inkmap.Measurement.snr">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">snr</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">float</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Measurement.snr" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Measurement.snr'">¶</a></dt>
+<dd><p>Contrast over the pooled standard deviation.</p>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="inkmap.Model">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/models/base.html#Model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Model" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Model'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Protocol" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Protocol</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>The shape of a mark, in its own coordinate system.</p>
+<p>Implement this – or just duck-type it – to teach the package a new kind of mark.
+Two members are required; <code class="xref py py-meth docutils literal notranslate"><span class="pre">render()</span></code> has a working default in
+<code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code>.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="inkmap.Model.extent">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">extent</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">tuple</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">float</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">float</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="p"><span class="pre">]</span></span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Model.extent" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Model.extent'">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">(width,</span> <span class="pre">height)</span></code> of model space, in the model’s natural units.</p>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="inkmap.Model.feature_size">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">feature_size</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">float</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Model.feature_size" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Model.feature_size'">¶</a></dt>
+<dd><p>Size of the smallest feature that must be resolved, in model units.</p>
+<p>A model unit is not a feature. A QR module <em>is</em> the smallest feature, so its
+feature size is 1. But a glyph rendered onto a 512-cell raster has strokes tens
+of cells wide, and a model unit there is far smaller than anything that must be
+resolved. Whether an image can support a measurement depends on pixels per
+<em>feature</em>, not pixels per unit, so this is what makes that judgement portable
+across model kinds.</p>
+<p><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code> estimates it from the rendered shape; grid models override
+it with the exact value.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="inkmap.Model.occupancy">
+<span class="sig-name descname"><span class="pre">occupancy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/models/base.html#Model.occupancy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Model.occupancy" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Model.occupancy'">¶</a></dt>
+<dd><p>Foreground indicator at model coordinates <code class="docutils literal notranslate"><span class="pre">(u,</span> <span class="pre">v)</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">u</span></code> and <code class="docutils literal notranslate"><span class="pre">v</span></code> are float arrays of any matching shape. Returns an array of the
+same shape, boolean or float in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>. Points outside <a class="reference internal" href="#inkmap.Model.extent" title="inkmap.Model.extent"><code class="xref py py-attr docutils literal notranslate"><span class="pre">extent</span></code></a> must
+return 0 – callers rely on that to bound the mark.</p>
+<p>Must be vectorised: it is called with millions of points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="inkmap.Placement">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">Placement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refined</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/types.html#Placement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Placement" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Placement'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>A located instance of a model: which shape, and where it sits in the image.</p>
+<p><code class="docutils literal notranslate"><span class="pre">transform</span></code> is the bridge the whole package is built on – a 3x3 homography from
+<em>model space</em> (the model’s own units, origin at its top-left) to image pixels. The
+quad is just its image under that transform, kept for convenience.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="inkmap.Placement.locator">
+<span class="sig-name descname"><span class="pre">locator</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Placement.locator" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Placement.locator'">¶</a></dt>
+<dd><p>Which locator strategy produced this.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="inkmap.Placement.payload">
+<span class="sig-name descname"><span class="pre">payload</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">str</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">None</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Placement.payload" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Placement.payload'">¶</a></dt>
+<dd><p>Decoded content, when the locator happened to decode something. Never required:
+decoding is not the point, and a barely-deposited mark may locate but not decode.</p>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="inkmap.Placement.pixels_per_feature">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">pixels_per_feature</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">float</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Placement.pixels_per_feature" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Placement.pixels_per_feature'">¶</a></dt>
+<dd><p>Image pixels across the model’s smallest feature.</p>
+<p><strong>This</strong> is the resolution figure that governs whether a trustworthy
+measurement is possible – not <a class="reference internal" href="#inkmap.Placement.pixels_per_unit" title="inkmap.Placement.pixels_per_unit"><code class="xref py py-attr docutils literal notranslate"><span class="pre">pixels_per_unit</span></code></a>. A model unit is not a
+feature: a QR module is both, but a glyph rendered onto a 512-cell raster has
+strokes tens of cells wide, so pixels-per-unit there would understate the real
+resolution by that factor and declare every image unmeasurable.</p>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="inkmap.Placement.pixels_per_unit">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">pixels_per_unit</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">float</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Placement.pixels_per_unit" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Placement.pixels_per_unit'">¶</a></dt>
+<dd><p>Image pixels per model unit.</p>
+<p>For a QR symbol a “unit” is one module; for a barcode, one narrow bar; for a
+raster model, one raster cell. Use <a class="reference internal" href="#inkmap.Placement.pixels_per_feature" title="inkmap.Placement.pixels_per_feature"><code class="xref py py-attr docutils literal notranslate"><span class="pre">pixels_per_feature</span></code></a> to reason about
+whether the image resolves the mark.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="inkmap.Placement.quad">
+<span class="sig-name descname"><span class="pre">quad</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Placement.quad" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Placement.quad'">¶</a></dt>
+<dd><p>(4, 2) float32 image-space corners of the model’s extent, in the <em>model’s</em> own
+order (its top-left first), not re-sorted into image order. Re-sorting by
+coordinate sum/difference – a common idiom – silently mislabels corners once the
+mark is rotated past 45 degrees, which rotates the model and corrupts every derived
+mask while leaving it looking plausible.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="inkmap.Placement.score">
+<span class="sig-name descname"><span class="pre">score</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">float</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">None</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Placement.score" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Placement.score'">¶</a></dt>
+<dd><p>Alignment score from refinement, if it ran. A proxy for geometric fit quality.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="inkmap.Placement.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Placement.transform" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Placement.transform'">¶</a></dt>
+<dd><p>(3, 3) float64, model coordinates -&gt; image pixels.</p>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="inkmap.Placement.units_per_pixel">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">units_per_pixel</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">float</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Placement.units_per_pixel" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Placement.units_per_pixel'">¶</a></dt>
+<dd><p>Model units spanned by one image pixel, averaged over the two axes.</p>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="inkmap.Polarity">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">Polarity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/types.html#Polarity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Polarity" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Polarity'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.IntEnum" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">IntEnum</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>Which apparent-brightness state the foreground corresponds to.</p>
+<p>Carried explicitly so that no appearance word ever has to stand in for a physical
+class. Flipping this is the supported way to handle inverted print and inverted
+imaging, rather than inverting masks at the call site.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="inkmap.Polarity.FOREGROUND_IS_DARK">
+<span class="sig-name descname"><span class="pre">FOREGROUND_IS_DARK</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Polarity.FOREGROUND_IS_DARK" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Polarity.FOREGROUND_IS_DARK'">¶</a></dt>
+<dd><p>ink absorbs, so the mark reads darker than the substrate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The usual case</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="inkmap.Polarity.FOREGROUND_IS_LIGHT">
+<span class="sig-name descname"><span class="pre">FOREGROUND_IS_LIGHT</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Polarity.FOREGROUND_IS_LIGHT" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Polarity.FOREGROUND_IS_LIGHT'">¶</a></dt>
+<dd><p>the mark reads brighter than the substrate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Reversed</p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="inkmap.Region">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">Region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/types.html#Region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Region" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Region'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.IntEnum" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">IntEnum</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>Four-way pixel classification.</p>
+<p>Not a matting <em>trimap</em>: a trimap’s third class is “unknown/undecided”, whereas
+every class here is a decided statement about location.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="inkmap.Region.BACKGROUND">
+<span class="sig-name descname"><span class="pre">BACKGROUND</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Region.BACKGROUND" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Region.BACKGROUND'">¶</a></dt>
+<dd><p>Bare substrate within the mark’s footprint.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="inkmap.Region.FOREGROUND">
+<span class="sig-name descname"><span class="pre">FOREGROUND</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Region.FOREGROUND" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Region.FOREGROUND'">¶</a></dt>
+<dd><p>The mark itself – printed ink, toner, engraving, whatever laid it down.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="inkmap.Region.MARGIN">
+<span class="sig-name descname"><span class="pre">MARGIN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Region.MARGIN" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Region.MARGIN'">¶</a></dt>
+<dd><p>The clear surround a mark is specified to have – a QR quiet zone, a barcode
+light margin, the whitespace around a glyph. Guaranteed background, contiguous, and
+free of edge effects from neighbouring foreground, which often makes it a better
+reference region than the background <em>inside</em> the mark.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="inkmap.Region.OUTSIDE">
+<span class="sig-name descname"><span class="pre">OUTSIDE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.Region.OUTSIDE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.Region.OUTSIDE'">¶</a></dt>
+<dd><p>Outside the mark and its margin.</p>
+</dd></dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.confidence">
+<span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">confidence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coverage</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">polarity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Polarity.FOREGROUND_IS_DARK</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/coverage.html#confidence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.confidence" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.confidence'">¶</a></dt>
+<dd><p>How much to trust the coverage value at each pixel, in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>.</p>
+<p>Distinct from coverage. Three things erode it, combined multiplicatively:</p>
+<ul class="simple">
+<li><p><strong>Model/image disagreement</strong> – where the observed value contradicts the modelled
+coverage, one of them is wrong. This is what catches foreground that failed to
+print, a torn label, or a mis-fitted transform.</p></li>
+<li><p><strong>Clipping</strong> – saturated or crushed pixels carry no photometric information.</p></li>
+<li><p><strong>Edge proximity</strong> – mixed pixels are inherently less certain, and their value
+depends on sub-pixel geometry known only to ~0.5 px.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.coverage_map">
+<span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">coverage_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_shape</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/coverage.html#coverage_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.coverage_map" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.coverage_map'">¶</a></dt>
+<dd><p>Area fraction of each pixel covered by the model’s foreground, in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>.</p>
+<p>Each pixel is probed at <code class="docutils literal notranslate"><span class="pre">samples**2</span></code> sub-positions on a regular grid at sub-pixel
+centres; each probe is back-projected into model coordinates and passed to
+<a class="reference internal" href="#inkmap.Model.occupancy" title="inkmap.Model.occupancy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Model.occupancy()</span></code></a>. The mean is the covered area fraction – ordinary
+supersampled area coverage, the same quantity a renderer’s anti-aliasing computes.</p>
+<p>Values are quantised to <code class="docutils literal notranslate"><span class="pre">1/samples**2</span></code>, so <code class="docutils literal notranslate"><span class="pre">samples</span></code> sets the accuracy floor.
+Only the model’s bounding box is evaluated, so a mark occupying 2% of a 12 MP photo
+costs 2% of the work.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.find">
+<span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">find</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap.html#find"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.find" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.find'">¶</a></dt>
+<dd><p>The largest mark in <code class="docutils literal notranslate"><span class="pre">image</span></code>, or <code class="docutils literal notranslate"><span class="pre">None</span></code>. See <a class="reference internal" href="#inkmap.find_all" title="inkmap.find_all"><code class="xref py py-func docutils literal notranslate"><span class="pre">find_all()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="inkmap.types.html#inkmap.types.InkMap" title="inkmap.types.InkMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">InkMap</span></code></a> | <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.find_all">
+<span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">find_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('qr_zxing',</span> <span class="pre">'qr_aruco',</span> <span class="pre">'qr_opencv',</span> <span class="pre">'barcode_zxing')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locate_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap.html#find_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.find_all" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.find_all'">¶</a></dt>
+<dd><p>Find every mark in <code class="docutils literal notranslate"><span class="pre">image</span></code> and compute its foreground coverage.</p>
+<p>With <code class="docutils literal notranslate"><span class="pre">model</span></code> and <code class="docutils literal notranslate"><span class="pre">quad</span></code>, skips detection entirely and analyses that one
+placement – the path for marks no detector knows about. With neither, runs the
+locator cascade (QR and linear barcodes out of the box).</p>
+<p><code class="docutils literal notranslate"><span class="pre">refine</span></code> (default on) aligns the rendered model to the photograph, pinning the
+transform to sub-pixel accuracy; it is far more accurate than locator corners alone
+and costs a few milliseconds.</p>
+<p><code class="docutils literal notranslate"><span class="pre">source</span></code> picks where coverage comes from: <code class="docutils literal notranslate"><span class="pre">"modelled"</span></code> (default) computes it
+from the model – exact and lighting-independent, answering “where should the
+foreground be”. <code class="docutils literal notranslate"><span class="pre">"observed"</span></code> reads it from the photograph, answering “where is
+the foreground actually”, and so is the one that can see a printing defect.</p>
+<p><code class="docutils literal notranslate"><span class="pre">locate_scale</span></code> (e.g. <code class="docutils literal notranslate"><span class="pre">0.5</span></code>) locates on a downscaled copy of the frame and maps
+the placements back – several times faster on large photographs, with refinement
+restoring sub-pixel geometry. Codes need about 4 px per module <em>after</em> downscaling
+(<code class="docutils literal notranslate"><span class="pre">config.MIN_COARSE_PIXELS_PER_FEATURE</span></code>); those below are re-located at full
+resolution. <code class="docutils literal notranslate"><span class="pre">None</span></code> (default) locates at full resolution. See
+<a class="reference internal" href="#inkmap.locate" title="inkmap.locate"><code class="xref py py-func docutils literal notranslate"><span class="pre">inkmap.locate()</span></code></a> (its <code class="docutils literal notranslate"><span class="pre">scale</span></code>). Ignored when <code class="docutils literal notranslate"><span class="pre">model</span></code>/<code class="docutils literal notranslate"><span class="pre">quad</span></code> are given.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="inkmap.types.html#inkmap.types.InkMap" title="inkmap.types.InkMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">InkMap</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.foreground">
+<span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">foreground</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap.html#foreground"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.foreground" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.foreground'">¶</a></dt>
+<dd><p>Foreground coverage of the largest mark, <code class="docutils literal notranslate"><span class="pre">(H,</span> <span class="pre">W)</span> <span class="pre">float32</span></code> in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>.</p>
+<p>All-zero if nothing is found – the one-liner never raises on a miss, so it can be
+mapped over a directory. Use <a class="reference internal" href="#inkmap.find" title="inkmap.find"><code class="xref py py-func docutils literal notranslate"><span class="pre">find()</span></code></a> to tell “no mark” from “a mark with no
+foreground”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.locate">
+<span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">locate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bgr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gray</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">locators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('qr_zxing',</span> <span class="pre">'qr_aruco',</span> <span class="pre">'qr_opencv',</span> <span class="pre">'barcode_zxing')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_hit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_res_retry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/locate.html#locate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.locate" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.locate'">¶</a></dt>
+<dd><p>Run locator strategies and merge their results, de-duplicating by position.</p>
+<p>Strategies are tried in order. With <code class="docutils literal notranslate"><span class="pre">first_hit=True</span></code> the cascade stops at the
+first strategy that finds anything – cheaper, and usually right when you know there
+is one mark. Otherwise every strategy runs and results merge, which is what earns
+the recall when an image holds several marks that no single detector finds all of.</p>
+<p><strong>Coarse-to-fine.</strong> <code class="docutils literal notranslate"><span class="pre">scale</span></code> (<code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">&lt;</span> <span class="pre">scale</span> <span class="pre">&lt;=</span> <span class="pre">1</span></code>) runs the cascade on a copy of the
+frame downscaled by that factor (<code class="docutils literal notranslate"><span class="pre">cv2.INTER_AREA</span></code>), then maps every placement back
+to full-resolution pixels. Locating costs roughly in proportion to pixel count, so
+on a 4000 x 3000 photograph 0.5 is about 4x faster and 0.35 about 7x. <code class="docutils literal notranslate"><span class="pre">None</span></code> (the
+default) or <code class="docutils literal notranslate"><span class="pre">1</span></code> locate at full resolution, exactly as without the argument.</p>
+<p>Every locator – a registered name or your own callable – is handed the
+<em>downscaled</em> <code class="docutils literal notranslate"><span class="pre">bgr</span></code> and <code class="docutils literal notranslate"><span class="pre">gray</span></code> (and, on a retry, a full-resolution crop), and
+must return placements in the coordinates of the frame it was given; mapping them
+back to the full frame is done here. A locator that bakes in absolute pixel sizes
+or positions will misbehave under <code class="docutils literal notranslate"><span class="pre">scale</span></code>.</p>
+<p>The mapping is one affine <code class="docutils literal notranslate"><span class="pre">A</span></code> (small -&gt; full pixels), in the pixel-centre
+convention <code class="docutils literal notranslate"><span class="pre">cv2.resize</span></code> uses, <code class="docutils literal notranslate"><span class="pre">x_full</span> <span class="pre">=</span> <span class="pre">(x_small</span> <span class="pre">+</span> <span class="pre">0.5)</span> <span class="pre">/</span> <span class="pre">scale</span> <span class="pre">-</span> <span class="pre">0.5</span></code>, applied
+to both <code class="docutils literal notranslate"><span class="pre">quad</span></code> and <code class="docutils literal notranslate"><span class="pre">transform</span></code> (<code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">@</span> <span class="pre">transform</span></code>). Locator name and payload are
+kept; <code class="docutils literal notranslate"><span class="pre">metadata["locate_scale"]</span></code> records the scale used. Corner conventions differ
+by locator (OpenCV’s are inclusive pixel indices, zxing’s are the continuous outer
+boundary), so a locator’s own half-pixel bias is magnified by <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">/</span> <span class="pre">scale</span></code> on the
+way up – a pixel or so at 0.5. That does not matter downstream when
+<code class="xref py py-func docutils literal notranslate"><span class="pre">inkmap.analyze()</span></code> refines (its default), which pins the transform to sub-pixel
+accuracy at full resolution anyway.</p>
+<p><strong>The model is the fragile part, not the geometry.</strong> Locators read the model off
+the frame they are given – a QR’s module count and module matrix, a barcode’s bar
+pattern – and refinement cannot repair a wrong model, it only fits its geometry.
+Below about <code class="docutils literal notranslate"><span class="pre">config.MIN_COARSE_PIXELS_PER_FEATURE</span></code> (4) pixels per module in the
+downscaled frame those reads go wrong while the code still decodes: a 25 x 25 QR
+read as 21 x 21, or tens of flipped modules. So, with <code class="docutils literal notranslate"><span class="pre">full_res_retry</span></code> (default
+on; only meaningful with <code class="docutils literal notranslate"><span class="pre">scale</span> <span class="pre">&lt;</span> <span class="pre">1</span></code>), a coarse placement is re-located on a
+padded full-resolution crop around it when either its <code class="docutils literal notranslate"><span class="pre">payload</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code> (found
+but not decoded – typically a small, far-away code) or its pixels per feature in
+the downscaled frame are under that floor. The full-resolution result replaces it
+(<code class="docutils literal notranslate"><span class="pre">metadata["locate_retry"]</span></code> names the reason, <code class="docutils literal notranslate"><span class="pre">"undecoded"</span></code> or
+<code class="docutils literal notranslate"><span class="pre">"undersampled"</span></code>, and <code class="docutils literal notranslate"><span class="pre">locate_scale</span></code> becomes 1.0). Crops are small, so this
+costs little; pick <code class="docutils literal notranslate"><span class="pre">scale</span></code> so your codes clear the floor (at 0.5, 8 px per module
+at full resolution) and it never triggers. A coarse placement under the floor that
+is kept anyway – <code class="docutils literal notranslate"><span class="pre">full_res_retry=False</span></code>, or the crop found nothing – carries
+<code class="docutils literal notranslate"><span class="pre">metadata["locate_undersampled"]</span> <span class="pre">=</span> <span class="pre">True</span></code>: treat its model as unreliable. A mark
+the coarse pass misses entirely is not recovered: lower the downscaling instead.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="inkmap.types.html#inkmap.types.Placement" title="inkmap.types.Placement"><code class="xref py py-class docutils literal notranslate"><span class="pre">Placement</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.measurability">
+<span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">measurability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ink_map</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_pixels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/photometry.html#measurability"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.measurability" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.measurability'">¶</a></dt>
+<dd><p>Judge whether a foreground/background measurement can be trusted here.</p>
+<p>Returning a number quietly biased by 30% is worse than refusing, so this is checked
+up front and attached to every <a class="reference internal" href="#inkmap.Measurement" title="inkmap.Measurement"><code class="xref py py-class docutils literal notranslate"><span class="pre">Measurement</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="inkmap.photometry.html#inkmap.photometry.Measurability" title="inkmap.photometry.Measurability"><code class="xref py py-class docutils literal notranslate"><span class="pre">Measurability</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.measure">
+<span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">measure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ink_map</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">linearize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatten</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robust</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/photometry.html#measure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.measure" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.measure'">¶</a></dt>
+<dd><p>Aggregate <code class="docutils literal notranslate"><span class="pre">image</span></code> over the safe foreground and background pixels of <code class="docutils literal notranslate"><span class="pre">ink_map</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">image</span></code> need not be the one the mark was located in: any frame registered to it
+works, which is the usual way to measure a different exposure, channel or modality
+using geometry established once on the sharpest frame.</p>
+<p><code class="docutils literal notranslate"><span class="pre">linearize</span></code> undoes sRGB encoding first – leave it on for anything from a normal
+camera pipeline, off for already-linear data. <code class="docutils literal notranslate"><span class="pre">flatten</span></code> divides out a fitted
+illumination field. <code class="docutils literal notranslate"><span class="pre">robust</span></code> reports medians alongside means; on real photographs
+they diverge exactly where something is wrong, which makes the pair a free
+diagnostic.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="inkmap.photometry.html#inkmap.photometry.Measurement" title="inkmap.photometry.Measurement"><code class="xref py py-class docutils literal notranslate"><span class="pre">Measurement</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.measurement_mask">
+<span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">measurement_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ink_map</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'foreground'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">purity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.999</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/photometry.html#measurement_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.measurement_mask" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.measurement_mask'">¶</a></dt>
+<dd><p>Pixels safe to measure: geometrically pure, then eroded clear of edges.</p>
+<p><code class="docutils literal notranslate"><span class="pre">kind</span></code> selects <code class="docutils literal notranslate"><span class="pre">"foreground"</span></code> or <code class="docutils literal notranslate"><span class="pre">"background"</span></code>. <code class="docutils literal notranslate"><span class="pre">purity</span></code> is the coverage
+threshold for “pure”; the default demands essentially total coverage, which is the
+point – a partially covered pixel biases the mean toward the other class.</p>
+<p>This is the mask to use for a measurement. <a class="reference internal" href="#inkmap.InkMap.foreground_mask" title="inkmap.InkMap.foreground_mask"><code class="xref py py-meth docutils literal notranslate"><span class="pre">InkMap.foreground_mask()</span></code></a> is for
+display and for anything that only needs a label.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.measurement_weight">
+<span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">measurement_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coverage</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">blur_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inside</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'foreground'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigmas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/coverage.html#measurement_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.measurement_weight" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.measurement_weight'">¶</a></dt>
+<dd><p>Blur-aware weight in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>: how safe each pixel is to <em>measure</em>.</p>
+<p>Coverage says a pixel lies entirely under foreground. That is necessary but not
+sufficient: the point spread function leaks neighbouring signal into interior
+pixels, and that contamination has a different footprint from partial area
+coverage – so no coverage-based weighting removes it. The fix is spatial: require
+a pixel’s whole neighbourhood to be foreground, out to the radius the blur reaches.</p>
+<p>Implemented as grayscale morphological erosion of the coverage map, which is exactly
+“the minimum coverage within radius r” – continuous rather than a hard mask, so a
+pixel one step from an edge is down-weighted rather than trusted or discarded.</p>
+<p>Give either <code class="docutils literal notranslate"><span class="pre">radius</span></code> (pixels, wins if both are given) or <code class="docutils literal notranslate"><span class="pre">blur_sigma</span></code>, from
+which the radius is <code class="docutils literal notranslate"><span class="pre">sigmas</span> <span class="pre">*</span> <span class="pre">blur_sigma</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.observed_coverage">
+<span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">observed_coverage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placement</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">polarity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Polarity.FOREGROUND_IS_DARK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yule_nielsen_n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/coverage.html#observed_coverage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.observed_coverage" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.observed_coverage'">¶</a></dt>
+<dd><p>Apparent coverage read from the photograph itself (Murray-Davies).</p>
+<p>Endmember values are estimated from the mark’s own pixels – its background region
+gives the substrate endpoint, its foreground core the solid endpoint – so no
+external calibration target is needed. Percentiles rather than extremes, so a
+specular highlight cannot define an endpoint.</p>
+<p><code class="docutils literal notranslate"><span class="pre">yule_nielsen_n</span></code> &gt; 1 compensates for lateral light scattering in the substrate,
+which otherwise inflates apparent coverage above geometric coverage. n = 1 is plain
+Murray-Davies; the right value is substrate- and wavelength-specific and should be
+fitted, not guessed.</p>
+<p>The result is <em>apparent</em>, not geometric, coverage. Do not silently substitute it
+for <a class="reference internal" href="#inkmap.coverage_map" title="inkmap.coverage_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">coverage_map()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.place">
+<span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">place</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quad</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">inclusive_pixel_corners</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'manual'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">metadata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/locate.html#place"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.place" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.place'">¶</a></dt>
+<dd><p>Place a model at a known quadrilateral – the universal escape hatch.</p>
+<p><code class="docutils literal notranslate"><span class="pre">quad</span></code> is four <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> image points in the <em>model’s</em> own corner order: the
+point corresponding to model-space <code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">0)</span></code> first, then clockwise. Order matters
+and is not inferred: sorting corners by image position silently mislabels them once
+the mark is rotated past 45 degrees.</p>
+<p>Use this for anything without a decoder – printed letters, logos, engraved marks –
+or when you already know where the mark is and only want the coverage machinery.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="inkmap.types.html#inkmap.types.Placement" title="inkmap.types.Placement"><code class="xref py py-class docutils literal notranslate"><span class="pre">Placement</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.srgb_to_linear">
+<span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">srgb_to_linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/photometry.html#srgb_to_linear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.srgb_to_linear" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.srgb_to_linear'">¶</a></dt>
+<dd><p>Undo the sRGB transfer function, returning float in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>.</p>
+<p>Averaging pixel values without this is a real error, not a nicety: sRGB values are
+perceptually encoded, so the mean of encoded values is not the encoded mean
+intensity. Any difference between two exposures compounds it. Apply before any
+arithmetic that claims to be about light.</p>
+<p>The piecewise IEC 61966-2-1 curve, not the 2.2 power approximation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+<p class="rubric">Modules</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="inkmap.models.html#module-inkmap.models" title="inkmap.models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models</span></code></a></p></td>
+<td><p>Shape models: what the foreground is expected to look like.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="inkmap.geometry.html#module-inkmap.geometry" title="inkmap.geometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geometry</span></code></a></p></td>
+<td><p>Model space &lt;-&gt; image space: transforms, and refining them against the photograph.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="inkmap.photometry.html#module-inkmap.photometry" title="inkmap.photometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">photometry</span></code></a></p></td>
+<td><p>Turning masks into measurements that are actually valid.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="inkmap.config.html#module-inkmap.config" title="inkmap.config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config</span></code></a></p></td>
+<td><p>Tunable defaults, in one place.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="inkmap.corpus.html#module-inkmap.corpus" title="inkmap.corpus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">corpus</span></code></a></p></td>
+<td><p>The real-photograph test corpus: 384 photographed marks in the wild, from Wikimedia Commons.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="inkmap.coverage.html#module-inkmap.coverage" title="inkmap.coverage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coverage</span></code></a></p></td>
+<td><p>Per-pixel foreground coverage: the 0..1 value, and which one you want.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="inkmap.synth.html#module-inkmap.synth" title="inkmap.synth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">synth</span></code></a></p></td>
+<td><p>Synthetic scenes with exact ground truth.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="inkmap.types.html#module-inkmap.types" title="inkmap.types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">types</span></code></a></p></td>
+<td><p>The data types the whole package speaks in.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="inkmap.viz.html#module-inkmap.viz" title="inkmap.viz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">viz</span></code></a></p></td>
+<td><p>Visual overlays, for checking that a result is actually right.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#terminology'" class="reference internal" href="#terminology">Terminology</a></li>
+<li><a :data-current="activeSection === '#inkmap.InkMap'" class="reference internal" href="#inkmap.InkMap"><code class="docutils literal notranslate"><span class="pre">InkMap</span></code></a><ul>
+<li><a :data-current="activeSection === '#inkmap.InkMap.background_mask'" class="reference internal" href="#inkmap.InkMap.background_mask"><code class="docutils literal notranslate"><span class="pre">InkMap.background_mask()</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.InkMap.blur_sigma'" class="reference internal" href="#inkmap.InkMap.blur_sigma"><code class="docutils literal notranslate"><span class="pre">InkMap.blur_sigma</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.InkMap.coverage'" class="reference internal" href="#inkmap.InkMap.coverage"><code class="docutils literal notranslate"><span class="pre">InkMap.coverage</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.InkMap.foreground_mask'" class="reference internal" href="#inkmap.InkMap.foreground_mask"><code class="docutils literal notranslate"><span class="pre">InkMap.foreground_mask()</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.InkMap.inside_mask'" class="reference internal" href="#inkmap.InkMap.inside_mask"><code class="docutils literal notranslate"><span class="pre">InkMap.inside_mask()</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.InkMap.margin_mask'" class="reference internal" href="#inkmap.InkMap.margin_mask"><code class="docutils literal notranslate"><span class="pre">InkMap.margin_mask()</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.InkMap.region'" class="reference internal" href="#inkmap.InkMap.region"><code class="docutils literal notranslate"><span class="pre">InkMap.region</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.InkMap.weight'" class="reference internal" href="#inkmap.InkMap.weight"><code class="docutils literal notranslate"><span class="pre">InkMap.weight</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#inkmap.Measurability'" class="reference internal" href="#inkmap.Measurability"><code class="docutils literal notranslate"><span class="pre">Measurability</span></code></a><ul>
+<li><a :data-current="activeSection === '#inkmap.Measurability.resolution_ratio'" class="reference internal" href="#inkmap.Measurability.resolution_ratio"><code class="docutils literal notranslate"><span class="pre">Measurability.resolution_ratio</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#inkmap.Measurement'" class="reference internal" href="#inkmap.Measurement"><code class="docutils literal notranslate"><span class="pre">Measurement</span></code></a><ul>
+<li><a :data-current="activeSection === '#inkmap.Measurement.contrast'" class="reference internal" href="#inkmap.Measurement.contrast"><code class="docutils literal notranslate"><span class="pre">Measurement.contrast</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.Measurement.ratio'" class="reference internal" href="#inkmap.Measurement.ratio"><code class="docutils literal notranslate"><span class="pre">Measurement.ratio</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.Measurement.snr'" class="reference internal" href="#inkmap.Measurement.snr"><code class="docutils literal notranslate"><span class="pre">Measurement.snr</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#inkmap.Model'" class="reference internal" href="#inkmap.Model"><code class="docutils literal notranslate"><span class="pre">Model</span></code></a><ul>
+<li><a :data-current="activeSection === '#inkmap.Model.extent'" class="reference internal" href="#inkmap.Model.extent"><code class="docutils literal notranslate"><span class="pre">Model.extent</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.Model.feature_size'" class="reference internal" href="#inkmap.Model.feature_size"><code class="docutils literal notranslate"><span class="pre">Model.feature_size</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.Model.occupancy'" class="reference internal" href="#inkmap.Model.occupancy"><code class="docutils literal notranslate"><span class="pre">Model.occupancy()</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#inkmap.Placement'" class="reference internal" href="#inkmap.Placement"><code class="docutils literal notranslate"><span class="pre">Placement</span></code></a><ul>
+<li><a :data-current="activeSection === '#inkmap.Placement.locator'" class="reference internal" href="#inkmap.Placement.locator"><code class="docutils literal notranslate"><span class="pre">Placement.locator</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.Placement.payload'" class="reference internal" href="#inkmap.Placement.payload"><code class="docutils literal notranslate"><span class="pre">Placement.payload</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.Placement.pixels_per_feature'" class="reference internal" href="#inkmap.Placement.pixels_per_feature"><code class="docutils literal notranslate"><span class="pre">Placement.pixels_per_feature</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.Placement.pixels_per_unit'" class="reference internal" href="#inkmap.Placement.pixels_per_unit"><code class="docutils literal notranslate"><span class="pre">Placement.pixels_per_unit</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.Placement.quad'" class="reference internal" href="#inkmap.Placement.quad"><code class="docutils literal notranslate"><span class="pre">Placement.quad</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.Placement.score'" class="reference internal" href="#inkmap.Placement.score"><code class="docutils literal notranslate"><span class="pre">Placement.score</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.Placement.transform'" class="reference internal" href="#inkmap.Placement.transform"><code class="docutils literal notranslate"><span class="pre">Placement.transform</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.Placement.units_per_pixel'" class="reference internal" href="#inkmap.Placement.units_per_pixel"><code class="docutils literal notranslate"><span class="pre">Placement.units_per_pixel</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#inkmap.Polarity'" class="reference internal" href="#inkmap.Polarity"><code class="docutils literal notranslate"><span class="pre">Polarity</span></code></a><ul>
+<li><a :data-current="activeSection === '#inkmap.Polarity.FOREGROUND_IS_DARK'" class="reference internal" href="#inkmap.Polarity.FOREGROUND_IS_DARK"><code class="docutils literal notranslate"><span class="pre">Polarity.FOREGROUND_IS_DARK</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.Polarity.FOREGROUND_IS_LIGHT'" class="reference internal" href="#inkmap.Polarity.FOREGROUND_IS_LIGHT"><code class="docutils literal notranslate"><span class="pre">Polarity.FOREGROUND_IS_LIGHT</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#inkmap.Region'" class="reference internal" href="#inkmap.Region"><code class="docutils literal notranslate"><span class="pre">Region</span></code></a><ul>
+<li><a :data-current="activeSection === '#inkmap.Region.BACKGROUND'" class="reference internal" href="#inkmap.Region.BACKGROUND"><code class="docutils literal notranslate"><span class="pre">Region.BACKGROUND</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.Region.FOREGROUND'" class="reference internal" href="#inkmap.Region.FOREGROUND"><code class="docutils literal notranslate"><span class="pre">Region.FOREGROUND</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.Region.MARGIN'" class="reference internal" href="#inkmap.Region.MARGIN"><code class="docutils literal notranslate"><span class="pre">Region.MARGIN</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.Region.OUTSIDE'" class="reference internal" href="#inkmap.Region.OUTSIDE"><code class="docutils literal notranslate"><span class="pre">Region.OUTSIDE</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#inkmap.confidence'" class="reference internal" href="#inkmap.confidence"><code class="docutils literal notranslate"><span class="pre">confidence()</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.coverage_map'" class="reference internal" href="#inkmap.coverage_map"><code class="docutils literal notranslate"><span class="pre">coverage_map()</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.find'" class="reference internal" href="#inkmap.find"><code class="docutils literal notranslate"><span class="pre">find()</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.find_all'" class="reference internal" href="#inkmap.find_all"><code class="docutils literal notranslate"><span class="pre">find_all()</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.foreground'" class="reference internal" href="#inkmap.foreground"><code class="docutils literal notranslate"><span class="pre">foreground()</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.locate'" class="reference internal" href="#inkmap.locate"><code class="docutils literal notranslate"><span class="pre">locate()</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.measurability'" class="reference internal" href="#inkmap.measurability"><code class="docutils literal notranslate"><span class="pre">measurability()</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.measure'" class="reference internal" href="#inkmap.measure"><code class="docutils literal notranslate"><span class="pre">measure()</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.measurement_mask'" class="reference internal" href="#inkmap.measurement_mask"><code class="docutils literal notranslate"><span class="pre">measurement_mask()</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.measurement_weight'" class="reference internal" href="#inkmap.measurement_weight"><code class="docutils literal notranslate"><span class="pre">measurement_weight()</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.observed_coverage'" class="reference internal" href="#inkmap.observed_coverage"><code class="docutils literal notranslate"><span class="pre">observed_coverage()</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.place'" class="reference internal" href="#inkmap.place"><code class="docutils literal notranslate"><span class="pre">place()</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.srgb_to_linear'" class="reference internal" href="#inkmap.srgb_to_linear"><code class="docutils literal notranslate"><span class="pre">srgb_to_linear()</span></code></a></li>
+</ul>
+</div>
+</aside>
+</main>
+</div>
+</div><footer class="py-6 border-t border-border md:py-0">
+<div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+<div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left"></p>
+</div>
+</div>
+</footer>
+</div>
+<script src="../_static/documentation_options.js?v=360bc84d"></script>
+<script src="../_static/doctools.js?v=fd6eb6e6"></script>
+<script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+<script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+<script src="../_static/copybutton.js?v=fd10adb8"></script>
+<script defer="defer" src="../_static/theme.js?v=5db23cf8"></script>
+</body>
+</html>

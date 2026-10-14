@@ -1,4 +1,0 @@
-inkmap.models.freeform
-======================
-.. automodule:: inkmap.models.freeform
-   :members:

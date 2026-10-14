@@ -1,0 +1,13 @@
+inkmap.models.grid
+==================
+
+.. automodule:: inkmap.models.grid
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      MatrixModel
+      BarsModel
+   

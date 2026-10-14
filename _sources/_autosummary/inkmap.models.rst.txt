@@ -1,0 +1,34 @@
+inkmap.models
+=============
+
+.. automodule:: inkmap.models
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      render_model
+      text_model
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Model
+      BaseModel
+      MatrixModel
+      BarsModel
+      RasterModel
+      PolygonModel
+      GlyphModel
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   base
+   freeform
+   grid

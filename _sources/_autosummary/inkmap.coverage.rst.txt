@@ -1,0 +1,17 @@
+inkmap.coverage
+===============
+
+.. automodule:: inkmap.coverage
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      coverage_map
+      observed_coverage
+      confidence
+      measurement_weight
+      region_map
+      estimate_blur_sigma
+   

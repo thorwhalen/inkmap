@@ -1,4 +1,0 @@
-inkmap.models.base
-==================
-.. automodule:: inkmap.models.base
-   :members:

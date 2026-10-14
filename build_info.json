@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "built_at": "2026-10-14T00:19:14Z",
+  "package": {
+    "name": "inkmap",
+    "version": "0.1.3",
+    "display_name": "inkmap",
+    "source": "pyproject.toml"
+  },
+  "git": {
+    "available": true,
+    "commit": "28b9d1092af3a8c89e96d11ac2cd6f1b9834407b",
+    "short_commit": "28b9d10",
+    "branch": "main",
+    "tags": [],
+    "dirty": false,
+    "remote_url": "https://github.com/thorwhalen/inkmap",
+    "commit_url": "https://github.com/thorwhalen/inkmap/commit/28b9d1092af3a8c89e96d11ac2cd6f1b9834407b",
+    "error": null
+  },
+  "ci": {
+    "provider": "github",
+    "repository": "thorwhalen/inkmap",
+    "sha": "28b9d1092af3a8c89e96d11ac2cd6f1b9834407b",
+    "sha_in_history": true,
+    "ref": "refs/heads/main",
+    "ref_name": "main",
+    "run_id": "38489273717",
+    "run_url": "https://github.com/thorwhalen/inkmap/actions/runs/38489273717",
+    "server_url": "https://github.com"
+  },
+  "tools": {
+    "epythet": "0.2.17",
+    "sphinx": "9.1.0",
+    "docutils": "0.22.4",
+    "python": "3.12.15"
+  },
+  "config": {
+    "theme": "auto",
+    "html_theme": "sphinxawesome_theme",
+    "accent": "#006883",
+    "mode": "auto",
+    "api_generator": "autosummary",
+    "ignore": [
+      "tests/",
+      "scrap/",
+      "examples/"
+    ],
+    "agent_outputs": true,
+    "aggregates": [
+      "md"
+    ],
+    "ai_artifacts": true,
+    "provenance": true,
+    "docs_dir": "docsrc"
+  },
+  "site": {
+    "modules_documented": 13,
+    "objects_documented": 170
+  },
+  "pypi": {
+    "checked": true,
+    "latest": "0.1.4",
+    "relation": "behind",
+    "error": null
+  },
+  "reproduce": "git clone https://github.com/thorwhalen/inkmap && cd inkmap\ngit checkout 28b9d1092af3a8c89e96d11ac2cd6f1b9834407b\npip install \"epythet==0.2.17\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "warnings": [],
+  "alignment": {
+    "aligned": false,
+    "notes": [
+      "The documented version (0.1.3) is behind the latest release on PyPI (0.1.4): `pip install inkmap` gives newer code than these docs describe."
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+inkmap.photometry
+=================
+
+.. automodule:: inkmap.photometry
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      srgb_to_linear
+      measurement_mask
+      measurement_margin
+      measurability
+      measure
+      illumination_field
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Measurability
+      Measurement
+   

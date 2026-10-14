@@ -1,0 +1,19 @@
+inkmap.models.base
+==================
+
+.. automodule:: inkmap.models.base
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      render_model
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Model
+      BaseModel
+   

@@ -1,0 +1,20 @@
+inkmap.models.freeform
+======================
+
+.. automodule:: inkmap.models.freeform
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      text_model
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      RasterModel
+      PolygonModel
+      GlyphModel
+   

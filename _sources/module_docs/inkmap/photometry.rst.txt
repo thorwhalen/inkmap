@@ -1,4 +1,0 @@
-inkmap.photometry
-=================
-.. automodule:: inkmap.photometry
-   :members:
