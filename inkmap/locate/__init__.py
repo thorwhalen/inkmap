@@ -22,6 +22,7 @@ found by :func:`locate_patch`, seeded at a point inside it.
 
 from __future__ import annotations
 
+import importlib
 import inspect
 import sys
 import types
@@ -346,10 +347,20 @@ class _CallableModule(types.ModuleType):
     same name. A module that is also the function serves both spellings, where
     re-exporting the function over the package (as the facade once did) broke
     ``inkmap.locate.LOCATORS`` and ``import inkmap.locate.marks as m``.
+
+    It is a module, so introspection describes the package (``help``, ``__doc__``,
+    ``__name__``), and static type checkers flag the call ("module not callable"):
+    in type-checked code, or wherever a real function object is needed, call
+    ``inkmap.locate.locate``. ``inspect.signature`` reports the function's signature.
     """
 
     def __call__(self, *args, **kwargs):
         return locate(*args, **kwargs)
+
+    def __reduce__(self):
+        # Pickles by name, as the function did, so ``inkmap.locate`` can still be
+        # handed to a process pool.
+        return importlib.import_module, (self.__name__,)
 
 
 sys.modules[__name__].__class__ = _CallableModule

@@ -816,6 +816,9 @@ def test_locate_is_the_package_and_callable_as_the_cascade():
     import inkmap.locate.marks as marks  # noqa: F401
 
     assert "scale" in inspect.signature(inkmap.locate).parameters
+    import pickle
+
+    assert pickle.loads(pickle.dumps(inkmap.locate)) is inkmap.locate  # process pools
     scene = synth.render(rng=0)
     bgr = cv2.cvtColor(scene.image, cv2.COLOR_GRAY2BGR)
     assert len(inkmap.locate(bgr, scene.image)) == len(locate.locate(bgr, scene.image)) > 0
