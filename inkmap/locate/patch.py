@@ -43,10 +43,15 @@ with the last split's reason appended. Text, specks or glare on the patch are le
 of :attr:`PatchRegions.patch`; ring pixels not of the paper's colour (a neighbouring
 light patch) are left out of :attr:`PatchRegions.substrate`.
 
-**Limits.** The patch colour is one global seed colour, so strong uneven light defeats
-a pale patch: with lightness falling 40% across the frame, a patch a Delta E of ~10
-from its paper is mostly refused (correctly, but refused). Coloured paper is refused
-too. Corners are good to about 0.3 px at blur up to 1.5 px, pale patches included
+**Uneven light.** The patch colour is one seed colour, so strong uneven light brings
+shaded paper close to a pale patch's colour, and the plain pass refuses it. Then (with
+``flatten="auto"``, the default) the light over the paper round the refused region is
+fitted and divided out, and the patch is located again on the flattened frame: with
+lightness falling 40% across it, a pale patch a Delta E of ~10 from its paper is found
+in every validation scene this way, and in none without. ``regions.flattened`` says
+which pass answered.
+
+**Limits.** Coloured paper is refused. Corners are good to about 0.3 px at blur up to 1.5 px, pale patches included
 (``python scripts/validate.py patch``). A 4000 x 3000 frame takes about 1.5 s.
 
 **On flash bursts,** seed on an unlit frame (or the median of the unlit frames): under
@@ -83,7 +88,8 @@ class PatchRegions:
     used, ``area_share`` of the frame, ``rectangularity`` (region over fitted quad),
     ``outline_deviation_px`` (95th percentile of the outline's distance from the
     fitted sides), ``hole_share`` (share of the interior not the patch's colour),
-    ``substrate_px``, and ``ring_px`` (the ring's inner and outer distance).
+    ``substrate_px``, ``ring_px`` (the ring's inner and outer distance), and
+    ``flattened`` (whether it was found on the frame with the light divided out).
     """
 
     patch: np.ndarray
@@ -101,6 +107,7 @@ class PatchRegions:
     outline_deviation_px: float = float("nan")
     substrate_px: int = 0
     ring_px: tuple[float, float] = (0.0, 0.0)
+    flattened: bool = False
 
     @property
     def placement(self) -> Placement | None:
@@ -166,6 +173,7 @@ def locate_patch(
     max_substrate_chroma: float = config.PATCH_MAX_SUBSTRATE_CHROMA,
     min_side_share: float = config.PATCH_MIN_SIDE_SHARE,
     min_edge_step: float = config.PATCH_MIN_EDGE_STEP,
+    flatten: str = "auto",
 ) -> PatchRegions:
     """The uniform patch at ``seed``, and the ring of substrate just outside it.
 
@@ -186,16 +194,79 @@ def locate_patch(
     colour step of ``min_edge_step`` across it -- the sign of a region that leaked into
     shaded paper. A failed verdict on a leaked region is retried at a tighter
     threshold.
+
+    ``flatten`` decides when uneven light is divided out first: ``"auto"`` (default)
+    only once the plain pass is refused, ``"never"``, or ``"always"``.
     """
     from .. import _as_bgr  # the facade's image coercion; lazy, as it imports us
 
+    if flatten not in ("auto", "never", "always"):
+        raise ValueError(
+            f"flatten must be 'auto', 'never' or 'always', got {flatten!r}"
+        )
     bgr = _as_bgr(image)
     if bgr.dtype != np.uint8:
         raise ValueError(f"locate_patch takes an 8-bit image, got {bgr.dtype}")
     h, w = bgr.shape[:2]
+    sx, sy = _seed_point(seed, w, h)
+    params = dict(
+        seed_share=seed_share,
+        min_delta_e=min_delta_e,
+        max_delta_e=max_delta_e,
+        edge_margin_share=edge_margin_share,
+        ring_share=ring_share,
+        min_area_share=min_area_share,
+        min_rectangularity=min_rectangularity,
+        min_substrate_px=min_substrate_px,
+        min_substrate_lift=min_substrate_lift,
+        max_substrate_chroma=max_substrate_chroma,
+        min_side_share=min_side_share,
+        min_edge_step=min_edge_step,
+    )
+    found = None if flatten == "always" else _locate_once(bgr, sx, sy, **params)
+    if found is not None and (found.ok or flatten == "never"):
+        return found
+    # Refused: perhaps uneven light brought the paper's colour too close to the
+    # patch's. Divide the light out, judged from the paper round the refused region,
+    # and try again on the flattened frame. The masks and quad are the same pixels.
+    flattened = _flatten_illumination(
+        bgr,
+        None if found is None else found.region,
+        max_substrate_chroma=max_substrate_chroma,
+    )
+    if flattened is None:
+        return found if found is not None else _locate_once(bgr, sx, sy, **params)
+    again = replace(_locate_once(flattened, sx, sy, **params), flattened=True)
+    if again.ok or found is None:
+        return again
+    return replace(
+        found,
+        notes=found.notes + (f"flattened the light, still: {'; '.join(again.notes)}",),
+    )
+
+
+def _locate_once(
+    bgr: np.ndarray,
+    sx: int,
+    sy: int,
+    *,
+    seed_share,
+    min_delta_e,
+    max_delta_e,
+    edge_margin_share,
+    ring_share,
+    min_area_share,
+    min_rectangularity,
+    min_substrate_px,
+    min_substrate_lift,
+    max_substrate_chroma,
+    min_side_share,
+    min_edge_step,
+) -> PatchRegions:
+    """One pass of :func:`locate_patch` on ``bgr``, without flattening the light."""
+    h, w = bgr.shape[:2]
     colour = bgr.astype(np.float32)
     lab = cv2.cvtColor(colour / 255.0, cv2.COLOR_BGR2Lab)
-    sx, sy = _seed_point(seed, w, h)
     half = max(1, int(round(seed_share * min(h, w) / 2)))
     window = (
         slice(max(sy - half, 0), sy + half + 1),
@@ -498,6 +569,71 @@ def locate_patch_centre(bgr: np.ndarray, gray: np.ndarray) -> list[Placement]:
     """
     regions = locate_patch(bgr)
     return [regions.placement] if regions.ok and regions.quad is not None else []
+
+
+def _flatten_illumination(
+    bgr: np.ndarray, region: np.ndarray | None, *, max_substrate_chroma: float
+) -> np.ndarray | None:
+    """``bgr`` with the illumination over the paper divided out, or None if unsure.
+
+    The paper round the (refused) region is the light, low-chroma population near it.
+    Its luminance, in linear light, is fitted with a smooth quadratic field as an upper
+    envelope: pixels well below the fit -- the patch, which is darker than its paper,
+    and anything else on it -- are dropped and the fit repeated, so the field follows
+    the paper alone. The frame is then divided by the field (in linear light, where
+    light multiplies) and re-encoded.
+    """
+    from ..photometry import _poly_basis, srgb_to_linear
+
+    h, w = bgr.shape[:2]
+    if region is None or not region.any():
+        x0, y0, x1, y1 = 0, 0, w, h
+    else:
+        x, y, bw, bh = cv2.boundingRect(region.astype(np.uint8))
+        pad = int(config.PATCH_FLATTEN_PAD_SHARE * max(bw, bh))
+        x0, y0 = max(x - pad, 0), max(y - pad, 0)
+        x1, y1 = min(x + bw + pad, w), min(y + bh + pad, h)
+    linear = srgb_to_linear(bgr)  # (h, w, 3), BGR, [0, 1]
+    luminance = linear @ np.array([0.0722, 0.7152, 0.2126], dtype=np.float32)
+    lab = cv2.cvtColor(bgr[y0:y1, x0:x1].astype(np.float32) / 255.0, cv2.COLOR_BGR2Lab)
+    lightness = lab[..., 0]
+    split, gap = _otsu_split(lightness.ravel())
+    paper_like = np.hypot(lab[..., 1], lab[..., 2]) < max_substrate_chroma
+    if gap >= config.PATCH_SUBSTRATE_SPLIT_GAP:
+        paper_like &= lightness > split  # leave the table out
+    ys, xs = np.nonzero(paper_like)
+    if len(ys) < config.PATCH_FLATTEN_MIN_PX:
+        return None
+    step = max(1, len(ys) // config.PATCH_FLATTEN_MAX_SAMPLES)
+    ys, xs = ys[::step] + y0, xs[::step] + x0
+    values = luminance[ys, xs].astype(np.float64)
+    basis = _poly_basis(xs / w, ys / h, config.PATCH_FLATTEN_DEGREE)
+    keep = np.ones(len(values), dtype=bool)
+    for _ in range(config.PATCH_FLATTEN_ITERATIONS):
+        coeffs, *_ = np.linalg.lstsq(basis[keep], values[keep], rcond=None)
+        residual = values - basis @ coeffs
+        noise = 1.4826 * float(
+            np.median(np.abs(residual[keep] - np.median(residual[keep])))
+        )
+        keep = residual > -config.PATCH_FLATTEN_ENVELOPE_SIGMAS * max(noise, 1e-4)
+        if keep.sum() < config.PATCH_FLATTEN_MIN_PX // 4:
+            return None
+    yy, xx = np.mgrid[0:h, 0:w]
+    field = (
+        _poly_basis((xx / w).ravel(), (yy / h).ravel(), config.PATCH_FLATTEN_DEGREE)
+        @ coeffs
+    ).reshape(h, w)
+    inside = field[y0:y1, x0:x1]
+    if not np.isfinite(field).all() or inside.min() <= 0:
+        return None
+    gain = (np.median(inside) / np.clip(field, 0.25 * inside.min(), None)).astype(
+        np.float32
+    )
+    flat = np.clip(linear * gain[..., None], 0.0, 1.0)
+    encoded = np.where(
+        flat <= 0.0031308, 12.92 * flat, 1.055 * np.power(flat, 1 / 2.4) - 0.055
+    )
+    return np.clip(np.round(encoded * 255.0), 0, 255).astype(np.uint8)
 
 
 def _seed_point(seed, w: int, h: int) -> tuple[int, int]:

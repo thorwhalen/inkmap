@@ -252,10 +252,11 @@ def plain_patches() -> None:
 
     print("\n## Plain patches")
     print(
-        "\n| patch | perspective | blur (px) | ok | corner error median (px) "
-        "| max (px) | patch px off the patch | substrate px off the paper |"
+        "\n| patch | light falloff | perspective | blur (px) | ok (flattened) "
+        "| corner error median (px) | max (px) | patch px off the patch "
+        "| substrate px off the paper |"
     )
-    print("|---|---|---|---|---|---|---|---|")
+    print("|---|---|---|---|---|---|---|---|---|")
     colours = {
         "dark grey": (40, 40, 45),
         "blue": (160, 90, 40),
@@ -268,47 +269,54 @@ def plain_patches() -> None:
         cv2.fillConvexPoly(mask, np.round(quad * 16).astype(np.int32), 1, shift=4)
         return mask.astype(bool)
 
-    for name, bgr in colours.items():
-        for perspective in (0.0, 0.05, 0.1):
-            for blur in (1.0, 1.5):
-                ok, errors, spill, table = 0, [], 0, 0
-                for t in range(HELD_OUT_SEED, HELD_OUT_SEED + TRIALS):
-                    rng = np.random.default_rng(t)
-                    scene = synth.render_patch(
-                        patch_bgr=bgr,
-                        perspective=perspective,
-                        rotation=float(rng.uniform(-45, 45)),
-                        blur=blur,
-                        noise=2.0,
-                        gradient=0.2,
-                        background_texture=10.0,
-                        rng=t,
-                    )
-                    regions = locate_patch(scene.image)
-                    ok += regions.ok
-                    if not regions.ok:
-                        continue
-                    # Order-free: "clockwise from the top-left" flips at 45 degrees.
-                    errors.append(
-                        min(
-                            np.abs(
-                                np.roll(regions.quad, k, axis=0) - scene.patch_quad
-                            ).max()
-                            for k in range(4)
-                        )
-                    )
-                    shape = scene.image.shape[:2]
-                    spill += int(
-                        (regions.patch & ~truth_mask(scene.patch_quad, shape)).sum()
-                    )
-                    table += int(
-                        (regions.substrate & ~truth_mask(scene.paper_quad, shape)).sum()
-                    )
-                e = np.array(errors) if errors else np.array([np.nan])
-                print(
-                    f"| {name} | {perspective:.2f} | {blur:.1f} | {ok}/{TRIALS} "
-                    f"| {np.median(e):.3f} | {e.max():.3f} | {spill} | {table} |"
+    # A 20% falloff throughout; then 40%, the case only flattening the light rescues.
+    conditions = [
+        (name, bgr, 0.2, perspective, blur)
+        for name, bgr in colours.items()
+        for perspective in (0.0, 0.05, 0.1)
+        for blur in (1.0, 1.5)
+    ] + [
+        (name, colours[name], 0.4, 0.05, blur)
+        for name in ("dark grey", "pale blue")
+        for blur in (1.0, 1.5)
+    ]
+    for name, bgr, gradient, perspective, blur in conditions:
+        ok, flattened, errors, spill, table = 0, 0, [], 0, 0
+        for t in range(HELD_OUT_SEED, HELD_OUT_SEED + TRIALS):
+            rng = np.random.default_rng(t)
+            scene = synth.render_patch(
+                patch_bgr=bgr,
+                perspective=perspective,
+                rotation=float(rng.uniform(-45, 45)),
+                blur=blur,
+                noise=2.0,
+                gradient=gradient,
+                background_texture=10.0,
+                rng=t,
+            )
+            regions = locate_patch(scene.image)
+            ok += regions.ok
+            flattened += regions.ok and regions.flattened
+            if not regions.ok:
+                continue
+            # Order-free: "clockwise from the top-left" flips at 45 degrees.
+            errors.append(
+                min(
+                    np.abs(np.roll(regions.quad, k, axis=0) - scene.patch_quad).max()
+                    for k in range(4)
                 )
+            )
+            shape = scene.image.shape[:2]
+            spill += int((regions.patch & ~truth_mask(scene.patch_quad, shape)).sum())
+            table += int(
+                (regions.substrate & ~truth_mask(scene.paper_quad, shape)).sum()
+            )
+        e = np.array(errors) if errors else np.array([np.nan])
+        print(
+            f"| {name} | {gradient:.0%} | {perspective:.2f} | {blur:.1f} "
+            f"| {ok}/{TRIALS} ({flattened}) "
+            f"| {np.median(e):.3f} | {e.max():.3f} | {spill} | {table} |"
+        )
 
 
 SECTIONS = {
