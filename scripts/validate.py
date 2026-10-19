@@ -202,8 +202,13 @@ def square_marks() -> None:
             centres = cv2.perspectiveTransform(
                 np.float32([c for c, _ in truth])[:, None], scene.transform
             )[:, 0]
-            # A false mark is one near no mark of the sheet's, in the frame or not.
-            extra += sum(np.hypot(*(centres - m.centre).T).min() > 2.0 for m in marks)
+            # A false mark is one near no mark of the sheet's, in the frame or not,
+            # or one unlike the mark it sits on: a clipped bullseye's inner square
+            # reported as solid sits exactly on a true centre.
+            for m in marks:
+                d = np.hypot(*(centres - m.centre).T)
+                kind = () if m.is_solid else min(kinds, key=m.ring_error)
+                extra += d.min() > 2.0 or kind != truth[int(np.argmin(d))][1]
             for (u, v), rings in truth:
                 sq = np.float32(
                     [

@@ -24,23 +24,31 @@ with nothing inside it, and reports no rings.
 **Centres are projective.** The centre of a square seen in perspective is where its
 image's diagonals cross, not the centroid of its pixels, which is pulled towards the
 near side. Each side is fitted as a line to its contour points, the corners are the
-lines' intersections, and the centre is where the diagonals cross. A threshold that
-grows or shrinks the foreground moves all four sides alike and leaves that intersection
-in place, which is what makes the centre robust to exposure and blur.
+lines' intersections, and the centre is where the diagonals cross. The sides are
+placed on the grey image's mid-level edge, not on the binarised outline, so the
+threshold does not move them: one that grew the foreground would move all four sides
+out alike, which leaves the diagonals' crossing in place for a square seen head-on but
+not for one in strong perspective. The mid-level edge is exact for a linear sensor
+response; a gamma-encoded image moves a blurred edge a little (a worst centre error of
+0.16 px was measured at strong perspective and blur 2 px with gamma 1/2.2).
 
 **Uncertainty.** Each mark carries ``sigma_px``, an estimate of how far its centre is
 from the truth: the scatter of the side fits over the square root of the points per
-side, combined with the disagreement between the centres of a nested mark's squares. A
-nested mark's centre is the side-weighted mean of its squares' centres, which
-perspective maps to one point. For a solid mark there are no rings to disagree, so the
-figure understates damage that keeps the outline straight (a glare bite, heavy blur). A
-mark cut by the frame's edge is dropped, never measured.
+side, combined, for a nested mark, with the disagreement between its squares' centres
+(its centre is their side-weighted mean, since perspective maps them to one point),
+and for a solid mark, which has nothing to disagree with, with a fixed floor for the
+biases the fit cannot see. Both are calibrated on synthetic sheets so that the median
+centre error is about ``sigma_px``; the tail is heavier than a Gaussian's (one mark in
+twenty is off by 3-6 sigma), so weigh marks by it, but do not gate on it. A mark cut by
+the frame's edge is dropped, never measured.
 
 **Limits.** Each ring must be several blur widths across to survive binarisation: at
-blur 1.5 px a bullseye needs roughly 40 px or more, a solid square 10 px. A mark wider
-than the local-mean window (``local_window_share`` of the frame) is hollowed by its own
-ink and missed. A disc under about 10 px radius fits four lines as well as a square of
-its size does, so it cannot be told from one.
+blur 1.5 px a bullseye needs roughly 40 px or more, a solid square 10 px. Marks over
+``max_side_share`` of the frame (10% by default) are not looked for; raising it widens
+the local-mean window with it, which tolerates uneven lighting less well. A disc under
+about 10 px radius fits four lines as well as a square of its size does, so it cannot
+be told from one. Anything square is a candidate, so a QR symbol's clusters of data
+modules come back as small solid marks.
 """
 
 from __future__ import annotations
@@ -137,7 +145,7 @@ def find_square_marks(
     gray: np.ndarray,
     *,
     min_side_px: float = 8.0,
-    max_side_share: float = 0.25,
+    max_side_share: float = 0.1,
     polarity: Polarity = Polarity.FOREGROUND_IS_DARK,
     dark_share: float = config.MARK_DARK_SHARE,
     min_contrast: float = config.MARK_MIN_CONTRAST,
@@ -153,17 +161,30 @@ def find_square_marks(
     The foreground is binarised relative to the local mean brightness: a pixel is
     foreground when it is darker than ``dark_share`` of the mean over a window
     ``local_window_share`` of the frame's shorter side, and darker by at least
-    ``min_contrast`` grey levels.
+    ``min_contrast`` grey levels. The window is widened to stay wider than the largest
+    mark looked for, since a mark wider than it is hollowed by its own ink.
+
+    Anything square is a candidate: a QR symbol's clusters of data modules and some
+    printed glyphs come back as solid marks too. Telling the registration marks from
+    them, by size, ring ratio and layout, is the caller's.
     """
     g = np.asarray(gray, dtype=np.float32)
     if g.ndim != 2:
         raise ValueError(
             f"find_square_marks takes a 2-D grey image, got shape {g.shape}"
         )
+    if g.size == 0:
+        return []
+    if not np.isfinite(g).all():
+        raise ValueError("find_square_marks takes a finite image; this one has NaN/inf")
     if not Polarity(polarity).foreground_is_dark():
         g = 255.0 - g
     h, w = g.shape
-    window = max(15, int(local_window_share * min(h, w)) | 1)
+    max_side = max_side_share * min(h, w)
+    window_share = max(
+        local_window_share, config.MARK_WINDOW_OVER_MAX_SIDE * max_side_share
+    )
+    window = max(15, int(window_share * min(h, w)) | 1)
     local = cv2.blur(g, (window, window))
     foreground = (g < dark_share * local) & (local - g > min_contrast)
     contours, hierarchy, quads = _quads(
@@ -174,33 +195,32 @@ def find_square_marks(
     )
     if hierarchy is None:
         return []
-    max_side = max_side_share * min(h, w)
 
-    # The inner foreground square of a nested mark is not a mark of its own. Only a
-    # square whose one hole holds exactly one square is a nested mark: the dark band a
-    # table or a shadow makes round a whole sheet also has the sheet as its hole, and
-    # every mark on the sheet inside it. A mark-sized square hole holding one square
-    # marks its child as inner too, so that a nested mark whose outer square is lost
-    # (cut by the frame, bitten by glare) is dropped, not reported as a solid mark.
-    nested_inner: set[int] = set()
-    for i in quads:
-        holes = _children(hierarchy, i)
-        if len(holes) == 1:
-            inner = [c for c in _children(hierarchy, holes[0]) if c in quads]
-            if len(inner) == 1:
-                nested_inner.add(inner[0])
-        if _depth(hierarchy, i) % 2 and np.sqrt(quads[i][1]) <= max_side:
-            inner = [c for c in _children(hierarchy, i) if c in quads]
-            if len(inner) == 1:
-                nested_inner.add(inner[0])
+    def is_inner(i: int) -> bool:
+        """Is square ``i`` the inner square of a nested mark, intact or not?
+
+        It is when the hole holding it is not much larger than it is. A sheet's
+        outline, a form's box or a table round a sheet also hold marks in a hole, but a
+        hole far larger than the mark. Judged from the hole alone, so that a nested
+        mark whose outer square is lost (cut by the frame, bitten by glare) is dropped,
+        not reported as a solid mark.
+        """
+        hole = hierarchy[i][3]
+        return hole != -1 and cv2.contourArea(
+            contours[hole]
+        ) < config.MARK_NESTED_HOLE_AREA_RATIO * cv2.contourArea(contours[i])
 
     marks = []
     for i, ((corners, resid, n_side), area) in quads.items():
-        if i in nested_inner or _depth(hierarchy, i) % 2:
-            continue  # an inner square, or (odd depth) the boundary of a hole
+        if _depth(hierarchy, i) % 2 or is_inner(i):
+            continue  # (odd depth) the boundary of a hole, or an inner square
         side = float(np.sqrt(area))
         if not min_side_px <= side <= max_side:
             continue
+        lengths = np.linalg.norm(np.roll(corners, -1, axis=0) - corners, axis=1)
+        across, down = lengths[0] + lengths[2], lengths[1] + lengths[3]
+        if max(across, down) > config.MARK_MAX_ASPECT * min(across, down):
+            continue  # a rectangle, not a square at any plausible incidence
         centre = quad_centre(corners)
         if centre is None:
             continue
@@ -210,6 +230,8 @@ def find_square_marks(
             for c in _children(hierarchy, i)
             if cv2.contourArea(contours[c]) > min_hole_area
         ]
+        if not holes and _may_be_clipped_ring(corners, side, foreground):
+            continue
         rings: tuple[float, ...] = ()
         centres = [centre]
         if holes:
@@ -231,19 +253,47 @@ def find_square_marks(
         points = np.array(centres)
         weights = np.array((1.0, *rings))
         best = weights @ points / weights.sum()
-        spread = float(np.max(np.linalg.norm(points - best, axis=1)))
+        spread = float(np.sqrt(np.mean(np.sum((points - best) ** 2, axis=1))))
         marks.append(
             SquareMark(
                 centre=(float(best[0]), float(best[1])),
                 corners=_clockwise_from_top_left(corners),
                 side_px=side,
                 rings=rings,
-                sigma_px=math.hypot(resid / math.sqrt(max(n_side, 1)), spread),
+                sigma_px=math.hypot(
+                    resid / math.sqrt(max(n_side, 1)),
+                    config.MARK_RING_SPREAD_SHARE * spread
+                    if rings
+                    else config.MARK_SOLID_SIGMA_FLOOR_PX,
+                ),
                 centres=tuple(centres),
             )
         )
     marks.sort(key=lambda m: -m.side_px)
     return marks
+
+
+def _may_be_clipped_ring(corners: np.ndarray, side: float, foreground: np.ndarray):
+    """Could this solid square be the inner square of a nested mark the frame cuts?
+
+    Once the frame cuts through a nested mark's hole, its inner square sits in open
+    background, as a solid mark would. What gives it away is the ink of the cut rings
+    beside it, in a neighbourhood that runs off the frame. A mark well inside the frame
+    is never judged this way, so ink near it (text, a QR symbol) costs nothing.
+    """
+    h, w = foreground.shape
+    reach = config.MARK_CLIP_GUARD_SHARE * side
+    x0, y0 = np.floor(corners.min(axis=0) - reach).astype(int)
+    x1, y1 = np.ceil(corners.max(axis=0) + reach).astype(int)
+    if x0 >= 0 and y0 >= 0 and x1 < w and y1 < h:
+        return False
+    x0, y0, x1, y1 = max(x0, 0), max(y0, 0), min(x1, w - 1), min(y1, h - 1)
+    near = foreground[y0 : y1 + 1, x0 : x1 + 1].copy()
+    own = np.zeros_like(near, dtype=np.uint8)
+    cv2.fillConvexPoly(own, np.round(corners - (x0, y0)).astype(np.int32), 1)
+    own = cv2.dilate(own, np.ones((7, 7), np.uint8))  # the square's own blurred edge
+    near[own.astype(bool)] = False
+    return near.mean() > config.MARK_CLIP_GUARD_INK_SHARE
 
 
 def _line_intersection(l1, l2):
@@ -262,7 +312,9 @@ def _clockwise_from_top_left(corners: np.ndarray) -> np.ndarray:
     x, y = c[:, 0], c[:, 1]
     if float(np.sum(x * np.roll(y, -1) - np.roll(x, -1) * y)) < 0:
         c = c[::-1]
-    return np.roll(c, -int(np.argmin(c.sum(axis=1))), axis=0)
+    c = np.roll(c, -int(np.argmin(c.sum(axis=1))), axis=0)
+    c.flags.writeable = False  # part of a frozen SquareMark
+    return c
 
 
 def _fit_quad(

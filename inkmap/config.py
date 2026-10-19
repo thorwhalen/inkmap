@@ -159,3 +159,33 @@ MARK_MAX_SIDE_SCATTER_SHARE = 0.01
 #: own ``min_side_px``, because a nested mark's inner square is a third of its side and
 #: must be found for the mark to be.
 MARK_MIN_QUAD_SIDE_PX = 5.0
+
+#: The local-mean window is kept at least this many times the largest mark looked for
+#: (``max_side_share``): a mark wider than the window raises its own threshold and is
+#: hollowed by its own ink.
+MARK_WINDOW_OVER_MAX_SIDE = 1.2
+
+#: A square in a hole less than this many times its own area is the inner square of a
+#: nested mark (a bullseye's hole is 4x its inner square, a QR finder's 2.8x), not a
+#: mark of its own. A sheet's outline or a form's box holds its marks in a far larger
+#: hole.
+MARK_NESTED_HOLE_AREA_RATIO = 9.0
+
+#: A quadrilateral whose mean opposite-side lengths differ by more than this factor is
+#: a rectangle, not a square: 1.6 is a square seen at about 51 degrees of incidence.
+MARK_MAX_ASPECT = 1.6
+
+#: A solid square whose neighbourhood out to this many sides runs off the frame, and
+#: holds more than MARK_CLIP_GUARD_INK_SHARE foreground, may be the inner square of a
+#: nested mark the frame cuts, and is dropped. A bullseye's outer edge is 1.06 inner
+#: sides out from its inner square, a QR finder's 0.67.
+MARK_CLIP_GUARD_SHARE = 1.2
+MARK_CLIP_GUARD_INK_SHARE = 0.02
+
+#: ``sigma_px`` calibration, fitted on synthetic sheets (rotations, perspective up to
+#: 0.15, blur 0.7-1.5 px, noise 1-4) so that the median centre error is about sigma for
+#: both kinds of mark. A nested mark's term is this share of the rms distance of its
+#: squares' centres from their mean; a solid mark, with nothing to disagree with, gets
+#: this floor (its side-fit scatter alone understated its error ~4x).
+MARK_RING_SPREAD_SHARE = 0.5
+MARK_SOLID_SIGMA_FLOOR_PX = 0.015

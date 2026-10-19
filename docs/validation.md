@@ -138,7 +138,7 @@ size the measurement margin from noise.
 
 ## Square registration marks
 
-`inkmap.find_square_marks` on `synth.mark_sheet()`: three bullseyes (rings 0.64, 0.32) and a solid square at the corners of a card, two QR finder patterns (7:5:3) inside it, rendered at ~60 px per mark in a 1200 × 900 frame with noise σ = 2. Twelve scenes per row, at random in-plane rotations, and again axis-aligned (0°), which is the hard case for sub-pixel edges: along a side that runs with the pixel grid, quantisation does not average out. "Perspective" jitters each corner of the card by up to that share of its span. A mark cut by the frame is not expected, and is correctly not reported. The error is the distance from the true projective centre, from the scene's own transform.
+`inkmap.find_square_marks` on `synth.mark_sheet()`: three bullseyes (rings 0.64, 0.32) and a solid square at the corners of a card, two QR finder patterns (7:5:3) inside it, rendered at ~60 px per mark in a 1200 × 900 frame with noise σ = 2. Twelve scenes per row, at random in-plane rotations, and again axis-aligned (0°), which is the hard case for sub-pixel edges: along a side that runs with the pixel grid, quantisation does not average out. "Perspective" jitters each corner of the card by up to that share of its span. A mark cut by the frame is not expected, and is correctly not reported; a false mark is one near no true mark, or unlike the true mark it sits on (a clipped bullseye's inner square reported as solid). The error is the distance from the true projective centre, from the scene's own transform.
 
 | rotation | perspective | blur (px) | marks found | misclassified | false marks | centre error median (px) | p95 (px) | max (px) |
 |---|---|---|---|---|---|---|---|---|
@@ -164,12 +164,14 @@ size the measurement margin from noise.
 | 0° | 0.05 | 1.5 | 72/72 | 0 | 0 | 0.018 | 0.057 | 0.077 |
 | 0° | 0.10 | 1.0 | 72/72 | 0 | 0 | 0.013 | 0.045 | 0.092 |
 | 0° | 0.10 | 1.5 | 72/72 | 0 | 0 | 0.013 | 0.053 | 0.104 |
-| 0° | 0.15 | 1.0 | 72/72 | 0 | 0 | 0.010 | 0.048 | 0.128 |
-| 0° | 0.15 | 1.5 | 71/72 | 0 | 0 | 0.012 | 0.048 | 0.118 |
+| 0° | 0.15 | 1.0 | 71/72 | 0 | 0 | 0.010 | 0.048 | 0.128 |
+| 0° | 0.15 | 1.5 | 70/72 | 0 | 0 | 0.013 | 0.049 | 0.118 |
 
 The two refinements that earn these numbers, measured on the same layout while developing: fitting each side to the grey image's mid-level edge crossings rather than to the binary contour's pixels (axis-aligned worst case 0.57 px → 0.16 px), and taking a nested mark's centre as the side-weighted mean of its squares' centres, which a homography maps to one point (nested worst case 0.16 px → 0.10 px). Reproduce with `python scripts/validate.py marks`.
 
-Where it stops: each ring must be several blur widths across. With the same layout at ~30 px per mark, blur 1.5 px merges a bullseye's rings and it is lost; a mark wider than the local-mean window (12% of the frame's shorter side) is hollowed by its own ink. A disc under ~10 px radius cannot be told from a square of its size.
+Where it stops: each ring must be several blur widths across. With the same layout at ~30 px per mark, blur 1.5 px merges a bullseye's rings and it is lost; marks over `max_side_share` of the frame (10% by default) are not looked for, since a mark wider than the local-mean window is hollowed by its own ink; raising it widens the window with it. A disc under ~10 px radius cannot be told from a square of its size, and a QR symbol's clusters of data modules come back as small solid marks.
+
+`sigma_px` is calibrated on these sheets (rotations, perspective up to 0.15, blur 0.7–1.5 px, noise 1–4) so that the median centre error over sigma is 1.09 for solid marks and 1.01 for nested ones. The tail is heavier than a Gaussian's: the 95th percentile of that ratio is 3–6, so weigh marks by sigma, but do not gate on it.
 
 ## Real photographs
 

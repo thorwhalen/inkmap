@@ -202,13 +202,13 @@ from inkmap.locate import BULLSEYE_RINGS, find_square_marks
 
 marks = find_square_marks(gray)                 # largest first
 for m in marks:
-    m.centre, m.sigma_px                        # sub-pixel centre, its uncertainty
+    m.centre, m.sigma_px                        # sub-pixel centre, its typical error
     m.corners                                   # (4, 2), clockwise from the top-left
     m.rings                                     # () for a solid square
 bullseyes = [m for m in marks if m.ring_error(BULLSEYE_RINGS) < 0.06]
 ```
 
-Nested marks are told apart by their ring ratios (bullseye 0.64/0.32, QR finder 5/7 and 3/7), which perspective barely changes. Which mark is which on your layout stays with you. On synthetic sheets at up to 15% corner perspective and blur ≤ 2 px, the worst centre error is 0.13 px ([validation](docs/validation.md#square-registration-marks)).
+Nested marks are told apart by their ring ratios (bullseye 0.64/0.32, QR finder 5/7 and 3/7), which perspective barely changes. Anything square is a candidate (a QR symbol's data modules too), so which mark is which on your layout stays with you; marks over 10% of the frame need `max_side_share=`. On synthetic sheets at up to 15% corner perspective and blur ≤ 2 px, the worst centre error is 0.13 px ([validation](docs/validation.md#square-registration-marks)).
 
 ## Extending it
 

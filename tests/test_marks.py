@@ -130,19 +130,63 @@ def test_inverted_print_is_found_with_the_polarity_flag():
 def test_qr_finder_patterns_of_a_real_symbol():
     scene = synth.render(perspective=0.1, rotation=20.0, blur=1.0, noise=2.0, rng=3)
     finders = [
-        m for m in find_square_marks(scene.image) if m.ring_error(QR_FINDER_RINGS) < 0.06
+        m
+        for m in find_square_marks(scene.image, max_side_share=0.25)  # ~70 px finders
+        if m.ring_error(QR_FINDER_RINGS) < 0.06
     ]
     assert len(finders) == 3
 
 
-def test_a_clipped_nested_mark_is_dropped_not_reported_as_solid():
-    """The frame cuts a bullseye's outer square; its inner square is not a solid mark."""
+@pytest.mark.parametrize("cut", [22, 18, 12])
+def test_a_clipped_nested_mark_is_dropped_not_reported_as_solid(cut):
+    """The frame cuts a bullseye; its inner square is not a solid mark.
+
+    At 22 px from the centre the cut is through the outer ring only; at 18 and 12 it
+    is through the hole too, leaving the inner square in open background.
+    """
     scene, truth = _render_sheet(blur=1.0)
     (cx, cy), _ = truth[0]  # the top-left bullseye, ~60 px across
-    crop = scene.image[int(cy) - 22 :, int(cx) - 22 :]  # through its outer ring only
+    crop = scene.image[int(cy) - cut :, int(cx) - cut :]
+    shifted = (cx - (int(cx) - cut), cy - (int(cy) - cut))
     found = find_square_marks(crop)
-    shifted = (cx - (int(cx) - 22), cy - (int(cy) - 22))
     assert all(np.hypot(*np.subtract(m.centre, shifted)) > 30 for m in found)
+
+
+def _page(size=(900, 1200), *, squares=(), border=None, background=235.0, ink=25.0):
+    """A synthetic page: solid squares ``(x, y, w, h)`` and an optional outline box."""
+    image = np.full(size, background)
+    if border is not None:
+        x0, y0, x1, y1, width = border
+        image[y0:y1, x0:x1] = ink
+        image[y0 + width : y1 - width, x0 + width : x1 - width] = background
+    for x, y, w, h in squares:
+        image[y : y + h, x : x + w] = ink
+    return synth.degrade(image, blur=1.0, noise=2.0, rng=0)
+
+
+def test_a_solid_mark_near_the_frame_edge_is_kept():
+    found = find_square_marks(_page(squares=[(6, 6, 40, 40)]))
+    assert len(found) == 1 and found[0].is_solid
+
+
+def test_a_lone_mark_inside_an_outline_is_kept():
+    """A form's box round one mark is not a nested mark's ring."""
+    image = _page(squares=[(500, 400, 40, 40)], border=(100, 80, 1100, 820, 6))
+    found = find_square_marks(image)
+    assert [round(m.side_px) for m in found] == [40]
+
+
+def test_rectangles_are_not_squares():
+    image = _page(squares=[(200, 200, 60, 120), (500, 200, 30, 90), (800, 200, 100, 40)])
+    assert find_square_marks(image) == []
+
+
+def test_large_marks_are_found_when_asked_for():
+    """A mark wider than the default window: the window widens with max_side_share."""
+    image = _page(squares=[(400, 300, 200, 200)])
+    assert find_square_marks(image) == []  # 22% of the frame: over the default bound
+    found = find_square_marks(image, max_side_share=0.25)
+    assert len(found) == 1 and abs(found[0].side_px - 200) < 1.5
 
 
 def test_discs_are_not_squares():
@@ -167,11 +211,25 @@ def test_corners_are_clockwise_from_the_top_left():
             assert np.hypot(*np.subtract(quad_centre(c), mark.centre)) < 0.5
 
 
-def test_sigma_is_reported_and_of_the_right_order():
-    scene, truth = _render_sheet(perspective=0.1, rotation=10.0, blur=1.5)
-    found = find_square_marks(scene.image)
-    assert all(np.isfinite(m.sigma_px) and 0 <= m.sigma_px < 1.0 for m in found)
-    assert all(len(m.centres) == 1 + len(m.rings) for m in found)
+def test_sigma_is_calibrated_for_both_kinds_of_mark():
+    """Median error / sigma near 1 for solid and nested marks alike.
+
+    Regression: sigma was the side-fit scatter alone for a solid mark, ~4x too
+    confident, while a nested mark's ring disagreement made it ~3x too cautious -- a
+    pose fit weighted by 1/sigma^2 then trusted solid marks ~100x too much.
+    """
+    ratios = {True: [], False: []}
+    for seed, (perspective, rotation) in enumerate([(0.1, 10.0), (0.15, -35.0), (0.05, 0.0)]):
+        scene, truth = _render_sheet(
+            perspective=perspective, rotation=rotation, blur=1.2, rng=seed
+        )
+        for m in find_square_marks(scene.image):
+            assert np.isfinite(m.sigma_px) and m.sigma_px > 0
+            assert len(m.centres) == 1 + len(m.rings)
+            error = min(np.hypot(*np.subtract(m.centre, c)) for c, _ in truth)
+            ratios[m.is_solid].append(error / m.sigma_px)
+    for solid, r in ratios.items():
+        assert 0.3 < np.median(r) < 3.0, f"solid={solid}: median error/sigma {np.median(r):.2f}"
 
 
 def test_size_bounds_are_respected():
@@ -200,6 +258,14 @@ def test_rejects_a_colour_image():
 def test_blank_and_tiny_frames_yield_nothing():
     assert find_square_marks(np.full((200, 300), 200, np.uint8)) == []
     assert find_square_marks(np.zeros((5, 5), np.uint8)) == []
+    assert find_square_marks(np.zeros((0, 0), np.uint8)) == []
+
+
+def test_rejects_non_finite_pixels():
+    image = np.full((100, 100), 200.0)
+    image[5, 5] = np.nan
+    with pytest.raises(ValueError, match="finite"):
+        find_square_marks(image)
 
 
 def test_nested_square_refuses_an_off_centre_ring():
