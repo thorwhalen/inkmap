@@ -50,14 +50,14 @@ from __future__ import annotations
 import cv2
 import numpy as np
 
-from . import config, coverage as _coverage, geometry, models, photometry
+# ``locate`` is the locator package, and callable as the cascade: locate(bgr, gray).
+from . import config, coverage as _coverage, geometry, locate, models, photometry
 from .coverage import confidence, coverage_map, measurement_weight, observed_coverage
 from .locate import (
     LOCATORS,
     PatchRegions,
     SquareMark,
     find_square_marks,
-    locate,
     locate_patch,
     place,
     validated_scale,

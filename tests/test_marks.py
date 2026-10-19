@@ -274,9 +274,8 @@ def test_nested_square_refuses_an_off_centre_ring():
 
 
 def test_public_surface():
-    import sys
+    from inkmap import locate
 
-    locate = sys.modules["inkmap.locate"]  # the attribute is the locate() function
     for name in ["find_square_marks", "SquareMark", "BULLSEYE_RINGS", "QR_FINDER_RINGS"]:
         assert name in locate.__all__
     assert inkmap.find_square_marks is find_square_marks

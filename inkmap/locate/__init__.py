@@ -22,6 +22,9 @@ found by :func:`locate_patch`, seeded at a point inside it.
 
 from __future__ import annotations
 
+import inspect
+import sys
+import types
 from dataclasses import replace
 from typing import Callable, Iterable, Sequence
 
@@ -333,3 +336,23 @@ def _duplicate(candidate: Placement, existing: Iterable[Placement]) -> bool:
         float(np.linalg.norm(other.quad.mean(axis=0) - c)) < span * 0.5
         for other in existing
     )
+
+
+class _CallableModule(types.ModuleType):
+    """This package, callable as :func:`locate` -- so ``inkmap.locate`` is both.
+
+    ``inkmap.locate(bgr, gray)`` has always called the cascade, and the package's
+    other names (``LOCATORS``, ``find_square_marks``, ``locate_patch``...) live on the
+    same name. A module that is also the function serves both spellings, where
+    re-exporting the function over the package (as the facade once did) broke
+    ``inkmap.locate.LOCATORS`` and ``import inkmap.locate.marks as m``.
+    """
+
+    def __call__(self, *args, **kwargs):
+        return locate(*args, **kwargs)
+
+
+sys.modules[__name__].__class__ = _CallableModule
+# So inspect.signature(inkmap.locate) reports locate's own. (__signature__, not
+# __wrapped__: unwrapping the module would hand doc tools the function instead.)
+__signature__ = inspect.signature(locate)

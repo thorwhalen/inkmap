@@ -167,9 +167,8 @@ def test_the_patch_locator_is_registered_but_opt_in():
 
 
 def test_public_surface():
-    import sys
+    from inkmap import locate
 
-    locate = sys.modules["inkmap.locate"]
     assert {"locate_patch", "PatchRegions"} <= set(locate.__all__)
     assert inkmap.locate_patch is locate_patch
     assert inkmap.PatchRegions is PatchRegions
