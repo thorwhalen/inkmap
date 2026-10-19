@@ -14,10 +14,12 @@ inkmap.synth
       degrade
       nested_square
       mark_sheet
+      render_patch
    
    .. rubric:: Classes
 
    .. autosummary::
    
       Scene
+      PatchScene
    

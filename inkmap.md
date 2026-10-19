@@ -1,4 +1,4 @@
-> built 2026-10-19 11:24 UTC from 4c6de7d (main) · inkmap 0.1.4. Details: build_info.json
+> built 2026-10-19 12:49 UTC from 1342444 (main) · inkmap 0.1.5. Details: build_info.json
 
 # index.html.md
 
@@ -216,6 +216,23 @@ bullseyes = [m for m in marks if m.ring_error(BULLSEYE_RINGS) < 0.06]
 
 Nested marks are told apart by their ring ratios (bullseye 0.64/0.32, QR finder 5/7 and 3/7), which perspective barely changes. Anything square is a candidate (a QR symbol’s data modules too), so which mark is which on your layout stays with you; marks over 10% of the frame need `max_side_share=`. On synthetic sheets at up to 15% corner perspective and blur ≤ 2 px, the worst centre error is 0.13 px ([validation]()).
 
+## Plain patches
+
+A single printed colour patch on a paper strip has no code and no marks to locate it by. `locate_patch` finds it from a seed point and returns the three things a measurement of the patch against its own paper needs: its interior, clear of the edge; a narrow ring of bare substrate round it; and a verdict on whether to trust them.
+
+```python
+regions = inkmap.locate_patch(photo)              # seeded at the frame's centre
+regions = inkmap.locate_patch(photo, seed=(x, y))
+regions.patch, regions.substrate                  # boolean masks over the frame
+regions.ok, regions.notes                         # the verdict, and why not
+regions.quad                                      # (4, 2) sub-pixel corners
+
+ink = inkmap.analyze(photo, [regions.placement])[0]   # or: find(photo, locators=["patch"])
+inkmap.measure(photo, ink)                        # patch vs the substrate round it
+```
+
+The patch is grown from the seed’s CIELAB colour and its sides fitted to the colour edge, so a pale patch on white paper is placed as well as a dark one. The verdict refuses a patch that leaked into the paper, is cut by the frame, or has no paper round it; see [validation](). On flash bursts, seed on an unlit frame: under flash a pale patch clips to white.
+
 ## Extending it
 
 ```python
@@ -306,41 +323,63 @@ at call time, so overriding one is a call-site concern, not global mutable state
 
 ### Module Attributes
 
-| [`SUPERSAMPLES`](_autosummary/inkmap.config.html.md#inkmap.config.SUPERSAMPLES)                  | Sub-samples per pixel per axis when computing area coverage.                                                                                                                                                                                                                                                                                                                            |
-|--------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`ECC_TEMPLATE_BLUR_FRAC`](_autosummary/inkmap.config.html.md#inkmap.config.ECC_TEMPLATE_BLUR_FRAC)        | Gaussian smoothing of the ECC template, as a fraction of one model unit's rendered size.                                                                                                                                                                                                                                                                                                |
-| [`ECC_MIN_CORRELATION`](_autosummary/inkmap.config.html.md#inkmap.config.ECC_MIN_CORRELATION)           | Minimum ECC correlation for a refinement to be accepted.                                                                                                                                                                                                                                                                                                                                |
-| [`ECC_MIN_SCALE`](_autosummary/inkmap.config.html.md#inkmap.config.ECC_MIN_SCALE)                 | The template is rendered at the observed pixels-per-unit, clamped here.                                                                                                                                                                                                                                                                                                                 |
-| [`TEMPLATE_MARGIN_UNITS`](_autosummary/inkmap.config.html.md#inkmap.config.TEMPLATE_MARGIN_UNITS)         | Clear margin rendered around the ECC template, in model units.                                                                                                                                                                                                                                                                                                                          |
-| [`MARGIN_UNITS`](_autosummary/inkmap.config.html.md#inkmap.config.MARGIN_UNITS)                  | Default clear margin around a mark, in model units, labelled Region.MARGIN.                                                                                                                                                                                                                                                                                                             |
-| [`PURE_COVERAGE_TOL`](_autosummary/inkmap.config.html.md#inkmap.config.PURE_COVERAGE_TOL)             | Coverage within this of 1.0 (or 0.0) counts as pure.                                                                                                                                                                                                                                                                                                                                    |
-| [`EDGE_MARGIN_SIGMAS`](_autosummary/inkmap.config.html.md#inkmap.config.EDGE_MARGIN_SIGMAS)            | Default erosion of the pure-foreground mask, in multiples of the estimated blur sigma.                                                                                                                                                                                                                                                                                                  |
-| [`DEFAULT_BLUR_SIGMA`](_autosummary/inkmap.config.html.md#inkmap.config.DEFAULT_BLUR_SIGMA)            | Fallback blur sigma (px) when it cannot be estimated from the image.                                                                                                                                                                                                                                                                                                                    |
-| [`MIN_SCALE_OVER_SIGMA`](_autosummary/inkmap.config.html.md#inkmap.config.MIN_SCALE_OVER_SIGMA)          | Below this ratio of pixels-per-unit to blur sigma, no erosion can recover an uncontaminated measurement -- the blur is wide relative to a unit and every pixel is mixed.                                                                                                                                                                                                                |
-| [`SATURATION_LEVEL`](_autosummary/inkmap.config.html.md#inkmap.config.SATURATION_LEVEL)              | Pixels at or above this 8-bit level are treated as clipped and excluded.                                                                                                                                                                                                                                                                                                                |
-| [`BLACK_CLIP_LEVEL`](_autosummary/inkmap.config.html.md#inkmap.config.BLACK_CLIP_LEVEL)              | Pixels at or below this level are treated as crushed black and excluded.                                                                                                                                                                                                                                                                                                                |
-| [`DEFAULT_LOCATORS`](_autosummary/inkmap.config.html.md#inkmap.config.DEFAULT_LOCATORS)              | Locator strategies tried by default, in order.                                                                                                                                                                                                                                                                                                                                          |
-| [`LOCATE_RETRY_PADDING`](_autosummary/inkmap.config.html.md#inkmap.config.LOCATE_RETRY_PADDING)          | a coarse placement that was not decoded, or is under `MIN_COARSE_PIXELS_PER_FEATURE`, is retried on a full-resolution crop around it, padded on each side by this fraction of the placement's larger bounding-box side.                                                                                                                                                                 |
-| [`MIN_COARSE_PIXELS_PER_FEATURE`](_autosummary/inkmap.config.html.md#inkmap.config.MIN_COARSE_PIXELS_PER_FEATURE) | below this many image pixels per model feature (a QR module, a barcode's narrowest bar) *in the downscaled frame*, the model a locator reads off that frame is unreliable even when the code decodes -- with modules at 2 px a 25 x 25 QR is read as 21 x 21, at 2.5-3.5 px tens of its 625 modules flip, and only from 4 px are they all right (synthetic pages, `locate(scale=0.5)`). |
-| [`MARK_DARK_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_DARK_SHARE)               | A pixel is foreground when it is darker than this share of the local mean brightness.                                                                                                                                                                                                                                                                                                   |
-| [`MARK_MIN_CONTRAST`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_MIN_CONTRAST)             | ...and darker than the local mean by at least this many grey levels (of 255).                                                                                                                                                                                                                                                                                                           |
-| [`MARK_LOCAL_WINDOW_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_LOCAL_WINDOW_SHARE)       | wider than any mark, so a mark's own ink does not raise the threshold inside it.                                                                                                                                                                                                                                                                                                        |
-| [`MARK_BORDER_PX`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_BORDER_PX)                | A contour within this many pixels of the frame's edge is cut by it.                                                                                                                                                                                                                                                                                                                     |
-| [`MARK_POLY_EPSILON_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_POLY_EPSILON_SHARE)       | A contour is a quadrilateral when a polygon within this share of its perimeter fits it with four vertices (`cv2.approxPolyDP`'s epsilon).                                                                                                                                                                                                                                               |
-| [`MARK_MAX_SIDE_RATIO`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_MAX_SIDE_RATIO)           | A quadrilateral whose opposite sides differ by more than this factor is not a square seen at any plausible incidence.                                                                                                                                                                                                                                                                   |
-| [`MARK_MIN_HOLE_AREA_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_MIN_HOLE_AREA_SHARE)      | the square is solid.                                                                                                                                                                                                                                                                                                                                                                    |
-| [`MARK_CORNER_TRIM_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_CORNER_TRIM_SHARE)        | Contour points within this share of a side's length from either corner are left out of that side's line fit: the corner is where binarisation rounds the outline.                                                                                                                                                                                                                       |
-| [`MARK_EDGE_PROFILE_PX`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_EDGE_PROFILE_PX)          | Each side's line is refined against the grey image along profiles this many pixels either side of it (and no more than MARK_EDGE_PROFILE_SHARE of the side's length), long enough to bracket a blurred edge, short enough not to reach a ring's next edge.                                                                                                                              |
-| [`MARK_EDGE_STEP_PX`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_EDGE_STEP_PX)             | Spacing of the samples along each edge profile, in pixels.                                                                                                                                                                                                                                                                                                                              |
-| [`MARK_EDGE_ITERATIONS`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_EDGE_ITERATIONS)          | Refinement passes per side.                                                                                                                                                                                                                                                                                                                                                             |
-| [`MARK_EDGE_OUTLIER_PX`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_EDGE_OUTLIER_PX)          | A refined edge crossing further than this from the fitted line (or three times the line's scatter, if larger) is an outlier -- a glare bite, a speck -- and is refitted without.                                                                                                                                                                                                        |
-| [`MARK_MAX_SIDE_SCATTER_PX`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_MAX_SIDE_SCATTER_PX)      | A quadrilateral whose refined sides scatter about their lines by more than this (rms, in pixels), or this share of its side if larger, is not a square: a disc's outline also fits four lines, but its scatter grows with its size (0.35 px for a 10 px radius, 1 px for 20 px), where a square's stays at the noise floor.                                                             |
-| [`MARK_MIN_QUAD_SIDE_PX`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_MIN_QUAD_SIDE_PX)         | The smallest square considered at all, in pixels on a side.                                                                                                                                                                                                                                                                                                                             |
-| [`MARK_WINDOW_OVER_MAX_SIDE`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_WINDOW_OVER_MAX_SIDE)     | The local-mean window is kept at least this many times the largest mark looked for (`max_side_share`): a mark wider than the window raises its own threshold and is hollowed by its own ink.                                                                                                                                                                                            |
-| [`MARK_NESTED_HOLE_AREA_RATIO`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_NESTED_HOLE_AREA_RATIO)   | A square in a hole less than this many times its own area is the inner square of a nested mark (a bullseye's hole is 4x its inner square, a QR finder's 2.8x), not a mark of its own.                                                                                                                                                                                                   |
-| [`MARK_MAX_ASPECT`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_MAX_ASPECT)               | A quadrilateral whose mean opposite-side lengths differ by more than this factor is a rectangle, not a square: 1.6 is a square seen at about 51 degrees of incidence.                                                                                                                                                                                                                   |
-| [`MARK_CLIP_GUARD_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_CLIP_GUARD_SHARE)         | A solid square whose neighbourhood out to this many sides runs off the frame, and holds more than MARK_CLIP_GUARD_INK_SHARE foreground, may be the inner square of a nested mark the frame cuts, and is dropped.                                                                                                                                                                        |
-| [`MARK_RING_SPREAD_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_RING_SPREAD_SHARE)        | `sigma_px` calibration, fitted on synthetic sheets (rotations, perspective up to 0.15, blur 0.7-1.5 px, noise 1-4) so that the median centre error is about sigma for both kinds of mark.                                                                                                                                                                                               |
+| [`SUPERSAMPLES`](_autosummary/inkmap.config.html.md#inkmap.config.SUPERSAMPLES)                   | Sub-samples per pixel per axis when computing area coverage.                                                                                                                                                                                                                                                                                                                            |
+|---------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`ECC_TEMPLATE_BLUR_FRAC`](_autosummary/inkmap.config.html.md#inkmap.config.ECC_TEMPLATE_BLUR_FRAC)         | Gaussian smoothing of the ECC template, as a fraction of one model unit's rendered size.                                                                                                                                                                                                                                                                                                |
+| [`ECC_MIN_CORRELATION`](_autosummary/inkmap.config.html.md#inkmap.config.ECC_MIN_CORRELATION)            | Minimum ECC correlation for a refinement to be accepted.                                                                                                                                                                                                                                                                                                                                |
+| [`ECC_MIN_SCALE`](_autosummary/inkmap.config.html.md#inkmap.config.ECC_MIN_SCALE)                  | The template is rendered at the observed pixels-per-unit, clamped here.                                                                                                                                                                                                                                                                                                                 |
+| [`TEMPLATE_MARGIN_UNITS`](_autosummary/inkmap.config.html.md#inkmap.config.TEMPLATE_MARGIN_UNITS)          | Clear margin rendered around the ECC template, in model units.                                                                                                                                                                                                                                                                                                                          |
+| [`MARGIN_UNITS`](_autosummary/inkmap.config.html.md#inkmap.config.MARGIN_UNITS)                   | Default clear margin around a mark, in model units, labelled Region.MARGIN.                                                                                                                                                                                                                                                                                                             |
+| [`PURE_COVERAGE_TOL`](_autosummary/inkmap.config.html.md#inkmap.config.PURE_COVERAGE_TOL)              | Coverage within this of 1.0 (or 0.0) counts as pure.                                                                                                                                                                                                                                                                                                                                    |
+| [`EDGE_MARGIN_SIGMAS`](_autosummary/inkmap.config.html.md#inkmap.config.EDGE_MARGIN_SIGMAS)             | Default erosion of the pure-foreground mask, in multiples of the estimated blur sigma.                                                                                                                                                                                                                                                                                                  |
+| [`DEFAULT_BLUR_SIGMA`](_autosummary/inkmap.config.html.md#inkmap.config.DEFAULT_BLUR_SIGMA)             | Fallback blur sigma (px) when it cannot be estimated from the image.                                                                                                                                                                                                                                                                                                                    |
+| [`MIN_SCALE_OVER_SIGMA`](_autosummary/inkmap.config.html.md#inkmap.config.MIN_SCALE_OVER_SIGMA)           | Below this ratio of pixels-per-unit to blur sigma, no erosion can recover an uncontaminated measurement -- the blur is wide relative to a unit and every pixel is mixed.                                                                                                                                                                                                                |
+| [`SATURATION_LEVEL`](_autosummary/inkmap.config.html.md#inkmap.config.SATURATION_LEVEL)               | Pixels at or above this 8-bit level are treated as clipped and excluded.                                                                                                                                                                                                                                                                                                                |
+| [`BLACK_CLIP_LEVEL`](_autosummary/inkmap.config.html.md#inkmap.config.BLACK_CLIP_LEVEL)               | Pixels at or below this level are treated as crushed black and excluded.                                                                                                                                                                                                                                                                                                                |
+| [`DEFAULT_LOCATORS`](_autosummary/inkmap.config.html.md#inkmap.config.DEFAULT_LOCATORS)               | Locator strategies tried by default, in order.                                                                                                                                                                                                                                                                                                                                          |
+| [`LOCATE_RETRY_PADDING`](_autosummary/inkmap.config.html.md#inkmap.config.LOCATE_RETRY_PADDING)           | a coarse placement that was not decoded, or is under `MIN_COARSE_PIXELS_PER_FEATURE`, is retried on a full-resolution crop around it, padded on each side by this fraction of the placement's larger bounding-box side.                                                                                                                                                                 |
+| [`MIN_COARSE_PIXELS_PER_FEATURE`](_autosummary/inkmap.config.html.md#inkmap.config.MIN_COARSE_PIXELS_PER_FEATURE)  | below this many image pixels per model feature (a QR module, a barcode's narrowest bar) *in the downscaled frame*, the model a locator reads off that frame is unreliable even when the code decodes -- with modules at 2 px a 25 x 25 QR is read as 21 x 21, at 2.5-3.5 px tens of its 625 modules flip, and only from 4 px are they all right (synthetic pages, `locate(scale=0.5)`). |
+| [`MARK_DARK_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_DARK_SHARE)                | A pixel is foreground when it is darker than this share of the local mean brightness.                                                                                                                                                                                                                                                                                                   |
+| [`MARK_MIN_CONTRAST`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_MIN_CONTRAST)              | ...and darker than the local mean by at least this many grey levels (of 255).                                                                                                                                                                                                                                                                                                           |
+| [`MARK_LOCAL_WINDOW_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_LOCAL_WINDOW_SHARE)        | wider than any mark, so a mark's own ink does not raise the threshold inside it.                                                                                                                                                                                                                                                                                                        |
+| [`MARK_BORDER_PX`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_BORDER_PX)                 | A contour within this many pixels of the frame's edge is cut by it.                                                                                                                                                                                                                                                                                                                     |
+| [`MARK_POLY_EPSILON_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_POLY_EPSILON_SHARE)        | A contour is a quadrilateral when a polygon within this share of its perimeter fits it with four vertices (`cv2.approxPolyDP`'s epsilon).                                                                                                                                                                                                                                               |
+| [`MARK_MAX_SIDE_RATIO`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_MAX_SIDE_RATIO)            | A quadrilateral whose opposite sides differ by more than this factor is not a square seen at any plausible incidence.                                                                                                                                                                                                                                                                   |
+| [`MARK_MIN_HOLE_AREA_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_MIN_HOLE_AREA_SHARE)       | the square is solid.                                                                                                                                                                                                                                                                                                                                                                    |
+| [`MARK_CORNER_TRIM_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_CORNER_TRIM_SHARE)         | Contour points within this share of a side's length from either corner are left out of that side's line fit: the corner is where binarisation rounds the outline.                                                                                                                                                                                                                       |
+| [`MARK_EDGE_PROFILE_PX`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_EDGE_PROFILE_PX)           | Each side's line is refined against the grey image along profiles this many pixels either side of it (and no more than MARK_EDGE_PROFILE_SHARE of the side's length), long enough to bracket a blurred edge, short enough not to reach a ring's next edge.                                                                                                                              |
+| [`MARK_EDGE_STEP_PX`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_EDGE_STEP_PX)              | Spacing of the samples along each edge profile, in pixels.                                                                                                                                                                                                                                                                                                                              |
+| [`MARK_EDGE_ITERATIONS`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_EDGE_ITERATIONS)           | Refinement passes per side.                                                                                                                                                                                                                                                                                                                                                             |
+| [`MARK_EDGE_OUTLIER_PX`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_EDGE_OUTLIER_PX)           | A refined edge crossing further than this from the fitted line (or three times the line's scatter, if larger) is an outlier -- a glare bite, a speck -- and is refitted without.                                                                                                                                                                                                        |
+| [`MARK_MAX_SIDE_SCATTER_PX`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_MAX_SIDE_SCATTER_PX)       | A quadrilateral whose refined sides scatter about their lines by more than this (rms, in pixels), or this share of its side if larger, is not a square: a disc's outline also fits four lines, but its scatter grows with its size (0.35 px for a 10 px radius, 1 px for 20 px), where a square's stays at the noise floor.                                                             |
+| [`MARK_MIN_QUAD_SIDE_PX`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_MIN_QUAD_SIDE_PX)          | The smallest square considered at all, in pixels on a side.                                                                                                                                                                                                                                                                                                                             |
+| [`MARK_WINDOW_OVER_MAX_SIDE`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_WINDOW_OVER_MAX_SIDE)      | The local-mean window is kept at least this many times the largest mark looked for (`max_side_share`): a mark wider than the window raises its own threshold and is hollowed by its own ink.                                                                                                                                                                                            |
+| [`MARK_NESTED_HOLE_AREA_RATIO`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_NESTED_HOLE_AREA_RATIO)    | A square in a hole less than this many times its own area is the inner square of a nested mark (a bullseye's hole is 4x its inner square, a QR finder's 2.8x), not a mark of its own.                                                                                                                                                                                                   |
+| [`MARK_MAX_ASPECT`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_MAX_ASPECT)                | A quadrilateral whose mean opposite-side lengths differ by more than this factor is a rectangle, not a square: 1.6 is a square seen at about 51 degrees of incidence.                                                                                                                                                                                                                   |
+| [`MARK_CLIP_GUARD_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_CLIP_GUARD_SHARE)          | A solid square whose neighbourhood out to this many sides runs off the frame, and holds more than MARK_CLIP_GUARD_INK_SHARE foreground, may be the inner square of a nested mark the frame cuts, and is dropped.                                                                                                                                                                        |
+| [`MARK_RING_SPREAD_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_RING_SPREAD_SHARE)         | `sigma_px` calibration, fitted on synthetic sheets (rotations, perspective up to 0.15, blur 0.7-1.5 px, noise 1-4) so that the median centre error is about sigma for both kinds of mark.                                                                                                                                                                                               |
+| [`PATCH_SEED_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_SEED_SHARE)               | The patch colour is the median over a window this share of the frame's shorter side across, round the seed.                                                                                                                                                                                                                                                                             |
+| [`PATCH_MIN_DELTA_E`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_MIN_DELTA_E)              | The CIELAB distance (Delta E) that splits patch from not-patch is Otsu's threshold, clamped to this range: below 4 the split follows noise, above 25 a pale patch leaks into white paper.                                                                                                                                                                                               |
+| [`PATCH_EDGE_MARGIN_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_EDGE_MARGIN_SHARE)        | The interior is eroded clear of the patch's blurred edge by this share of its shorter side.                                                                                                                                                                                                                                                                                             |
+| [`PATCH_RING_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_RING_SHARE)               | The substrate ring runs between these shares of the patch's shorter side outside it.                                                                                                                                                                                                                                                                                                    |
+| [`PATCH_MIN_AREA_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_MIN_AREA_SHARE)           | Verdict thresholds.                                                                                                                                                                                                                                                                                                                                                                     |
+| [`PATCH_MIN_RECTANGULARITY`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_MIN_RECTANGULARITY)       | a pale patch that leaked into the paper is no longer rectangular.                                                                                                                                                                                                                                                                                                                       |
+| [`PATCH_MIN_SUBSTRATE_PX`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_MIN_SUBSTRATE_PX)         | The ring must hold at least this many substrate pixels...                                                                                                                                                                                                                                                                                                                               |
+| [`PATCH_MIN_SUBSTRATE_LIFT`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_MIN_SUBSTRATE_LIFT)       | ...whose median L\* exceeds the patch's by at least this much (paper is lighter)...                                                                                                                                                                                                                                                                                                     |
+| [`PATCH_MAX_SUBSTRATE_CHROMA`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_MAX_SUBSTRATE_CHROMA)     | paper, not a coloured table.                                                                                                                                                                                                                                                                                                                                                            |
+| [`PATCH_MIN_SIDE_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_MIN_SIDE_SHARE)           | ...on at least three sides, each holding substrate in this share of its ring.                                                                                                                                                                                                                                                                                                           |
+| [`PATCH_POLY_EPSILON_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_POLY_EPSILON_SHARE)       | A patch's outline is four-sided when a polygon within this share of its perimeter fits it with four vertices.                                                                                                                                                                                                                                                                           |
+| [`PATCH_MAX_RESPLITS`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_MAX_RESPLITS)             | How many times the patch region may be re-split by Otsu within itself, peeling off the paper a pale patch was first merged with (one is usually enough).                                                                                                                                                                                                                                |
+| [`PATCH_EDGE_BAND_PX`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_EDGE_BAND_PX)             | The patch's sides are fitted to its colour edge along the direction from the patch's colour to the median colour of this band outside it (in pixels from its outline).                                                                                                                                                                                                                  |
+| [`PATCH_MIN_EDGE_STEP`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_MIN_EDGE_STEP)            | A patch must show a colour step of at least this (in Delta E along the patch-to- paper direction) across every side, measured between PATCH_EDGE_STEP_OFFSET_PX inside and outside it.                                                                                                                                                                                                  |
+| [`PATCH_SUBSTRATE_SPLIT_GAP`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_SUBSTRATE_SPLIT_GAP)      | The substrate ring's lightness is split (paper from a darker background) only when its two Otsu classes are this many L\* apart; shading alone spreads paper less.                                                                                                                                                                                                                      |
+| [`PATCH_MIN_EDGE_CONTRAST`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_MIN_EDGE_CONTRAST)        | A patch side is refined against the image only where its edge steps by at least this many 8-bit levels (along the patch-to-paper colour direction).                                                                                                                                                                                                                                     |
+| [`PATCH_EDGE_LEVEL_WINDOW`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_EDGE_LEVEL_WINDOW)        | A patch side's edge level is taken per profile and smoothed over this many profiles (pixels) along the side, rather than once for the whole side: uneven light moves it along a long side, which on a faint edge tilts the fitted line.                                                                                                                                                 |
+| [`PATCH_MAX_OUTLINE_DEVIATION_PX`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_MAX_OUTLINE_DEVIATION_PX) | The thresholded outline must lie within this many pixels of the fitted sides (95th percentile): a lobe leaked into shaded paper, or a rounded corner, strays further.                                                                                                                                                                                                                   |
+| [`PATCH_MAX_HOLE_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_MAX_HOLE_SHARE)           | Pixels of the interior that are not the patch's colour are always left out of it.                                                                                                                                                                                                                                                                                                       |
+| [`PATCH_SUBSTRATE_MAX_DELTA_E`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_SUBSTRATE_MAX_DELTA_E)    | a neighbouring light-grey patch, or a white table, can pass for paper otherwise.                                                                                                                                                                                                                                                                                                        |
+| [`PATCH_INTERIOR_MADS`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_INTERIOR_MADS)            | Interior pixels further from the seed colour than the patch's median distance plus this many robust deviations (1.4826 MAD) are left out, with a pixel round them: the fringe of text or glare on the patch.                                                                                                                                                                            |
+| [`PATCH_TWO_COLOUR_SEPARATION`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_TWO_COLOUR_SEPARATION)    | Two colours are distinct when their Otsu split along the principal axis is at least this many pooled deviations apart.                                                                                                                                                                                                                                                                  |
 
 ### inkmap.config.BLACK_CLIP_LEVEL *= 2*
 
@@ -527,6 +566,129 @@ Such placements are re-located on a full-resolution crop. See `locate`.
 Below this ratio of pixels-per-unit to blur sigma, no erosion can recover an
 uncontaminated measurement – the blur is wide relative to a unit and every pixel is
 mixed. Results are flagged rather than silently returned. See docs/validation.md.
+
+### inkmap.config.PATCH_EDGE_BAND_PX *= (2.0, 6.0)*
+
+The patch’s sides are fitted to its colour edge along the direction from the patch’s
+colour to the median colour of this band outside it (in pixels from its outline).
+
+### inkmap.config.PATCH_EDGE_LEVEL_WINDOW *= 25*
+
+A patch side’s edge level is taken per profile and smoothed over this many profiles
+(pixels) along the side, rather than once for the whole side: uneven light moves it
+along a long side, which on a faint edge tilts the fitted line.
+
+### inkmap.config.PATCH_EDGE_MARGIN_SHARE *= 0.08*
+
+The interior is eroded clear of the patch’s blurred edge by this share of its
+shorter side.
+
+### inkmap.config.PATCH_INTERIOR_MADS *= 4.0*
+
+Interior pixels further from the seed colour than the patch’s median distance plus
+this many robust deviations (1.4826 MAD) are left out, with a pixel round them:
+the fringe of text or glare on the patch.
+
+### inkmap.config.PATCH_MAX_HOLE_SHARE *= 0.05*
+
+Pixels of the interior that are not the patch’s colour are always left out of it.
+The verdict fails when one connected blob of them covers more than this share of
+the interior (another patch, or the patch itself inside a region seeded on the
+paper: 7-8% in the cases seen), or when all of them together cover more than
+PATCH_MAX_OFF_COLOUR_SHARE (text, specks or glare obscuring the patch).
+
+### inkmap.config.PATCH_MAX_OUTLINE_DEVIATION_PX *= 2.0*
+
+The thresholded outline must lie within this many pixels of the fitted sides (95th
+percentile): a lobe leaked into shaded paper, or a rounded corner, strays further.
+
+### inkmap.config.PATCH_MAX_RESPLITS *= 3*
+
+How many times the patch region may be re-split by Otsu within itself, peeling off
+the paper a pale patch was first merged with (one is usually enough).
+
+### inkmap.config.PATCH_MAX_SUBSTRATE_CHROMA *= 15.0*
+
+paper, not a coloured table.
+
+* **Type:**
+  …and which are low-chroma (C\*ab under this)
+
+### inkmap.config.PATCH_MIN_AREA_SHARE *= 0.01*
+
+Verdict thresholds. A patch under this share of the frame is too small to trust.
+
+### inkmap.config.PATCH_MIN_DELTA_E *= 4.0*
+
+The CIELAB distance (Delta E) that splits patch from not-patch is Otsu’s threshold,
+clamped to this range: below 4 the split follows noise, above 25 a pale patch leaks
+into white paper.
+
+### inkmap.config.PATCH_MIN_EDGE_CONTRAST *= 3.0*
+
+A patch side is refined against the image only where its edge steps by at least
+this many 8-bit levels (along the patch-to-paper colour direction).
+
+### inkmap.config.PATCH_MIN_EDGE_STEP *= 3.0*
+
+A patch must show a colour step of at least this (in Delta E along the patch-to-
+paper direction) across every side, measured between PATCH_EDGE_STEP_OFFSET_PX
+inside and outside it. A leaked region’s boundary through shaded paper has none.
+
+### inkmap.config.PATCH_MIN_RECTANGULARITY *= 0.85*
+
+a pale patch that leaked into the paper
+is no longer rectangular. (A rectangle seen in perspective scores ~0.9-1.)
+
+* **Type:**
+  Area over the minimum-area rectangle’s
+
+### inkmap.config.PATCH_MIN_SIDE_SHARE *= 0.15*
+
+…on at least three sides, each holding substrate in this share of its ring.
+
+### inkmap.config.PATCH_MIN_SUBSTRATE_LIFT *= 1.0*
+
+…whose median L\* exceeds the patch’s by at least this much (paper is lighter)…
+
+### inkmap.config.PATCH_MIN_SUBSTRATE_PX *= 50*
+
+The ring must hold at least this many substrate pixels…
+
+### inkmap.config.PATCH_POLY_EPSILON_SHARE *= 0.02*
+
+A patch’s outline is four-sided when a polygon within this share of its perimeter
+fits it with four vertices.
+
+### inkmap.config.PATCH_RING_SHARE *= (0.02, 0.06)*
+
+The substrate ring runs between these shares of the patch’s shorter side outside
+it. Narrow on purpose: a thin paper border is easily overshot onto the background.
+
+### inkmap.config.PATCH_SEED_SHARE *= 0.04*
+
+The patch colour is the median over a window this share of the frame’s shorter side
+across, round the seed. Small, so that a seed near the patch’s edge still takes the
+patch’s colour, not the paper’s.
+
+### inkmap.config.PATCH_SUBSTRATE_MAX_DELTA_E *= 8.0*
+
+a
+neighbouring light-grey patch, or a white table, can pass for paper otherwise.
+
+* **Type:**
+  Substrate pixels must be within this Delta E of the ring’s median paper colour
+
+### inkmap.config.PATCH_SUBSTRATE_SPLIT_GAP *= 15.0*
+
+The substrate ring’s lightness is split (paper from a darker background) only when
+its two Otsu classes are this many L\* apart; shading alone spreads paper less.
+
+### inkmap.config.PATCH_TWO_COLOUR_SEPARATION *= 5.0*
+
+Two colours are distinct when their Otsu split along the principal axis is at least
+this many pooled deviations apart. One evenly spread population – a patch under a
+lighting gradient – scores about 3.5; a patch beside its paper, far more.
 
 ### inkmap.config.PURE_COVERAGE_TOL *= 0.001*
 
@@ -986,6 +1148,7 @@ continuous value is **coverage**, after ISO 12647-2:2013 3.1 *area coverage*. Se
 | [`measurement_weight`](_autosummary/inkmap.html.md#inkmap.measurement_weight)(coverage, \*[, ...])            | Blur-aware weight in `[0, 1]`: how safe each pixel is to *measure*.            |
 | [`locate`](_autosummary/inkmap.html.md#inkmap.locate)(bgr, gray, \*[, locators, first_hit, ...])  | Run locator strategies and merge their results, de-duplicating by position.    |
 | [`find_square_marks`](_autosummary/inkmap.html.md#inkmap.find_square_marks)(gray, \*[, min_side_px, ...])    | Every solid or nested square mark in `gray` (2-D, 0-255 scale), largest first. |
+| [`locate_patch`](_autosummary/inkmap.html.md#inkmap.locate_patch)(image, \*[, seed, seed_share, ...])   | The uniform patch at `seed`, and the ring of substrate just outside it.        |
 
 ### Classes
 
@@ -998,6 +1161,7 @@ continuous value is **coverage**, after ISO 12647-2:2013 3.1 *area coverage*. Se
 | [`Measurement`](_autosummary/inkmap.html.md#inkmap.Measurement)(foreground_mean, foreground_std, ...) | Aggregated signal over foreground and background, with its validity attached.      |
 | [`Measurability`](_autosummary/inkmap.html.md#inkmap.Measurability)(ok, pixels_per_feature, ...[, ...]) | Whether a trustworthy measurement is possible on this image at all.                |
 | [`SquareMark`](_autosummary/inkmap.html.md#inkmap.SquareMark)(centre, corners, side_px[, ...])       | One square mark found in an image.                                                 |
+| [`PatchRegions`](_autosummary/inkmap.html.md#inkmap.PatchRegions)(patch, substrate, region, quad, ok)  | A located patch: masks over the frame, its geometry, and how far to trust them.    |
 
 ### *class* inkmap.InkMap(coverage, region, placement, polarity=Polarity.FOREGROUND_IS_DARK, weight=None, blur_sigma=None, metadata=dict())
 
@@ -1133,6 +1297,37 @@ Must be vectorised: it is called with millions of points.
 
 * **Return type:**
   `ndarray`
+
+### *class* inkmap.PatchRegions(patch, substrate, region, quad, ok, notes=(), seed_lab=(nan, nan, nan), threshold_delta_e=nan, area_share=0.0, rectangularity=0.0, touches_border=False, hole_share=0.0, outline_deviation_px=nan, substrate_px=0, ring_px=(0.0, 0.0))
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A located patch: masks over the frame, its geometry, and how far to trust them.
+
+`patch` is the interior, eroded clear of the edge; `substrate` a ring of bare
+substrate just outside; `region` the whole patch, uneroded. `quad` is the
+patch’s corners, clockwise as seen on screen from the one nearest the image’s
+top-left, to a fraction of a pixel when its sides could be fitted (`None` if no
+region was found). `ok` is `not notes`.
+
+The rest say why: `seed_lab` the patch colour, `threshold_delta_e` the split
+used, `area_share` of the frame, `rectangularity` (region over fitted quad),
+`outline_deviation_px` (95th percentile of the outline’s distance from the
+fitted sides), `hole_share` (share of the interior not the patch’s colour),
+`substrate_px`, and `ring_px` (the ring’s inner and outer distance).
+
+#### *property* placement *: [Placement](_autosummary/inkmap.types.html.md#inkmap.types.Placement) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+The patch and its substrate ring as a placement, or `None` without a quad.
+
+The model is the patch as foreground inside a border of background as wide as
+the substrate ring’s outer edge, in units of about one pixel. So
+`inkmap.analyze()` and [`inkmap.measure()`](_autosummary/inkmap.html.md#inkmap.measure) treat the patch as any other
+mark, and `measure` compares the patch with the substrate round it. The
+placement’s `quad` is that bordered model’s, not the patch’s: the patch’s own
+corners are `quad`. `measure` averages the whole border, background
+and all, where `substrate` keeps only its paper-like pixels: on a thin
+paper border, measure with `substrate` instead.
 
 ### *class* inkmap.Placement(model, transform, quad, locator='', payload=None, refined=False, score=None, metadata=dict())
 
@@ -1423,6 +1618,31 @@ the coarse pass misses entirely is not recovered: lower the downscaling instead.
 
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Placement`](_autosummary/inkmap.types.html.md#inkmap.types.Placement)]
+
+### inkmap.locate_patch(image, , seed='centre', seed_share=0.04, min_delta_e=4.0, max_delta_e=25.0, edge_margin_share=0.08, ring_share=(0.02, 0.06), min_area_share=0.01, min_rectangularity=0.85, min_substrate_px=50, min_substrate_lift=1.0, max_substrate_chroma=15.0, min_side_share=0.15, min_edge_step=3.0)
+
+The uniform patch at `seed`, and the ring of substrate just outside it.
+
+`image` is a path, a BGR (or BGRA) array, or a grey array, 8-bit. `seed` is
+`"centre"` or an `(x, y)` pixel inside the patch; its colour is the median of a
+window `seed_share` of the frame’s shorter side across. Pixels within the Otsu
+split of the CIELAB distance to it, clamped to `[min_delta_e, max_delta_e]`, are
+candidates, and the connected candidate region at the seed is the patch.
+
+`edge_margin_share` erodes the interior, and `ring_share` places the
+substrate ring, both as shares of the patch’s shorter side. The verdict fails, with
+a note saying why, when the patch is under `min_area_share` of the frame, less
+rectangular than `min_rectangularity` (area over its minimum-area rectangle’s:
+where a pale patch leaked into the paper), cut by the frame’s edge, or when the
+ring holds under `min_substrate_px` pixels of substrate, substrate no lighter than
+the patch by `min_substrate_lift` L\*, or substrate on fewer than three sides
+(`min_side_share` of that side’s ring each), or when a side of the patch has no
+colour step of `min_edge_step` across it – the sign of a region that leaked into
+shaded paper. A failed verdict on a leaked region is retried at a tighter
+threshold.
+
+* **Return type:**
+  [`PatchRegions`](_autosummary/inkmap.html.md#inkmap.PatchRegions)
 
 ### inkmap.measurability(ink_map, , min_pixels=50)
 
@@ -2192,11 +2412,31 @@ Real photographs remain essential for *detection* rate – see [`inkmap.corpus`]
 | [`degrade`](_autosummary/inkmap.synth.html.md#inkmap.synth.degrade)(image, \*[, blur, noise, gradient, ...]) | Apply a capture-order degradation chain to a float image, returning uint8.                                             |
 | [`nested_square`](_autosummary/inkmap.synth.html.md#inkmap.synth.nested_square)(side[, rings])                     | A square mark as a `(side, side)` cell grid: foreground, then alternating rings.                                       |
 | [`mark_sheet`](_autosummary/inkmap.synth.html.md#inkmap.synth.mark_sheet)()                                     | A card of square registration marks, and where each one's centre truly is.                                             |
+| [`render_patch`](_autosummary/inkmap.synth.html.md#inkmap.synth.render_patch)(\*[, size, patch_bgr, ...])         | Render a uniform colour patch centred on a paper strip, over a background.                                             |
 
 ### Classes
 
-| [`Scene`](_autosummary/inkmap.synth.html.md#inkmap.synth.Scene)(image, coverage, transform, model[, ...])   | A synthetic image together with the truth used to make it.   |
-|----------------------------------------------------------------------------------------------------|--------------------------------------------------------------|
+| [`Scene`](_autosummary/inkmap.synth.html.md#inkmap.synth.Scene)(image, coverage, transform, model[, ...])   | A synthetic image together with the truth used to make it.                        |
+|----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| [`PatchScene`](_autosummary/inkmap.synth.html.md#inkmap.synth.PatchScene)(image, patch_quad, paper_quad[, ...])  | A synthetic colour photograph of a printed patch on a paper strip, and its truth. |
+
+### *class* inkmap.synth.PatchScene(image, patch_quad, paper_quad, params=dict())
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A synthetic colour photograph of a printed patch on a paper strip, and its truth.
+
+#### image *: ndarray*
+
+(H, W, 3) uint8 BGR.
+
+#### paper_quad *: ndarray*
+
+(4, 2) true image corners of the paper strip, in the same order.
+
+#### patch_quad *: ndarray*
+
+(4, 2) true image corners of the patch, clockwise from its top-left.
 
 ### *class* inkmap.synth.Scene(image, coverage, transform, model, params=dict())
 
@@ -2286,6 +2526,22 @@ fractional illumination falloff across the frame.
 
 * **Return type:**
   [`Scene`](_autosummary/inkmap.synth.html.md#inkmap.synth.Scene)
+
+### inkmap.synth.render_patch(, size=(600, 800), patch_bgr=(60.0, 110.0, 200.0), paper_bgr=(232.0, 236.0, 238.0), background_bgr=(70.0, 80.0, 95.0), patch_size=(40.0, 24.0), paper_size=(100.0, 32.0), pixels_per_unit=6.0, centre=None, perspective=0.0, rotation=0.0, blur=0.0, noise=0.0, gradient=0.0, background_texture=0.0, supersample=8, rng=None)
+
+Render a uniform colour patch centred on a paper strip, over a background.
+
+Model space is the strip’s own, in units: a `paper_size` strip with a
+`patch_size` patch at its centre, mapped into the frame at `pixels_per_unit`
+around `centre` (the frame’s centre by default), then rotated by `rotation`
+degrees and its corners jittered by `perspective` of the strip’s span. Edges are
+anti-aliased by drawing at `supersample` times the resolution and area-averaging,
+so the true patch quad is exact to that sampling. `background_texture` adds
+low-frequency blotches of that many grey levels to the background (a table, a
+cloth). Degradations then apply per channel, as in [`degrade()`](_autosummary/inkmap.synth.html.md#inkmap.synth.degrade).
+
+* **Return type:**
+  [`PatchScene`](_autosummary/inkmap.synth.html.md#inkmap.synth.PatchScene)
 
 
 # _autosummary/inkmap.types.html.md
@@ -2565,18 +2821,18 @@ leaving only interiors. If weight is empty, the image cannot support a measureme
 
 # About this build
 
-This documentation was built on **2026-10-19 11:24 UTC** from commit <a href="https://github.com/thorwhalen/inkmap/commit/4c6de7db71b785b6af098c14eb4189e84dc121d6"><code>4c6de7d</code></a> on branch <code>main</code>, for **inkmap 0.1.4** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-19 12:49 UTC** from commit <a href="https://github.com/thorwhalen/inkmap/commit/1342444c23d8f3ade4d3dce16914e5be192beef8"><code>1342444</code></a> on branch <code>main</code>, for **inkmap 0.1.5** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.1.4) is behind the latest release on PyPI (0.1.5): `pip install inkmap` gives newer code than these docs describe.
+- The documented version (0.1.5) is behind the latest release on PyPI (0.1.6): `pip install inkmap` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/inkmap/commit/4c6de7db71b785b6af098c14eb4189e84dc121d6"><code>4c6de7db71b785b6af098c14eb4189e84dc121d6</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/inkmap/commit/1342444c23d8f3ade4d3dce16914e5be192beef8"><code>1342444c23d8f3ade4d3dce16914e5be192beef8</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
 | Tags at this commit | none                                                                                                                                                     |
 | Working tree        | clean                                                                                                                                                    |
@@ -2587,9 +2843,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/inkmap</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/inkmap/actions/runs/39244129679">39244129679</a>    |
+| Run          | <a href="https://github.com/thorwhalen/inkmap/actions/runs/39254792483">39254792483</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>4c6de7db71b785b6af098c14eb4189e84dc121d6</code> (in the history of the built commit) |
+| Event commit | <code>1342444c23d8f3ade4d3dce16914e5be192beef8</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -2614,13 +2870,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/inkmap/0.1.5/">0.1.5</a>, newer than the documented version (0.1.4).
+Latest release: <a href="https://pypi.org/project/inkmap/0.1.6/">0.1.6</a>, newer than the documented version (0.1.5).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/inkmap && cd inkmap
-git checkout 4c6de7db71b785b6af098c14eb4189e84dc121d6
+git checkout 1342444c23d8f3ade4d3dce16914e5be192beef8
 pip install "epythet==0.2.18"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

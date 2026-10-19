@@ -158,6 +158,9 @@ Real photographs remain essential for <em>detection</em> rate – see <a class="
 <tr class="row-even"><td><p><a class="reference internal" href="#inkmap.synth.mark_sheet" title="inkmap.synth.mark_sheet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mark_sheet</span></code></a>()</p></td>
 <td><p>A card of square registration marks, and where each one's centre truly is.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.synth.render_patch" title="inkmap.synth.render_patch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">render_patch</span></code></a>(*[, size, patch_bgr, ...])</p></td>
+<td><p>Render a uniform colour patch centred on a paper strip, over a background.</p></td>
+</tr>
 </tbody>
 </table>
 <p class="rubric">Classes</p>
@@ -166,8 +169,34 @@ Real photographs remain essential for <em>detection</em> rate – see <a class="
 <tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.synth.Scene" title="inkmap.synth.Scene"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Scene</span></code></a>(image, coverage, transform, model[, ...])</p></td>
 <td><p>A synthetic image together with the truth used to make it.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.synth.PatchScene" title="inkmap.synth.PatchScene"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PatchScene</span></code></a>(image, patch_quad, paper_quad[, ...])</p></td>
+<td><p>A synthetic colour photograph of a printed patch on a paper strip, and its truth.</p></td>
+</tr>
 </tbody>
 </table>
+<dl class="py class">
+<dt class="sig sig-object py" id="inkmap.synth.PatchScene">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">inkmap.synth.</span></span><span class="sig-name descname"><span class="pre">PatchScene</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patch_quad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paper_quad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">dict()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/synth.html#PatchScene"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.synth.PatchScene" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.synth.PatchScene'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>A synthetic colour photograph of a printed patch on a paper strip, and its truth.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="inkmap.synth.PatchScene.image">
+<span class="sig-name descname"><span class="pre">image</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.synth.PatchScene.image" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.synth.PatchScene.image'">¶</a></dt>
+<dd><p>(H, W, 3) uint8 BGR.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="inkmap.synth.PatchScene.paper_quad">
+<span class="sig-name descname"><span class="pre">paper_quad</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.synth.PatchScene.paper_quad" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.synth.PatchScene.paper_quad'">¶</a></dt>
+<dd><p>(4, 2) true image corners of the paper strip, in the same order.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="inkmap.synth.PatchScene.patch_quad">
+<span class="sig-name descname"><span class="pre">patch_quad</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.synth.PatchScene.patch_quad" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.synth.PatchScene.patch_quad'">¶</a></dt>
+<dd><p>(4, 2) true image corners of the patch, clockwise from its top-left.</p>
+</dd></dl>
+</dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="inkmap.synth.Scene">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">inkmap.synth.</span></span><span class="sig-name descname"><span class="pre">Scene</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coverage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">dict()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/synth.html#Scene"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.synth.Scene" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.synth.Scene'">¶</a></dt>
@@ -274,10 +303,34 @@ fractional illumination falloff across the frame.</p>
 </dd>
 </dl>
 </dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="inkmap.synth.render_patch">
+<span class="sig-prename descclassname"><span class="pre">inkmap.synth.</span></span><span class="sig-name descname"><span class="pre">render_patch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(600,</span> <span class="pre">800)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patch_bgr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(60.0,</span> <span class="pre">110.0,</span> <span class="pre">200.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paper_bgr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(232.0,</span> <span class="pre">236.0,</span> <span class="pre">238.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background_bgr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(70.0,</span> <span class="pre">80.0,</span> <span class="pre">95.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(40.0,</span> <span class="pre">24.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paper_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(100.0,</span> <span class="pre">32.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixels_per_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">centre</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perspective</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blur</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gradient</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background_texture</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">supersample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/synth.html#render_patch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.synth.render_patch" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.synth.render_patch'">¶</a></dt>
+<dd><p>Render a uniform colour patch centred on a paper strip, over a background.</p>
+<p>Model space is the strip’s own, in units: a <code class="docutils literal notranslate"><span class="pre">paper_size</span></code> strip with a
+<code class="docutils literal notranslate"><span class="pre">patch_size</span></code> patch at its centre, mapped into the frame at <code class="docutils literal notranslate"><span class="pre">pixels_per_unit</span></code>
+around <code class="docutils literal notranslate"><span class="pre">centre</span></code> (the frame’s centre by default), then rotated by <code class="docutils literal notranslate"><span class="pre">rotation</span></code>
+degrees and its corners jittered by <code class="docutils literal notranslate"><span class="pre">perspective</span></code> of the strip’s span. Edges are
+anti-aliased by drawing at <code class="docutils literal notranslate"><span class="pre">supersample</span></code> times the resolution and area-averaging,
+so the true patch quad is exact to that sampling. <code class="docutils literal notranslate"><span class="pre">background_texture</span></code> adds
+low-frequency blotches of that many grey levels to the background (a table, a
+cloth). Degradations then apply per channel, as in <a class="reference internal" href="#inkmap.synth.degrade" title="inkmap.synth.degrade"><code class="xref py py-func docutils literal notranslate"><span class="pre">degrade()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#inkmap.synth.PatchScene" title="inkmap.synth.PatchScene"><code class="xref py py-class docutils literal notranslate"><span class="pre">PatchScene</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
+<li><a :data-current="activeSection === '#inkmap.synth.PatchScene'" class="reference internal" href="#inkmap.synth.PatchScene"><code class="docutils literal notranslate"><span class="pre">PatchScene</span></code></a><ul>
+<li><a :data-current="activeSection === '#inkmap.synth.PatchScene.image'" class="reference internal" href="#inkmap.synth.PatchScene.image"><code class="docutils literal notranslate"><span class="pre">PatchScene.image</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.synth.PatchScene.paper_quad'" class="reference internal" href="#inkmap.synth.PatchScene.paper_quad"><code class="docutils literal notranslate"><span class="pre">PatchScene.paper_quad</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.synth.PatchScene.patch_quad'" class="reference internal" href="#inkmap.synth.PatchScene.patch_quad"><code class="docutils literal notranslate"><span class="pre">PatchScene.patch_quad</span></code></a></li>
+</ul>
+</li>
 <li><a :data-current="activeSection === '#inkmap.synth.Scene'" class="reference internal" href="#inkmap.synth.Scene"><code class="docutils literal notranslate"><span class="pre">Scene</span></code></a><ul>
 <li><a :data-current="activeSection === '#inkmap.synth.Scene.coverage'" class="reference internal" href="#inkmap.synth.Scene.coverage"><code class="docutils literal notranslate"><span class="pre">Scene.coverage</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.synth.Scene.image'" class="reference internal" href="#inkmap.synth.Scene.image"><code class="docutils literal notranslate"><span class="pre">Scene.image</span></code></a></li>
@@ -290,6 +343,7 @@ fractional illumination falloff across the frame.</p>
 <li><a :data-current="activeSection === '#inkmap.synth.nested_square'" class="reference internal" href="#inkmap.synth.nested_square"><code class="docutils literal notranslate"><span class="pre">nested_square()</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.synth.qr_model'" class="reference internal" href="#inkmap.synth.qr_model"><code class="docutils literal notranslate"><span class="pre">qr_model()</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.synth.render'" class="reference internal" href="#inkmap.synth.render"><code class="docutils literal notranslate"><span class="pre">render()</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.synth.render_patch'" class="reference internal" href="#inkmap.synth.render_patch"><code class="docutils literal notranslate"><span class="pre">render_patch()</span></code></a></li>
 </ul>
 </div>
 </aside>
@@ -303,7 +357,7 @@ fractional illumination falloff across the frame.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=fd825880"></script>
+<script src="../_static/documentation_options.js?v=59fadc99"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

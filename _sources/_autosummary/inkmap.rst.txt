@@ -22,6 +22,7 @@
       measurement_weight
       locate
       find_square_marks
+      locate_patch
    
    .. rubric:: Classes
 
@@ -35,6 +36,7 @@
       Measurement
       Measurability
       SquareMark
+      PatchRegions
    
 .. rubric:: Modules
 

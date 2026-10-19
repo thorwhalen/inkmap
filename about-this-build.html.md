@@ -2,18 +2,18 @@
 
 # About this build
 
-This documentation was built on **2026-10-19 11:24 UTC** from commit <a href="https://github.com/thorwhalen/inkmap/commit/4c6de7db71b785b6af098c14eb4189e84dc121d6"><code>4c6de7d</code></a> on branch <code>main</code>, for **inkmap 0.1.4** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-19 12:49 UTC** from commit <a href="https://github.com/thorwhalen/inkmap/commit/1342444c23d8f3ade4d3dce16914e5be192beef8"><code>1342444</code></a> on branch <code>main</code>, for **inkmap 0.1.5** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.1.4) is behind the latest release on PyPI (0.1.5): `pip install inkmap` gives newer code than these docs describe.
+- The documented version (0.1.5) is behind the latest release on PyPI (0.1.6): `pip install inkmap` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/inkmap/commit/4c6de7db71b785b6af098c14eb4189e84dc121d6"><code>4c6de7db71b785b6af098c14eb4189e84dc121d6</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/inkmap/commit/1342444c23d8f3ade4d3dce16914e5be192beef8"><code>1342444c23d8f3ade4d3dce16914e5be192beef8</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
 | Tags at this commit | none                                                                                                                                                     |
 | Working tree        | clean                                                                                                                                                    |
@@ -24,9 +24,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/inkmap</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/inkmap/actions/runs/39244129679">39244129679</a>    |
+| Run          | <a href="https://github.com/thorwhalen/inkmap/actions/runs/39254792483">39254792483</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>4c6de7db71b785b6af098c14eb4189e84dc121d6</code> (in the history of the built commit) |
+| Event commit | <code>1342444c23d8f3ade4d3dce16914e5be192beef8</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -51,13 +51,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/inkmap/0.1.5/">0.1.5</a>, newer than the documented version (0.1.4).
+Latest release: <a href="https://pypi.org/project/inkmap/0.1.6/">0.1.6</a>, newer than the documented version (0.1.5).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/inkmap && cd inkmap
-git checkout 4c6de7db71b785b6af098c14eb4189e84dc121d6
+git checkout 1342444c23d8f3ade4d3dce16914e5be192beef8
 pip install "epythet==0.2.18"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

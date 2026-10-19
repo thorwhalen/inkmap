@@ -71,6 +71,7 @@ continuous value is **coverage**, after ISO 12647-2:2013 3.1 *area coverage*. Se
 | [`measurement_weight`](#inkmap.measurement_weight)(coverage, \*[, ...])            | Blur-aware weight in `[0, 1]`: how safe each pixel is to *measure*.            |
 | [`locate`](#inkmap.locate)(bgr, gray, \*[, locators, first_hit, ...])  | Run locator strategies and merge their results, de-duplicating by position.    |
 | [`find_square_marks`](#inkmap.find_square_marks)(gray, \*[, min_side_px, ...])    | Every solid or nested square mark in `gray` (2-D, 0-255 scale), largest first. |
+| [`locate_patch`](#inkmap.locate_patch)(image, \*[, seed, seed_share, ...])   | The uniform patch at `seed`, and the ring of substrate just outside it.        |
 
 ### Classes
 
@@ -83,6 +84,7 @@ continuous value is **coverage**, after ISO 12647-2:2013 3.1 *area coverage*. Se
 | [`Measurement`](#inkmap.Measurement)(foreground_mean, foreground_std, ...) | Aggregated signal over foreground and background, with its validity attached.      |
 | [`Measurability`](#inkmap.Measurability)(ok, pixels_per_feature, ...[, ...]) | Whether a trustworthy measurement is possible on this image at all.                |
 | [`SquareMark`](#inkmap.SquareMark)(centre, corners, side_px[, ...])       | One square mark found in an image.                                                 |
+| [`PatchRegions`](#inkmap.PatchRegions)(patch, substrate, region, quad, ok)  | A located patch: masks over the frame, its geometry, and how far to trust them.    |
 
 ### *class* inkmap.InkMap(coverage, region, placement, polarity=Polarity.FOREGROUND_IS_DARK, weight=None, blur_sigma=None, metadata=dict())
 
@@ -218,6 +220,37 @@ Must be vectorised: it is called with millions of points.
 
 * **Return type:**
   `ndarray`
+
+### *class* inkmap.PatchRegions(patch, substrate, region, quad, ok, notes=(), seed_lab=(nan, nan, nan), threshold_delta_e=nan, area_share=0.0, rectangularity=0.0, touches_border=False, hole_share=0.0, outline_deviation_px=nan, substrate_px=0, ring_px=(0.0, 0.0))
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A located patch: masks over the frame, its geometry, and how far to trust them.
+
+`patch` is the interior, eroded clear of the edge; `substrate` a ring of bare
+substrate just outside; `region` the whole patch, uneroded. `quad` is the
+patch’s corners, clockwise as seen on screen from the one nearest the image’s
+top-left, to a fraction of a pixel when its sides could be fitted (`None` if no
+region was found). `ok` is `not notes`.
+
+The rest say why: `seed_lab` the patch colour, `threshold_delta_e` the split
+used, `area_share` of the frame, `rectangularity` (region over fitted quad),
+`outline_deviation_px` (95th percentile of the outline’s distance from the
+fitted sides), `hole_share` (share of the interior not the patch’s colour),
+`substrate_px`, and `ring_px` (the ring’s inner and outer distance).
+
+#### *property* placement *: [Placement](inkmap.types.html.md#inkmap.types.Placement) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+The patch and its substrate ring as a placement, or `None` without a quad.
+
+The model is the patch as foreground inside a border of background as wide as
+the substrate ring’s outer edge, in units of about one pixel. So
+`inkmap.analyze()` and [`inkmap.measure()`](#inkmap.measure) treat the patch as any other
+mark, and `measure` compares the patch with the substrate round it. The
+placement’s `quad` is that bordered model’s, not the patch’s: the patch’s own
+corners are `quad`. `measure` averages the whole border, background
+and all, where `substrate` keeps only its paper-like pixels: on a thin
+paper border, measure with `substrate` instead.
 
 ### *class* inkmap.Placement(model, transform, quad, locator='', payload=None, refined=False, score=None, metadata=dict())
 
@@ -508,6 +541,31 @@ the coarse pass misses entirely is not recovered: lower the downscaling instead.
 
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Placement`](inkmap.types.html.md#inkmap.types.Placement)]
+
+### inkmap.locate_patch(image, , seed='centre', seed_share=0.04, min_delta_e=4.0, max_delta_e=25.0, edge_margin_share=0.08, ring_share=(0.02, 0.06), min_area_share=0.01, min_rectangularity=0.85, min_substrate_px=50, min_substrate_lift=1.0, max_substrate_chroma=15.0, min_side_share=0.15, min_edge_step=3.0)
+
+The uniform patch at `seed`, and the ring of substrate just outside it.
+
+`image` is a path, a BGR (or BGRA) array, or a grey array, 8-bit. `seed` is
+`"centre"` or an `(x, y)` pixel inside the patch; its colour is the median of a
+window `seed_share` of the frame’s shorter side across. Pixels within the Otsu
+split of the CIELAB distance to it, clamped to `[min_delta_e, max_delta_e]`, are
+candidates, and the connected candidate region at the seed is the patch.
+
+`edge_margin_share` erodes the interior, and `ring_share` places the
+substrate ring, both as shares of the patch’s shorter side. The verdict fails, with
+a note saying why, when the patch is under `min_area_share` of the frame, less
+rectangular than `min_rectangularity` (area over its minimum-area rectangle’s:
+where a pale patch leaked into the paper), cut by the frame’s edge, or when the
+ring holds under `min_substrate_px` pixels of substrate, substrate no lighter than
+the patch by `min_substrate_lift` L\*, or substrate on fewer than three sides
+(`min_side_share` of that side’s ring each), or when a side of the patch has no
+colour step of `min_edge_step` across it – the sign of a region that leaked into
+shaded paper. A failed verdict on a leaked region is retried at a tighter
+threshold.
+
+* **Return type:**
+  [`PatchRegions`](#inkmap.PatchRegions)
 
 ### inkmap.measurability(ink_map, , min_pixels=50)
 

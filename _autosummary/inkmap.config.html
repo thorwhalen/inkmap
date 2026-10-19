@@ -234,6 +234,72 @@ at call time, so overriding one is a call-site concern, not global mutable state
 <tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.MARK_RING_SPREAD_SHARE" title="inkmap.config.MARK_RING_SPREAD_SHARE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MARK_RING_SPREAD_SHARE</span></code></a></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">sigma_px</span></code> calibration, fitted on synthetic sheets (rotations, perspective up to 0.15, blur 0.7-1.5 px, noise 1-4) so that the median centre error is about sigma for both kinds of mark.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.PATCH_SEED_SHARE" title="inkmap.config.PATCH_SEED_SHARE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_SEED_SHARE</span></code></a></p></td>
+<td><p>The patch colour is the median over a window this share of the frame's shorter side across, round the seed.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.PATCH_MIN_DELTA_E" title="inkmap.config.PATCH_MIN_DELTA_E"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_MIN_DELTA_E</span></code></a></p></td>
+<td><p>The CIELAB distance (Delta E) that splits patch from not-patch is Otsu's threshold, clamped to this range: below 4 the split follows noise, above 25 a pale patch leaks into white paper.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.PATCH_EDGE_MARGIN_SHARE" title="inkmap.config.PATCH_EDGE_MARGIN_SHARE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_EDGE_MARGIN_SHARE</span></code></a></p></td>
+<td><p>The interior is eroded clear of the patch's blurred edge by this share of its shorter side.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.PATCH_RING_SHARE" title="inkmap.config.PATCH_RING_SHARE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_RING_SHARE</span></code></a></p></td>
+<td><p>The substrate ring runs between these shares of the patch's shorter side outside it.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.PATCH_MIN_AREA_SHARE" title="inkmap.config.PATCH_MIN_AREA_SHARE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_MIN_AREA_SHARE</span></code></a></p></td>
+<td><p>Verdict thresholds.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.PATCH_MIN_RECTANGULARITY" title="inkmap.config.PATCH_MIN_RECTANGULARITY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_MIN_RECTANGULARITY</span></code></a></p></td>
+<td><p>a pale patch that leaked into the paper is no longer rectangular.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.PATCH_MIN_SUBSTRATE_PX" title="inkmap.config.PATCH_MIN_SUBSTRATE_PX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_MIN_SUBSTRATE_PX</span></code></a></p></td>
+<td><p>The ring must hold at least this many substrate pixels...</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.PATCH_MIN_SUBSTRATE_LIFT" title="inkmap.config.PATCH_MIN_SUBSTRATE_LIFT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_MIN_SUBSTRATE_LIFT</span></code></a></p></td>
+<td><p>...whose median L* exceeds the patch's by at least this much (paper is lighter)...</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.PATCH_MAX_SUBSTRATE_CHROMA" title="inkmap.config.PATCH_MAX_SUBSTRATE_CHROMA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_MAX_SUBSTRATE_CHROMA</span></code></a></p></td>
+<td><p>paper, not a coloured table.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.PATCH_MIN_SIDE_SHARE" title="inkmap.config.PATCH_MIN_SIDE_SHARE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_MIN_SIDE_SHARE</span></code></a></p></td>
+<td><p>...on at least three sides, each holding substrate in this share of its ring.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.PATCH_POLY_EPSILON_SHARE" title="inkmap.config.PATCH_POLY_EPSILON_SHARE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_POLY_EPSILON_SHARE</span></code></a></p></td>
+<td><p>A patch's outline is four-sided when a polygon within this share of its perimeter fits it with four vertices.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.PATCH_MAX_RESPLITS" title="inkmap.config.PATCH_MAX_RESPLITS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_MAX_RESPLITS</span></code></a></p></td>
+<td><p>How many times the patch region may be re-split by Otsu within itself, peeling off the paper a pale patch was first merged with (one is usually enough).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.PATCH_EDGE_BAND_PX" title="inkmap.config.PATCH_EDGE_BAND_PX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_EDGE_BAND_PX</span></code></a></p></td>
+<td><p>The patch's sides are fitted to its colour edge along the direction from the patch's colour to the median colour of this band outside it (in pixels from its outline).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.PATCH_MIN_EDGE_STEP" title="inkmap.config.PATCH_MIN_EDGE_STEP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_MIN_EDGE_STEP</span></code></a></p></td>
+<td><p>A patch must show a colour step of at least this (in Delta E along the patch-to- paper direction) across every side, measured between PATCH_EDGE_STEP_OFFSET_PX inside and outside it.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.PATCH_SUBSTRATE_SPLIT_GAP" title="inkmap.config.PATCH_SUBSTRATE_SPLIT_GAP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_SUBSTRATE_SPLIT_GAP</span></code></a></p></td>
+<td><p>The substrate ring's lightness is split (paper from a darker background) only when its two Otsu classes are this many L* apart; shading alone spreads paper less.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.PATCH_MIN_EDGE_CONTRAST" title="inkmap.config.PATCH_MIN_EDGE_CONTRAST"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_MIN_EDGE_CONTRAST</span></code></a></p></td>
+<td><p>A patch side is refined against the image only where its edge steps by at least this many 8-bit levels (along the patch-to-paper colour direction).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.PATCH_EDGE_LEVEL_WINDOW" title="inkmap.config.PATCH_EDGE_LEVEL_WINDOW"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_EDGE_LEVEL_WINDOW</span></code></a></p></td>
+<td><p>A patch side's edge level is taken per profile and smoothed over this many profiles (pixels) along the side, rather than once for the whole side: uneven light moves it along a long side, which on a faint edge tilts the fitted line.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.PATCH_MAX_OUTLINE_DEVIATION_PX" title="inkmap.config.PATCH_MAX_OUTLINE_DEVIATION_PX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_MAX_OUTLINE_DEVIATION_PX</span></code></a></p></td>
+<td><p>The thresholded outline must lie within this many pixels of the fitted sides (95th percentile): a lobe leaked into shaded paper, or a rounded corner, strays further.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.PATCH_MAX_HOLE_SHARE" title="inkmap.config.PATCH_MAX_HOLE_SHARE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_MAX_HOLE_SHARE</span></code></a></p></td>
+<td><p>Pixels of the interior that are not the patch's colour are always left out of it.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.PATCH_SUBSTRATE_MAX_DELTA_E" title="inkmap.config.PATCH_SUBSTRATE_MAX_DELTA_E"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_SUBSTRATE_MAX_DELTA_E</span></code></a></p></td>
+<td><p>a neighbouring light-grey patch, or a white table, can pass for paper otherwise.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.PATCH_INTERIOR_MADS" title="inkmap.config.PATCH_INTERIOR_MADS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_INTERIOR_MADS</span></code></a></p></td>
+<td><p>Interior pixels further from the seed colour than the patch's median distance plus this many robust deviations (1.4826 MAD) are left out, with a pixel round them: the fringe of text or glare on the patch.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.PATCH_TWO_COLOUR_SEPARATION" title="inkmap.config.PATCH_TWO_COLOUR_SEPARATION"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_TWO_COLOUR_SEPARATION</span></code></a></p></td>
+<td><p>Two colours are distinct when their Otsu split along the principal axis is at least this many pooled deviations apart.</p></td>
+</tr>
 </tbody>
 </table>
 <dl class="py data">
@@ -461,6 +527,157 @@ uncontaminated measurement – the blur is wide relative to a unit and every pix
 mixed. Results are flagged rather than silently returned. See docs/validation.md.</p>
 </dd></dl>
 <dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.PATCH_EDGE_BAND_PX">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PATCH_EDGE_BAND_PX</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(2.0,</span> <span class="pre">6.0)</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PATCH_EDGE_BAND_PX" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PATCH_EDGE_BAND_PX'">¶</a></dt>
+<dd><p>The patch’s sides are fitted to its colour edge along the direction from the patch’s
+colour to the median colour of this band outside it (in pixels from its outline).</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.PATCH_EDGE_LEVEL_WINDOW">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PATCH_EDGE_LEVEL_WINDOW</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">25</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PATCH_EDGE_LEVEL_WINDOW" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PATCH_EDGE_LEVEL_WINDOW'">¶</a></dt>
+<dd><p>A patch side’s edge level is taken per profile and smoothed over this many profiles
+(pixels) along the side, rather than once for the whole side: uneven light moves it
+along a long side, which on a faint edge tilts the fitted line.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.PATCH_EDGE_MARGIN_SHARE">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PATCH_EDGE_MARGIN_SHARE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.08</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PATCH_EDGE_MARGIN_SHARE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PATCH_EDGE_MARGIN_SHARE'">¶</a></dt>
+<dd><p>The interior is eroded clear of the patch’s blurred edge by this share of its
+shorter side.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.PATCH_INTERIOR_MADS">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PATCH_INTERIOR_MADS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4.0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PATCH_INTERIOR_MADS" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PATCH_INTERIOR_MADS'">¶</a></dt>
+<dd><p>Interior pixels further from the seed colour than the patch’s median distance plus
+this many robust deviations (1.4826 MAD) are left out, with a pixel round them:
+the fringe of text or glare on the patch.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.PATCH_MAX_HOLE_SHARE">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PATCH_MAX_HOLE_SHARE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.05</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PATCH_MAX_HOLE_SHARE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PATCH_MAX_HOLE_SHARE'">¶</a></dt>
+<dd><p>Pixels of the interior that are not the patch’s colour are always left out of it.
+The verdict fails when one connected blob of them covers more than this share of
+the interior (another patch, or the patch itself inside a region seeded on the
+paper: 7-8% in the cases seen), or when all of them together cover more than
+PATCH_MAX_OFF_COLOUR_SHARE (text, specks or glare obscuring the patch).</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.PATCH_MAX_OUTLINE_DEVIATION_PX">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PATCH_MAX_OUTLINE_DEVIATION_PX</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2.0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PATCH_MAX_OUTLINE_DEVIATION_PX" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PATCH_MAX_OUTLINE_DEVIATION_PX'">¶</a></dt>
+<dd><p>The thresholded outline must lie within this many pixels of the fitted sides (95th
+percentile): a lobe leaked into shaded paper, or a rounded corner, strays further.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.PATCH_MAX_RESPLITS">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PATCH_MAX_RESPLITS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PATCH_MAX_RESPLITS" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PATCH_MAX_RESPLITS'">¶</a></dt>
+<dd><p>How many times the patch region may be re-split by Otsu within itself, peeling off
+the paper a pale patch was first merged with (one is usually enough).</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.PATCH_MAX_SUBSTRATE_CHROMA">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PATCH_MAX_SUBSTRATE_CHROMA</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">15.0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PATCH_MAX_SUBSTRATE_CHROMA" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PATCH_MAX_SUBSTRATE_CHROMA'">¶</a></dt>
+<dd><p>paper, not a coloured table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>…and which are low-chroma (C*ab under this)</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.PATCH_MIN_AREA_SHARE">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PATCH_MIN_AREA_SHARE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.01</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PATCH_MIN_AREA_SHARE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PATCH_MIN_AREA_SHARE'">¶</a></dt>
+<dd><p>Verdict thresholds. A patch under this share of the frame is too small to trust.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.PATCH_MIN_DELTA_E">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PATCH_MIN_DELTA_E</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4.0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PATCH_MIN_DELTA_E" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PATCH_MIN_DELTA_E'">¶</a></dt>
+<dd><p>The CIELAB distance (Delta E) that splits patch from not-patch is Otsu’s threshold,
+clamped to this range: below 4 the split follows noise, above 25 a pale patch leaks
+into white paper.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.PATCH_MIN_EDGE_CONTRAST">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PATCH_MIN_EDGE_CONTRAST</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3.0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PATCH_MIN_EDGE_CONTRAST" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PATCH_MIN_EDGE_CONTRAST'">¶</a></dt>
+<dd><p>A patch side is refined against the image only where its edge steps by at least
+this many 8-bit levels (along the patch-to-paper colour direction).</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.PATCH_MIN_EDGE_STEP">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PATCH_MIN_EDGE_STEP</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3.0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PATCH_MIN_EDGE_STEP" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PATCH_MIN_EDGE_STEP'">¶</a></dt>
+<dd><p>A patch must show a colour step of at least this (in Delta E along the patch-to-
+paper direction) across every side, measured between PATCH_EDGE_STEP_OFFSET_PX
+inside and outside it. A leaked region’s boundary through shaded paper has none.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.PATCH_MIN_RECTANGULARITY">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PATCH_MIN_RECTANGULARITY</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.85</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PATCH_MIN_RECTANGULARITY" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PATCH_MIN_RECTANGULARITY'">¶</a></dt>
+<dd><p>a pale patch that leaked into the paper
+is no longer rectangular. (A rectangle seen in perspective scores ~0.9-1.)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Area over the minimum-area rectangle’s</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.PATCH_MIN_SIDE_SHARE">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PATCH_MIN_SIDE_SHARE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.15</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PATCH_MIN_SIDE_SHARE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PATCH_MIN_SIDE_SHARE'">¶</a></dt>
+<dd><p>…on at least three sides, each holding substrate in this share of its ring.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.PATCH_MIN_SUBSTRATE_LIFT">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PATCH_MIN_SUBSTRATE_LIFT</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PATCH_MIN_SUBSTRATE_LIFT" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PATCH_MIN_SUBSTRATE_LIFT'">¶</a></dt>
+<dd><p>…whose median L* exceeds the patch’s by at least this much (paper is lighter)…</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.PATCH_MIN_SUBSTRATE_PX">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PATCH_MIN_SUBSTRATE_PX</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">50</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PATCH_MIN_SUBSTRATE_PX" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PATCH_MIN_SUBSTRATE_PX'">¶</a></dt>
+<dd><p>The ring must hold at least this many substrate pixels…</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.PATCH_POLY_EPSILON_SHARE">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PATCH_POLY_EPSILON_SHARE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.02</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PATCH_POLY_EPSILON_SHARE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PATCH_POLY_EPSILON_SHARE'">¶</a></dt>
+<dd><p>A patch’s outline is four-sided when a polygon within this share of its perimeter
+fits it with four vertices.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.PATCH_RING_SHARE">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PATCH_RING_SHARE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(0.02,</span> <span class="pre">0.06)</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PATCH_RING_SHARE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PATCH_RING_SHARE'">¶</a></dt>
+<dd><p>The substrate ring runs between these shares of the patch’s shorter side outside
+it. Narrow on purpose: a thin paper border is easily overshot onto the background.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.PATCH_SEED_SHARE">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PATCH_SEED_SHARE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.04</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PATCH_SEED_SHARE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PATCH_SEED_SHARE'">¶</a></dt>
+<dd><p>The patch colour is the median over a window this share of the frame’s shorter side
+across, round the seed. Small, so that a seed near the patch’s edge still takes the
+patch’s colour, not the paper’s.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.PATCH_SUBSTRATE_MAX_DELTA_E">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PATCH_SUBSTRATE_MAX_DELTA_E</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8.0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PATCH_SUBSTRATE_MAX_DELTA_E" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PATCH_SUBSTRATE_MAX_DELTA_E'">¶</a></dt>
+<dd><p>a
+neighbouring light-grey patch, or a white table, can pass for paper otherwise.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Substrate pixels must be within this Delta E of the ring’s median paper colour</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.PATCH_SUBSTRATE_SPLIT_GAP">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PATCH_SUBSTRATE_SPLIT_GAP</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">15.0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PATCH_SUBSTRATE_SPLIT_GAP" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PATCH_SUBSTRATE_SPLIT_GAP'">¶</a></dt>
+<dd><p>The substrate ring’s lightness is split (paper from a darker background) only when
+its two Otsu classes are this many L* apart; shading alone spreads paper less.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.PATCH_TWO_COLOUR_SEPARATION">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PATCH_TWO_COLOUR_SEPARATION</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5.0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PATCH_TWO_COLOUR_SEPARATION" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PATCH_TWO_COLOUR_SEPARATION'">¶</a></dt>
+<dd><p>Two colours are distinct when their Otsu split along the principal axis is at least
+this many pooled deviations apart. One evenly spread population – a patch under a
+lighting gradient – scores about 3.5; a patch beside its paper, far more.</p>
+</dd></dl>
+<dl class="py data">
 <dt class="sig sig-object py" id="inkmap.config.PURE_COVERAGE_TOL">
 <span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PURE_COVERAGE_TOL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.001</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PURE_COVERAGE_TOL" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PURE_COVERAGE_TOL'">¶</a></dt>
 <dd><p>Coverage within this of 1.0 (or 0.0) counts as pure. Not exactly 1.0, to tolerate
@@ -518,6 +735,28 @@ kernel reflects interior content across the border and biases alignment ~0.45 px
 <li><a :data-current="activeSection === '#inkmap.config.MARK_WINDOW_OVER_MAX_SIDE'" class="reference internal" href="#inkmap.config.MARK_WINDOW_OVER_MAX_SIDE"><code class="docutils literal notranslate"><span class="pre">MARK_WINDOW_OVER_MAX_SIDE</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.config.MIN_COARSE_PIXELS_PER_FEATURE'" class="reference internal" href="#inkmap.config.MIN_COARSE_PIXELS_PER_FEATURE"><code class="docutils literal notranslate"><span class="pre">MIN_COARSE_PIXELS_PER_FEATURE</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.config.MIN_SCALE_OVER_SIGMA'" class="reference internal" href="#inkmap.config.MIN_SCALE_OVER_SIGMA"><code class="docutils literal notranslate"><span class="pre">MIN_SCALE_OVER_SIGMA</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.PATCH_EDGE_BAND_PX'" class="reference internal" href="#inkmap.config.PATCH_EDGE_BAND_PX"><code class="docutils literal notranslate"><span class="pre">PATCH_EDGE_BAND_PX</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.PATCH_EDGE_LEVEL_WINDOW'" class="reference internal" href="#inkmap.config.PATCH_EDGE_LEVEL_WINDOW"><code class="docutils literal notranslate"><span class="pre">PATCH_EDGE_LEVEL_WINDOW</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.PATCH_EDGE_MARGIN_SHARE'" class="reference internal" href="#inkmap.config.PATCH_EDGE_MARGIN_SHARE"><code class="docutils literal notranslate"><span class="pre">PATCH_EDGE_MARGIN_SHARE</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.PATCH_INTERIOR_MADS'" class="reference internal" href="#inkmap.config.PATCH_INTERIOR_MADS"><code class="docutils literal notranslate"><span class="pre">PATCH_INTERIOR_MADS</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.PATCH_MAX_HOLE_SHARE'" class="reference internal" href="#inkmap.config.PATCH_MAX_HOLE_SHARE"><code class="docutils literal notranslate"><span class="pre">PATCH_MAX_HOLE_SHARE</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.PATCH_MAX_OUTLINE_DEVIATION_PX'" class="reference internal" href="#inkmap.config.PATCH_MAX_OUTLINE_DEVIATION_PX"><code class="docutils literal notranslate"><span class="pre">PATCH_MAX_OUTLINE_DEVIATION_PX</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.PATCH_MAX_RESPLITS'" class="reference internal" href="#inkmap.config.PATCH_MAX_RESPLITS"><code class="docutils literal notranslate"><span class="pre">PATCH_MAX_RESPLITS</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.PATCH_MAX_SUBSTRATE_CHROMA'" class="reference internal" href="#inkmap.config.PATCH_MAX_SUBSTRATE_CHROMA"><code class="docutils literal notranslate"><span class="pre">PATCH_MAX_SUBSTRATE_CHROMA</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.PATCH_MIN_AREA_SHARE'" class="reference internal" href="#inkmap.config.PATCH_MIN_AREA_SHARE"><code class="docutils literal notranslate"><span class="pre">PATCH_MIN_AREA_SHARE</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.PATCH_MIN_DELTA_E'" class="reference internal" href="#inkmap.config.PATCH_MIN_DELTA_E"><code class="docutils literal notranslate"><span class="pre">PATCH_MIN_DELTA_E</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.PATCH_MIN_EDGE_CONTRAST'" class="reference internal" href="#inkmap.config.PATCH_MIN_EDGE_CONTRAST"><code class="docutils literal notranslate"><span class="pre">PATCH_MIN_EDGE_CONTRAST</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.PATCH_MIN_EDGE_STEP'" class="reference internal" href="#inkmap.config.PATCH_MIN_EDGE_STEP"><code class="docutils literal notranslate"><span class="pre">PATCH_MIN_EDGE_STEP</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.PATCH_MIN_RECTANGULARITY'" class="reference internal" href="#inkmap.config.PATCH_MIN_RECTANGULARITY"><code class="docutils literal notranslate"><span class="pre">PATCH_MIN_RECTANGULARITY</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.PATCH_MIN_SIDE_SHARE'" class="reference internal" href="#inkmap.config.PATCH_MIN_SIDE_SHARE"><code class="docutils literal notranslate"><span class="pre">PATCH_MIN_SIDE_SHARE</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.PATCH_MIN_SUBSTRATE_LIFT'" class="reference internal" href="#inkmap.config.PATCH_MIN_SUBSTRATE_LIFT"><code class="docutils literal notranslate"><span class="pre">PATCH_MIN_SUBSTRATE_LIFT</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.PATCH_MIN_SUBSTRATE_PX'" class="reference internal" href="#inkmap.config.PATCH_MIN_SUBSTRATE_PX"><code class="docutils literal notranslate"><span class="pre">PATCH_MIN_SUBSTRATE_PX</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.PATCH_POLY_EPSILON_SHARE'" class="reference internal" href="#inkmap.config.PATCH_POLY_EPSILON_SHARE"><code class="docutils literal notranslate"><span class="pre">PATCH_POLY_EPSILON_SHARE</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.PATCH_RING_SHARE'" class="reference internal" href="#inkmap.config.PATCH_RING_SHARE"><code class="docutils literal notranslate"><span class="pre">PATCH_RING_SHARE</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.PATCH_SEED_SHARE'" class="reference internal" href="#inkmap.config.PATCH_SEED_SHARE"><code class="docutils literal notranslate"><span class="pre">PATCH_SEED_SHARE</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.PATCH_SUBSTRATE_MAX_DELTA_E'" class="reference internal" href="#inkmap.config.PATCH_SUBSTRATE_MAX_DELTA_E"><code class="docutils literal notranslate"><span class="pre">PATCH_SUBSTRATE_MAX_DELTA_E</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.PATCH_SUBSTRATE_SPLIT_GAP'" class="reference internal" href="#inkmap.config.PATCH_SUBSTRATE_SPLIT_GAP"><code class="docutils literal notranslate"><span class="pre">PATCH_SUBSTRATE_SPLIT_GAP</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.PATCH_TWO_COLOUR_SEPARATION'" class="reference internal" href="#inkmap.config.PATCH_TWO_COLOUR_SEPARATION"><code class="docutils literal notranslate"><span class="pre">PATCH_TWO_COLOUR_SEPARATION</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.config.PURE_COVERAGE_TOL'" class="reference internal" href="#inkmap.config.PURE_COVERAGE_TOL"><code class="docutils literal notranslate"><span class="pre">PURE_COVERAGE_TOL</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.config.SATURATION_LEVEL'" class="reference internal" href="#inkmap.config.SATURATION_LEVEL"><code class="docutils literal notranslate"><span class="pre">SATURATION_LEVEL</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.config.SUPERSAMPLES'" class="reference internal" href="#inkmap.config.SUPERSAMPLES"><code class="docutils literal notranslate"><span class="pre">SUPERSAMPLES</span></code></a></li>
@@ -535,7 +774,7 @@ kernel reflects interior content across the border and biases alignment ~0.45 px
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=fd825880"></script>
+<script src="../_static/documentation_options.js?v=59fadc99"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

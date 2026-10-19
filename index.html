@@ -359,6 +359,21 @@ barcode defect the evaluation caught and forced a fix for (round-trip 5% → 48%
 </div>
 <p>Nested marks are told apart by their ring ratios (bullseye 0.64/0.32, QR finder 5/7 and 3/7), which perspective barely changes. Anything square is a candidate (a QR symbol’s data modules too), so which mark is which on your layout stays with you; marks over 10% of the frame need <code class="docutils literal notranslate"><span class="pre">max_side_share=</span></code>. On synthetic sheets at up to 15% corner perspective and blur ≤ 2 px, the worst centre error is 0.13 px (<a class="reference internal" href="#docs/validation.md#square-registration-marks"><span class="xref myst">validation</span></a>).</p>
 </section>
+<section id="plain-patches">
+<h2>Plain patches<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#plain-patches" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#plain-patches'">¶</a></h2>
+<p>A single printed colour patch on a paper strip has no code and no marks to locate it by. <code class="docutils literal notranslate"><span class="pre">locate_patch</span></code> finds it from a seed point and returns the three things a measurement of the patch against its own paper needs: its interior, clear of the edge; a narrow ring of bare substrate round it; and a verdict on whether to trust them.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">regions</span> <span class="o">=</span> <span class="n">inkmap</span><span class="o">.</span><span class="n">locate_patch</span><span class="p">(</span><span class="n">photo</span><span class="p">)</span>              <span class="c1"># seeded at the frame's centre</span>
+</span><span id="line-2"><span class="n">regions</span> <span class="o">=</span> <span class="n">inkmap</span><span class="o">.</span><span class="n">locate_patch</span><span class="p">(</span><span class="n">photo</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+</span><span id="line-3"><span class="n">regions</span><span class="o">.</span><span class="n">patch</span><span class="p">,</span> <span class="n">regions</span><span class="o">.</span><span class="n">substrate</span>                  <span class="c1"># boolean masks over the frame</span>
+</span><span id="line-4"><span class="n">regions</span><span class="o">.</span><span class="n">ok</span><span class="p">,</span> <span class="n">regions</span><span class="o">.</span><span class="n">notes</span>                         <span class="c1"># the verdict, and why not</span>
+</span><span id="line-5"><span class="n">regions</span><span class="o">.</span><span class="n">quad</span>                                      <span class="c1"># (4, 2) sub-pixel corners</span>
+</span><span id="line-6">
+</span><span id="line-7"><span class="n">ink</span> <span class="o">=</span> <span class="n">inkmap</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span><span class="n">photo</span><span class="p">,</span> <span class="p">[</span><span class="n">regions</span><span class="o">.</span><span class="n">placement</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>   <span class="c1"># or: find(photo, locators=["patch"])</span>
+</span><span id="line-8"><span class="n">inkmap</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="n">photo</span><span class="p">,</span> <span class="n">ink</span><span class="p">)</span>                        <span class="c1"># patch vs the substrate round it</span>
+</span></code></pre></div>
+</div>
+<p>The patch is grown from the seed’s CIELAB colour and its sides fitted to the colour edge, so a pale patch on white paper is placed as well as a dark one. The verdict refuses a patch that leaked into the paper, is cut by the frame, or has no paper round it; see <a class="reference internal" href="#docs/validation.md#plain-patches"><span class="xref myst">validation</span></a>. On flash bursts, seed on an unlit frame: under flash a pale patch clips to white.</p>
+</section>
 <section id="extending-it">
 <h2>Extending it<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#extending-it" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#extending-it'">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">inkmap</span><span class="o">.</span><span class="n">LOCATORS</span><span class="p">[</span><span class="s2">"mine"</span><span class="p">]</span> <span class="o">=</span> <span class="n">my_locator</span>          <span class="c1"># (bgr, gray) -&gt; list[Placement]</span>
@@ -428,7 +443,7 @@ Pillow only for <code class="docutils literal notranslate"><span class="pre">Gly
 
 </section>
 </section>
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-19 11:24 UTC from <a href="https://github.com/thorwhalen/inkmap/commit/4c6de7db71b785b6af098c14eb4189e84dc121d6">4c6de7d</a> (main) · inkmap 0.1.4 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-19 12:49 UTC from <a href="https://github.com/thorwhalen/inkmap/commit/1342444c23d8f3ade4d3dce16914e5be192beef8">1342444</a> (main) · inkmap 0.1.5 · <a href="about-this-build.html">about this build</a></p>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
@@ -440,6 +455,7 @@ Pillow only for <code class="docutils literal notranslate"><span class="pre">Gly
 <li><a :data-current="activeSection === '#how-well-it-works'" class="reference internal" href="#how-well-it-works">How well it works</a></li>
 <li><a :data-current="activeSection === '#large-photographs-locate-coarse-refine-fine'" class="reference internal" href="#large-photographs-locate-coarse-refine-fine">Large photographs: locate coarse, refine fine</a></li>
 <li><a :data-current="activeSection === '#registration-marks'" class="reference internal" href="#registration-marks">Registration marks</a></li>
+<li><a :data-current="activeSection === '#plain-patches'" class="reference internal" href="#plain-patches">Plain patches</a></li>
 <li><a :data-current="activeSection === '#extending-it'" class="reference internal" href="#extending-it">Extending it</a></li>
 <li><a :data-current="activeSection === '#skills-for-ai-agents'" class="reference internal" href="#skills-for-ai-agents">Skills for AI agents</a></li>
 <li><a :data-current="activeSection === '#test-data'" class="reference internal" href="#test-data">Test data</a></li>
@@ -459,7 +475,7 @@ Pillow only for <code class="docutils literal notranslate"><span class="pre">Gly
 </div>
 </footer>
 </div>
-<script src="_static/documentation_options.js?v=fd825880"></script>
+<script src="_static/documentation_options.js?v=59fadc99"></script>
 <script src="_static/doctools.js?v=fd6eb6e6"></script>
 <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="_static/clipboard.min.js?v=a7894cd8"></script>

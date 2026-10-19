@@ -211,6 +211,9 @@ continuous value is <strong>coverage</strong>, after ISO 12647-2:2013 3.1 <em>ar
 <tr class="row-even"><td><p><a class="reference internal" href="#inkmap.find_square_marks" title="inkmap.find_square_marks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_square_marks</span></code></a>(gray, *[, min_side_px, ...])</p></td>
 <td><p>Every solid or nested square mark in <code class="docutils literal notranslate"><span class="pre">gray</span></code> (2-D, 0-255 scale), largest first.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.locate_patch" title="inkmap.locate_patch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">locate_patch</span></code></a>(image, *[, seed, seed_share, ...])</p></td>
+<td><p>The uniform patch at <code class="docutils literal notranslate"><span class="pre">seed</span></code>, and the ring of substrate just outside it.</p></td>
+</tr>
 </tbody>
 </table>
 <p class="rubric">Classes</p>
@@ -239,6 +242,9 @@ continuous value is <strong>coverage</strong>, after ISO 12647-2:2013 3.1 <em>ar
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#inkmap.SquareMark" title="inkmap.SquareMark"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SquareMark</span></code></a>(centre, corners, side_px[, ...])</p></td>
 <td><p>One square mark found in an image.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.PatchRegions" title="inkmap.PatchRegions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PatchRegions</span></code></a>(patch, substrate, region, quad, ok)</p></td>
+<td><p>A located patch: masks over the frame, its geometry, and how far to trust them.</p></td>
 </tr>
 </tbody>
 </table>
@@ -400,6 +406,37 @@ return 0 – callers rely on that to bound the mark.</p>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
 </dd>
 </dl>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="inkmap.PatchRegions">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">PatchRegions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">substrate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ok</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed_lab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(nan,</span> <span class="pre">nan,</span> <span class="pre">nan)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold_delta_e</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">area_share</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rectangularity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">touches_border</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hole_share</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outline_deviation_px</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">substrate_px</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ring_px</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.0,</span> <span class="pre">0.0)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/locate/patch.html#PatchRegions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.PatchRegions" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.PatchRegions'">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p>
+<p>A located patch: masks over the frame, its geometry, and how far to trust them.</p>
+<p><code class="docutils literal notranslate"><span class="pre">patch</span></code> is the interior, eroded clear of the edge; <code class="docutils literal notranslate"><span class="pre">substrate</span></code> a ring of bare
+substrate just outside; <code class="docutils literal notranslate"><span class="pre">region</span></code> the whole patch, uneroded. <code class="docutils literal notranslate"><span class="pre">quad</span></code> is the
+patch’s corners, clockwise as seen on screen from the one nearest the image’s
+top-left, to a fraction of a pixel when its sides could be fitted (<code class="docutils literal notranslate"><span class="pre">None</span></code> if no
+region was found). <code class="docutils literal notranslate"><span class="pre">ok</span></code> is <code class="docutils literal notranslate"><span class="pre">not</span> <span class="pre">notes</span></code>.</p>
+<p>The rest say why: <code class="docutils literal notranslate"><span class="pre">seed_lab</span></code> the patch colour, <code class="docutils literal notranslate"><span class="pre">threshold_delta_e</span></code> the split
+used, <code class="docutils literal notranslate"><span class="pre">area_share</span></code> of the frame, <code class="docutils literal notranslate"><span class="pre">rectangularity</span></code> (region over fitted quad),
+<code class="docutils literal notranslate"><span class="pre">outline_deviation_px</span></code> (95th percentile of the outline’s distance from the
+fitted sides), <code class="docutils literal notranslate"><span class="pre">hole_share</span></code> (share of the interior not the patch’s colour),
+<code class="docutils literal notranslate"><span class="pre">substrate_px</span></code>, and <code class="docutils literal notranslate"><span class="pre">ring_px</span></code> (the ring’s inner and outer distance).</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="inkmap.PatchRegions.placement">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">placement</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="inkmap.types.html#inkmap.types.Placement" title="inkmap.types.Placement"><span class="pre">Placement</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" rel="nofollow noopener" title="(in Python v3.15)"><span class="pre">None</span><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.PatchRegions.placement" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.PatchRegions.placement'">¶</a></dt>
+<dd><p>The patch and its substrate ring as a placement, or <code class="docutils literal notranslate"><span class="pre">None</span></code> without a quad.</p>
+<p>The model is the patch as foreground inside a border of background as wide as
+the substrate ring’s outer edge, in units of about one pixel. So
+<code class="xref py py-func docutils literal notranslate"><span class="pre">inkmap.analyze()</span></code> and <a class="reference internal" href="#inkmap.measure" title="inkmap.measure"><code class="xref py py-func docutils literal notranslate"><span class="pre">inkmap.measure()</span></code></a> treat the patch as any other
+mark, and <code class="docutils literal notranslate"><span class="pre">measure</span></code> compares the patch with the substrate round it. The
+placement’s <code class="docutils literal notranslate"><span class="pre">quad</span></code> is that bordered model’s, not the patch’s: the patch’s own
+corners are <code class="xref py py-attr docutils literal notranslate"><span class="pre">quad</span></code>. <code class="docutils literal notranslate"><span class="pre">measure</span></code> averages the whole border, background
+and all, where <code class="xref py py-attr docutils literal notranslate"><span class="pre">substrate</span></code> keeps only its paper-like pixels: on a thin
+paper border, measure with <code class="xref py py-attr docutils literal notranslate"><span class="pre">substrate</span></code> instead.</p>
 </dd></dl>
 </dd></dl>
 <dl class="py class">
@@ -717,6 +754,32 @@ the coarse pass misses entirely is not recovered: lower the downscaling instead.
 </dl>
 </dd></dl>
 <dl class="py function">
+<dt class="sig sig-object py" id="inkmap.locate_patch">
+<span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">locate_patch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'centre'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed_share</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_delta_e</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_delta_e</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_margin_share</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ring_share</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.02,</span> <span class="pre">0.06)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_area_share</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_rectangularity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.85</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_substrate_px</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_substrate_lift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_substrate_chroma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_side_share</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_edge_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/locate/patch.html#locate_patch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.locate_patch" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.locate_patch'">¶</a></dt>
+<dd><p>The uniform patch at <code class="docutils literal notranslate"><span class="pre">seed</span></code>, and the ring of substrate just outside it.</p>
+<p><code class="docutils literal notranslate"><span class="pre">image</span></code> is a path, a BGR (or BGRA) array, or a grey array, 8-bit. <code class="docutils literal notranslate"><span class="pre">seed</span></code> is
+<code class="docutils literal notranslate"><span class="pre">"centre"</span></code> or an <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> pixel inside the patch; its colour is the median of a
+window <code class="docutils literal notranslate"><span class="pre">seed_share</span></code> of the frame’s shorter side across. Pixels within the Otsu
+split of the CIELAB distance to it, clamped to <code class="docutils literal notranslate"><span class="pre">[min_delta_e,</span> <span class="pre">max_delta_e]</span></code>, are
+candidates, and the connected candidate region at the seed is the patch.</p>
+<p><code class="docutils literal notranslate"><span class="pre">edge_margin_share</span></code> erodes the interior, and <code class="docutils literal notranslate"><span class="pre">ring_share</span></code> places the
+substrate ring, both as shares of the patch’s shorter side. The verdict fails, with
+a note saying why, when the patch is under <code class="docutils literal notranslate"><span class="pre">min_area_share</span></code> of the frame, less
+rectangular than <code class="docutils literal notranslate"><span class="pre">min_rectangularity</span></code> (area over its minimum-area rectangle’s:
+where a pale patch leaked into the paper), cut by the frame’s edge, or when the
+ring holds under <code class="docutils literal notranslate"><span class="pre">min_substrate_px</span></code> pixels of substrate, substrate no lighter than
+the patch by <code class="docutils literal notranslate"><span class="pre">min_substrate_lift</span></code> L*, or substrate on fewer than three sides
+(<code class="docutils literal notranslate"><span class="pre">min_side_share</span></code> of that side’s ring each), or when a side of the patch has no
+colour step of <code class="docutils literal notranslate"><span class="pre">min_edge_step</span></code> across it – the sign of a region that leaked into
+shaded paper. A failed verdict on a leaked region is retried at a tighter
+threshold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#inkmap.PatchRegions" title="inkmap.locate.patch.PatchRegions"><code class="xref py py-class docutils literal notranslate"><span class="pre">PatchRegions</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
 <dt class="sig sig-object py" id="inkmap.measurability">
 <span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">measurability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ink_map</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_pixels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/photometry.html#measurability"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.measurability" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.measurability'">¶</a></dt>
 <dd><p>Judge whether a foreground/background measurement can be trusted here.</p>
@@ -896,6 +959,10 @@ arithmetic that claims to be about light.</p>
 <li><a :data-current="activeSection === '#inkmap.Model.occupancy'" class="reference internal" href="#inkmap.Model.occupancy"><code class="docutils literal notranslate"><span class="pre">Model.occupancy()</span></code></a></li>
 </ul>
 </li>
+<li><a :data-current="activeSection === '#inkmap.PatchRegions'" class="reference internal" href="#inkmap.PatchRegions"><code class="docutils literal notranslate"><span class="pre">PatchRegions</span></code></a><ul>
+<li><a :data-current="activeSection === '#inkmap.PatchRegions.placement'" class="reference internal" href="#inkmap.PatchRegions.placement"><code class="docutils literal notranslate"><span class="pre">PatchRegions.placement</span></code></a></li>
+</ul>
+</li>
 <li><a :data-current="activeSection === '#inkmap.Placement'" class="reference internal" href="#inkmap.Placement"><code class="docutils literal notranslate"><span class="pre">Placement</span></code></a><ul>
 <li><a :data-current="activeSection === '#inkmap.Placement.locator'" class="reference internal" href="#inkmap.Placement.locator"><code class="docutils literal notranslate"><span class="pre">Placement.locator</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.Placement.payload'" class="reference internal" href="#inkmap.Placement.payload"><code class="docutils literal notranslate"><span class="pre">Placement.payload</span></code></a></li>
@@ -930,6 +997,7 @@ arithmetic that claims to be about light.</p>
 <li><a :data-current="activeSection === '#inkmap.find_square_marks'" class="reference internal" href="#inkmap.find_square_marks"><code class="docutils literal notranslate"><span class="pre">find_square_marks()</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.foreground'" class="reference internal" href="#inkmap.foreground"><code class="docutils literal notranslate"><span class="pre">foreground()</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.locate'" class="reference internal" href="#inkmap.locate"><code class="docutils literal notranslate"><span class="pre">locate()</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.locate_patch'" class="reference internal" href="#inkmap.locate_patch"><code class="docutils literal notranslate"><span class="pre">locate_patch()</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.measurability'" class="reference internal" href="#inkmap.measurability"><code class="docutils literal notranslate"><span class="pre">measurability()</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.measure'" class="reference internal" href="#inkmap.measure"><code class="docutils literal notranslate"><span class="pre">measure()</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.measurement_mask'" class="reference internal" href="#inkmap.measurement_mask"><code class="docutils literal notranslate"><span class="pre">measurement_mask()</span></code></a></li>
@@ -950,7 +1018,7 @@ arithmetic that claims to be about light.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=fd825880"></script>
+<script src="../_static/documentation_options.js?v=59fadc99"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

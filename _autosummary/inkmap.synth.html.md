@@ -26,11 +26,31 @@ Real photographs remain essential for *detection* rate – see [`inkmap.corpus`]
 | [`degrade`](#inkmap.synth.degrade)(image, \*[, blur, noise, gradient, ...]) | Apply a capture-order degradation chain to a float image, returning uint8.                                             |
 | [`nested_square`](#inkmap.synth.nested_square)(side[, rings])                     | A square mark as a `(side, side)` cell grid: foreground, then alternating rings.                                       |
 | [`mark_sheet`](#inkmap.synth.mark_sheet)()                                     | A card of square registration marks, and where each one's centre truly is.                                             |
+| [`render_patch`](#inkmap.synth.render_patch)(\*[, size, patch_bgr, ...])         | Render a uniform colour patch centred on a paper strip, over a background.                                             |
 
 ### Classes
 
-| [`Scene`](#inkmap.synth.Scene)(image, coverage, transform, model[, ...])   | A synthetic image together with the truth used to make it.   |
-|----------------------------------------------------------------------------------------------------|--------------------------------------------------------------|
+| [`Scene`](#inkmap.synth.Scene)(image, coverage, transform, model[, ...])   | A synthetic image together with the truth used to make it.                        |
+|----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| [`PatchScene`](#inkmap.synth.PatchScene)(image, patch_quad, paper_quad[, ...])  | A synthetic colour photograph of a printed patch on a paper strip, and its truth. |
+
+### *class* inkmap.synth.PatchScene(image, patch_quad, paper_quad, params=dict())
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A synthetic colour photograph of a printed patch on a paper strip, and its truth.
+
+#### image *: ndarray*
+
+(H, W, 3) uint8 BGR.
+
+#### paper_quad *: ndarray*
+
+(4, 2) true image corners of the paper strip, in the same order.
+
+#### patch_quad *: ndarray*
+
+(4, 2) true image corners of the patch, clockwise from its top-left.
 
 ### *class* inkmap.synth.Scene(image, coverage, transform, model, params=dict())
 
@@ -120,3 +140,19 @@ fractional illumination falloff across the frame.
 
 * **Return type:**
   [`Scene`](#inkmap.synth.Scene)
+
+### inkmap.synth.render_patch(, size=(600, 800), patch_bgr=(60.0, 110.0, 200.0), paper_bgr=(232.0, 236.0, 238.0), background_bgr=(70.0, 80.0, 95.0), patch_size=(40.0, 24.0), paper_size=(100.0, 32.0), pixels_per_unit=6.0, centre=None, perspective=0.0, rotation=0.0, blur=0.0, noise=0.0, gradient=0.0, background_texture=0.0, supersample=8, rng=None)
+
+Render a uniform colour patch centred on a paper strip, over a background.
+
+Model space is the strip’s own, in units: a `paper_size` strip with a
+`patch_size` patch at its centre, mapped into the frame at `pixels_per_unit`
+around `centre` (the frame’s centre by default), then rotated by `rotation`
+degrees and its corners jittered by `perspective` of the strip’s span. Edges are
+anti-aliased by drawing at `supersample` times the resolution and area-averaging,
+so the true patch quad is exact to that sampling. `background_texture` adds
+low-frequency blotches of that many grey levels to the background (a table, a
+cloth). Degradations then apply per channel, as in [`degrade()`](#inkmap.synth.degrade).
+
+* **Return type:**
+  [`PatchScene`](#inkmap.synth.PatchScene)
