@@ -219,7 +219,8 @@ def test_text_on_the_patch_is_left_out_of_the_interior():
     scene = synth.render_patch(rotation=0.0, rng=1)
     image = scene.image.copy()
     ink = np.zeros(image.shape[:2], np.uint8)
-    cv2.putText(ink, "C-42", (330, 320), cv2.FONT_HERSHEY_SIMPLEX, 1.6, 1, 3)
+    # Clear of the seed at the frame centre (400, 300): text under the seed is refused.
+    cv2.putText(ink, "C-42", (300, 272), cv2.FONT_HERSHEY_SIMPLEX, 1.0, 1, 2)
     image[ink.astype(bool)] = 20
     image = cv2.GaussianBlur(image, (0, 0), 1.0)
     regions = locate_patch(image)
