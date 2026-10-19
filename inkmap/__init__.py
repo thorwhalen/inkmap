@@ -52,7 +52,14 @@ import numpy as np
 
 from . import config, coverage as _coverage, geometry, models, photometry
 from .coverage import confidence, coverage_map, measurement_weight, observed_coverage
-from .locate import LOCATORS, locate, place, validated_scale
+from .locate import (
+    LOCATORS,
+    SquareMark,
+    find_square_marks,
+    locate,
+    place,
+    validated_scale,
+)
 from .models import Model
 from .photometry import (
     Measurability,
@@ -103,6 +110,8 @@ __all__ = [
     "measurement_weight",
     "locate",
     "LOCATORS",
+    "find_square_marks",
+    "SquareMark",
     "models",
     "geometry",
     "photometry",

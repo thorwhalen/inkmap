@@ -6,6 +6,7 @@ and no cached corpus; the real-photograph figures come from ``scripts/corpus_eva
 
 from __future__ import annotations
 
+import cv2
 import numpy as np
 
 import inkmap
@@ -157,8 +158,97 @@ def blur_estimation() -> None:
         )
 
 
+def square_marks() -> None:
+    """Centre error of find_square_marks on synth.mark_sheet, rotated and in perspective."""
+    from inkmap.locate import BULLSEYE_RINGS, QR_FINDER_RINGS, find_square_marks
+
+    print("\n## Square registration marks")
+    print(
+        "\n| rotation | perspective | blur (px) | marks found | misclassified "
+        "| false marks | centre error median (px) | p95 (px) | max (px) |"
+    )
+    print("|---|---|---|---|---|---|---|---|---|")
+    model, truth = synth.mark_sheet()
+    kinds = (BULLSEYE_RINGS, QR_FINDER_RINGS)
+    # Axis-aligned is the hard case for sub-pixel edges: the pixel grid's quantisation
+    # does not average out along a side that runs with it.
+    conditions = [
+        (rot, persp, blur)
+        for rot in ("random", "0°")
+        for persp in (0.0, 0.05, 0.1, 0.15)
+        for blur in ((0.5, 1.0, 1.5, 2.0) if rot == "random" else (1.0, 1.5))
+    ]
+    for rot, perspective, blur in conditions:
+        errors, expected, found_n, wrong, extra = [], 0, 0, 0, 0
+        for t in range(TRIALS):
+            rotation = (
+                float(np.random.default_rng(t).uniform(-180, 180))
+                if rot == "random"
+                else 0.0
+            )
+            scene = synth.render(
+                model,
+                size=(900, 1200),
+                pixels_per_unit=1.2,
+                perspective=perspective,
+                rotation=rotation,
+                blur=blur,
+                noise=2,
+                samples=4,
+                rng=t,
+            )
+            h, w = scene.image.shape
+            marks = find_square_marks(scene.image)
+            centres = cv2.perspectiveTransform(
+                np.float32([c for c, _ in truth])[:, None], scene.transform
+            )[:, 0]
+            # A false mark is one near no mark of the sheet's, in the frame or not.
+            extra += sum(np.hypot(*(centres - m.centre).T).min() > 2.0 for m in marks)
+            for (u, v), rings in truth:
+                sq = np.float32(
+                    [
+                        [u - 25, v - 25],
+                        [u + 25, v - 25],
+                        [u + 25, v + 25],
+                        [u - 25, v + 25],
+                    ]
+                )
+                q = cv2.perspectiveTransform(sq[:, None], scene.transform)[:, 0]
+                if q.min() < 4 or (q[:, 0] > w - 4).any() or (q[:, 1] > h - 4).any():
+                    continue  # cut by the frame: correctly not reported
+                expected += 1
+                c = cv2.perspectiveTransform(np.float32([[[u, v]]]), scene.transform)[
+                    0, 0
+                ]
+                d = [np.hypot(*np.subtract(m.centre, c)) for m in marks]
+                if not d or min(d) > 2.0:
+                    continue
+                k = int(np.argmin(d))
+                found_n += 1
+                errors.append(d[k])
+                m = marks[k]
+                kind = () if m.is_solid else min(kinds, key=m.ring_error)
+                wrong += kind != rings
+        e = np.array(errors)
+        print(
+            f"| {rot} | {perspective:.2f} | {blur:.1f} | {found_n}/{expected} | {wrong} "
+            f"| {extra} | {np.median(e):.3f} | {np.percentile(e, 95):.3f} "
+            f"| {e.max():.3f} |"
+        )
+
+
+SECTIONS = {
+    "geometry": geometry_accuracy,
+    "coverage": coverage_accuracy,
+    "photometry": photometric_bias,
+    "blur": blur_estimation,
+    "marks": square_marks,
+}
+
+
 if __name__ == "__main__":
-    geometry_accuracy()
-    coverage_accuracy()
-    photometric_bias()
-    blur_estimation()
+    import sys
+
+    # ``python scripts/validate.py marks`` runs one section; no argument runs them all.
+    for name in sys.argv[1:] or SECTIONS:
+        SECTIONS[name]()
