@@ -173,3 +173,101 @@ def test_public_surface():
     assert {"locate_patch", "PatchRegions"} <= set(locate.__all__)
     assert inkmap.locate_patch is locate_patch
     assert inkmap.PatchRegions is PatchRegions
+
+
+# --------------------------------------------------------------------------- #
+# Regressions from the adversarial review: each was an ok=True on a wrong region
+# --------------------------------------------------------------------------- #
+
+
+def test_a_seed_near_the_patch_edge_still_takes_the_patch_colour():
+    """A seed window straddling the edge took the paper's colour: the strip came back."""
+    scene = synth.render_patch(
+        patch_bgr=(205, 215, 225), background_bgr=(245, 245, 245), blur=1.0,
+        noise=2.0, rng=0,
+    )  # the patch spans x 280..520
+    regions = locate_patch(scene.image, seed=(515, 300))
+    assert regions.ok, regions.notes
+    assert _corner_error(regions.quad, scene.patch_quad) < MAX_CORNER_ERROR_PX
+
+
+def test_a_region_holding_another_colour_is_refused():
+    """Seeded on the paper of a strip lying on a white page: the strip is no patch."""
+    scene = synth.render_patch(
+        patch_bgr=(205, 215, 225), background_bgr=(250, 250, 250), blur=1.0,
+        noise=2.0, rng=0,
+    )
+    regions = locate_patch(scene.image, seed=(200, 300))  # on the strip, off the patch
+    assert not regions.ok
+    assert any("another colour" in n or "two colours" in n for n in regions.notes)
+
+
+def test_a_neighbouring_light_patch_is_not_substrate():
+    """A colour bar: a light-grey patch butting onto the measured one."""
+    scene = synth.render_patch(rotation=0.0, blur=1.0, noise=2.0, rng=1)
+    image = scene.image.copy()
+    image[228:373, 521:600] = 195  # x 520..600 on the paper strip, beside the patch
+    image = cv2.GaussianBlur(image, (0, 0), 1.0)
+    regions = locate_patch(image)
+    assert regions.ok, regions.notes
+    neighbour = np.zeros(image.shape[:2], bool)
+    neighbour[226:375, 519:602] = True
+    assert (regions.substrate & neighbour).sum() < 0.01 * regions.substrate.sum()
+
+
+def test_text_on_the_patch_is_left_out_of_the_interior():
+    scene = synth.render_patch(rotation=0.0, rng=1)
+    image = scene.image.copy()
+    ink = np.zeros(image.shape[:2], np.uint8)
+    cv2.putText(ink, "C-42", (330, 320), cv2.FONT_HERSHEY_SIMPLEX, 1.6, 1, 3)
+    image[ink.astype(bool)] = 20
+    image = cv2.GaussianBlur(image, (0, 0), 1.0)
+    regions = locate_patch(image)
+    assert regions.ok, regions.notes
+    text = cv2.dilate(ink, np.ones((3, 3), np.uint8)).astype(bool)
+    assert not (regions.patch & text).any()
+
+
+def _card(draw):
+    """A strip of paper on a table, with ``draw(image)`` painting the patch."""
+    image = np.full((600, 800, 3), (70, 80, 95), np.uint8)
+    image[150:450, 100:700] = (232, 236, 238)
+    draw(image)
+    return cv2.GaussianBlur(image, (0, 0), 1.0)
+
+
+def _rounded(radius):
+    def draw(image, colour=(160, 90, 40), box=(280, 240, 520, 360)):
+        x0, y0, x1, y1 = box
+        cv2.rectangle(image, (x0 + radius, y0), (x1 - radius, y1), colour, -1)
+        cv2.rectangle(image, (x0, y0 + radius), (x1, y1 - radius), colour, -1)
+        for cx in (x0 + radius, x1 - radius):
+            for cy in (y0 + radius, y1 - radius):
+                cv2.circle(image, (cx, cy), radius, colour, -1)
+
+    return draw
+
+
+@pytest.mark.parametrize(
+    "draw",
+    [
+        lambda im: cv2.ellipse(im, (400, 300), (120, 72), 0, 0, 360, (160, 90, 40), -1),
+        _rounded(25),
+    ],
+    ids=["ellipse", "rounded r=25"],
+)
+def test_non_rectangular_patches_are_refused(draw):
+    regions = locate_patch(_card(draw))
+    assert not regions.ok
+    assert any("strays" in n or "rectangularity" in n for n in regions.notes)
+
+
+def test_slightly_rounded_corners_are_still_a_patch():
+    assert locate_patch(_card(_rounded(6))).ok
+
+
+def test_non_finite_and_malformed_seeds_are_errors():
+    image = synth.render_patch(rng=0).image
+    for seed in [(np.nan, 10), (10, 20, 30)]:
+        with pytest.raises(ValueError, match="finite"):
+            locate_patch(image, seed=seed)

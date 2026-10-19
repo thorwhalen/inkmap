@@ -193,8 +193,9 @@ MARK_SOLID_SIGMA_FLOOR_PX = 0.015
 # --- Plain patches ----------------------------------------------------------- #
 
 #: The patch colour is the median over a window this share of the frame's shorter side
-#: across, round the seed.
-PATCH_SEED_SHARE = 0.1
+#: across, round the seed. Small, so that a seed near the patch's edge still takes the
+#: patch's colour, not the paper's.
+PATCH_SEED_SHARE = 0.04
 
 #: The CIELAB distance (Delta E) that splits patch from not-patch is Otsu's threshold,
 #: clamped to this range: below 4 the split follows noise, above 25 a pale patch leaks
@@ -254,3 +255,29 @@ PATCH_MIN_EDGE_CONTRAST = 3.0
 #: (pixels) along the side, rather than once for the whole side: uneven light moves it
 #: along a long side, which on a faint edge tilts the fitted line.
 PATCH_EDGE_LEVEL_WINDOW = 25
+
+#: The thresholded outline must lie within this many pixels of the fitted sides (95th
+#: percentile): a lobe leaked into shaded paper, or a rounded corner, strays further.
+PATCH_MAX_OUTLINE_DEVIATION_PX = 2.0
+
+#: Pixels of the interior that are not the patch's colour are always left out of it.
+#: The verdict fails when one connected blob of them covers more than this share of
+#: the interior (another patch, or the patch itself inside a region seeded on the
+#: paper: 7-8% in the cases seen), or when all of them together cover more than
+#: PATCH_MAX_OFF_COLOUR_SHARE (text, specks or glare obscuring the patch).
+PATCH_MAX_HOLE_SHARE = 0.05
+PATCH_MAX_OFF_COLOUR_SHARE = 0.25
+
+#: Substrate pixels must be within this Delta E of the ring's median paper colour: a
+#: neighbouring light-grey patch, or a white table, can pass for paper otherwise.
+PATCH_SUBSTRATE_MAX_DELTA_E = 8.0
+
+#: Interior pixels further from the seed colour than the patch's median distance plus
+#: this many robust deviations (1.4826 MAD) are left out, with a pixel round them:
+#: the fringe of text or glare on the patch.
+PATCH_INTERIOR_MADS = 4.0
+
+#: Two colours are distinct when their Otsu split along the principal axis is at least
+#: this many pooled deviations apart. One evenly spread population -- a patch under a
+#: lighting gradient -- scores about 3.5; a patch beside its paper, far more.
+PATCH_TWO_COLOUR_SEPARATION = 5.0

@@ -15,6 +15,10 @@ from inkmap.coverage import measurement_weight
 
 TRIALS = 12
 
+#: Scenes for the patch table are drawn from seeds never used while developing the
+#: locator (0-11 were), so the table is not tuned to its own test set.
+HELD_OUT_SEED = 1000
+
 
 def _corner_rms(estimated: np.ndarray, truth: np.ndarray, model) -> float:
     a = geometry.transform_to_quad(estimated, model)
@@ -268,7 +272,7 @@ def plain_patches() -> None:
         for perspective in (0.0, 0.05, 0.1):
             for blur in (1.0, 1.5):
                 ok, errors, spill, table = 0, [], 0, 0
-                for t in range(TRIALS):
+                for t in range(HELD_OUT_SEED, HELD_OUT_SEED + TRIALS):
                     rng = np.random.default_rng(t)
                     scene = synth.render_patch(
                         patch_bgr=bgr,

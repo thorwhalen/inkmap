@@ -235,46 +235,51 @@ def render_patch(
     paper_quad, patch_quad = to_image(paper_uv), to_image(patch_uv)
 
     k = int(supersample)
-    big = np.empty((height * k, width * k, 3), dtype=np.float32)
-    big[:] = background_bgr
+    image = np.empty((height, width, 3), dtype=np.float32)
+    image[:] = background_bgr
     if background_texture:
         blotches = cv2.resize(
             rng.normal(0.0, 1.0, (max(2, height // 40), max(2, width // 40))),
-            (width * k, height * k),
+            (width, height),
             interpolation=cv2.INTER_CUBIC,
         )
-        big += (background_texture * blotches)[..., None].astype(np.float32)
+        image += (background_texture * blotches)[..., None].astype(np.float32)
 
     def fill(quad, colour):
-        # Exact centre sampling: a sub-pixel is inside when its centre is on the inner
-        # side of all four edges. (cv2.fillConvexPoly includes both boundary rows, which
-        # widens the right and bottom edges by a sub-pixel: 1/8 px of bias at k = 8.)
-        # Sub-pixel j of pixel x is centred at x - 0.5 + (j + 0.5) / k.
-        lo = np.floor(quad.min(axis=0)).astype(int) - 1
-        hi = np.ceil(quad.max(axis=0)).astype(int) + 1
-        lo = np.maximum(lo, 0)
-        hi = np.minimum(hi, (width - 1, height - 1))
+        # Blend ``colour`` in by the exact area coverage of each pixel, from centre
+        # sampling k x k sub-pixels: one is inside when its centre is on the inner side
+        # of all four edges. Sub-pixel j of pixel x is centred at x - 0.5 + (j + 0.5)/k.
+        # (cv2.fillConvexPoly includes both boundary rows, which would widen the right
+        # and bottom edges by a sub-pixel.) Only the quad's bounding box is sampled.
+        lo = np.maximum(np.floor(quad.min(axis=0)).astype(int) - 1, 0)
+        hi = np.minimum(
+            np.ceil(quad.max(axis=0)).astype(int) + 1, (width - 1, height - 1)
+        )
         if (hi < lo).any():
             return
-        xs = np.arange(lo[0] * k, (hi[0] + 1) * k)
-        ys = np.arange(lo[1] * k, (hi[1] + 1) * k)
-        gx, gy = np.meshgrid((xs + 0.5) / k - 0.5, (ys + 0.5) / k - 0.5)
+        offsets = (np.arange(k) + 0.5) / k - 0.5
+        gx = (np.arange(lo[0], hi[0] + 1)[:, None] + offsets).ravel()
         orientation = np.sign(
             np.sum(
                 quad[:, 0] * np.roll(quad[:, 1], -1)
                 - np.roll(quad[:, 0], -1) * quad[:, 1]
             )
         )
-        inside = np.ones(gx.shape, dtype=bool)
-        for (ax, ay), (bx, by) in zip(quad, np.roll(quad, -1, axis=0)):
-            cross = (bx - ax) * (gy - ay) - (by - ay) * (gx - ax)
-            inside &= orientation * cross >= 0
-        block = big[ys[0] : ys[-1] + 1, xs[0] : xs[-1] + 1]
-        block[inside] = colour
+        colour = np.asarray(colour, np.float32)
+        cols = hi[0] - lo[0] + 1
+        for top in range(lo[1], hi[1] + 1, 16):  # row chunks keep memory bounded
+            bottom = min(top + 16, hi[1] + 1)
+            gy = (np.arange(top, bottom)[:, None] + offsets).ravel()
+            inside = np.ones((gy.size, gx.size), dtype=bool)
+            for (ax, ay), (bx, by) in zip(quad, np.roll(quad, -1, axis=0)):
+                cross = (bx - ax) * (gy[:, None] - ay) - (by - ay) * (gx[None, :] - ax)
+                inside &= orientation * cross >= 0
+            coverage = inside.reshape(bottom - top, k, cols, k).mean(axis=(1, 3))
+            block = image[top:bottom, lo[0] : hi[0] + 1]
+            block[:] = block * (1 - coverage[..., None]) + colour * coverage[..., None]
 
     fill(paper_quad, paper_bgr)
     fill(patch_quad, patch_bgr)
-    image = cv2.resize(big, (width, height), interpolation=cv2.INTER_AREA)
     channels = [
         degrade(
             image[..., i],
