@@ -12,6 +12,10 @@ For the many cases where the mark cannot be auto-detected -- a letter, a logo, a
 with no decoder in the world -- :func:`place` is the universal entry point: you supply
 the model and where its corners are, and the rest of the package proceeds identically.
 That is the seam that makes this work for "anything the user provides a model for".
+
+Plain registration marks -- solid squares and nested-square bullseyes, which carry no
+code to decode -- are found by :func:`find_square_marks`, which returns their
+projective sub-pixel centres rather than placements of a model.
 """
 
 from __future__ import annotations
@@ -26,6 +30,14 @@ from .. import config, geometry
 from ..models import Model
 from ..types import Placement
 from .barcode import locate_barcode_zxing
+from .marks import (
+    BULLSEYE_RINGS,
+    QR_FINDER_RINGS,
+    SquareMark,
+    find_square_marks,
+    quad_centre,
+    ring_ratios,
+)
 from .qr import locate_qr_aruco, locate_qr_opencv, locate_qr_zxing
 
 Locator = Callable[[np.ndarray, np.ndarray], list[Placement]]
@@ -40,6 +52,12 @@ __all__ = [
     "locate_qr_aruco",
     "locate_qr_zxing",
     "locate_barcode_zxing",
+    "find_square_marks",
+    "SquareMark",
+    "BULLSEYE_RINGS",
+    "QR_FINDER_RINGS",
+    "quad_centre",
+    "ring_ratios",
 ]
 
 #: Registry of locator strategies. Add your own: ``LOCATORS["mine"] = my_locator``.

@@ -30,7 +30,15 @@ from .coverage import coverage_map
 from .geometry import model_quad
 from .models import MatrixModel, Model
 
-__all__ = ["Scene", "render", "qr_model", "default_matrix", "degrade"]
+__all__ = [
+    "Scene",
+    "render",
+    "qr_model",
+    "default_matrix",
+    "degrade",
+    "nested_square",
+    "mark_sheet",
+]
 
 _DEFAULT_MATRIX_PATH = Path(__file__).parent / "data" / "default_qr.txt"
 
@@ -91,6 +99,60 @@ def qr_model(payload: str | None = None, *, error: str = "m") -> MatrixModel:
     qr = segno.make_qr(payload, error=error)
     cells = np.array([[bool(v) for v in row] for row in qr.matrix], dtype=bool)
     return MatrixModel(cells, metadata={"symbology": "QR Code", "payload": payload})
+
+
+def nested_square(side: int, rings: tuple[float, ...] = ()) -> np.ndarray:
+    """A square mark as a ``(side, side)`` cell grid: foreground, then alternating rings.
+
+    ``rings`` are the sides of the nested squares as fractions of ``side``, outermost
+    first, alternating background and foreground. Each must leave an equal whole number
+    of cells on both sides, or the mark would be off-centre -- that is an error.
+
+    >>> nested_square(7, (5 / 7, 3 / 7)).astype(int)[3]
+    array([1, 0, 1, 1, 1, 0, 1])
+    """
+    cells = np.ones((side, side), dtype=bool)
+    for k, ratio in enumerate(rings):
+        inner = round(side * ratio)
+        offset, odd = divmod(side - inner, 2)
+        if odd or abs(inner - side * ratio) > 1e-9:
+            raise ValueError(
+                f"a {side}-cell mark cannot hold a centred ring of {ratio} "
+                f"({side * ratio} cells); choose a side that makes it whole"
+            )
+        cells[offset : offset + inner, offset : offset + inner] = k % 2 == 1
+    return cells
+
+
+def mark_sheet() -> tuple[MatrixModel, list[tuple[tuple[float, float], tuple]]]:
+    """A card of square registration marks, and where each one's centre truly is.
+
+    Three bullseyes and a solid square at the corners, as on an OMR form, and two QR
+    finder patterns inside: 700 x 500 cells, marks 50 cells (42 for a finder). Render it
+    with :func:`render` at about 1.2 pixels per cell for ~60 px marks. Returns
+    ``(model, truth)``, ``truth`` being ``(centre_uv, rings)`` per mark in model units,
+    so ``cv2.perspectiveTransform`` through a scene's transform gives the true image
+    centres.
+    """
+    from .locate.marks import BULLSEYE_RINGS, QR_FINDER_RINGS
+
+    cells = np.zeros((500, 700), dtype=bool)
+    truth = []
+    bullseye = nested_square(50, BULLSEYE_RINGS)
+    finder = np.kron(nested_square(7, QR_FINDER_RINGS), np.ones((6, 6), dtype=bool))
+    layout = [
+        (bullseye, 30, 30, BULLSEYE_RINGS),
+        (bullseye, 30, 620, BULLSEYE_RINGS),
+        (bullseye, 420, 30, BULLSEYE_RINGS),
+        (np.ones((50, 50), dtype=bool), 420, 620, ()),
+        (finder, 200, 250, QR_FINDER_RINGS),
+        (finder, 250, 400, QR_FINDER_RINGS),
+    ]
+    for block, row, col, rings in layout:
+        rows, cols = block.shape
+        cells[row : row + rows, col : col + cols] = block
+        truth.append(((col + cols / 2.0, row + rows / 2.0), rings))
+    return MatrixModel(cells, metadata={"target": "square registration marks"}), truth
 
 
 def render(

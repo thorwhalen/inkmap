@@ -136,6 +136,43 @@ measurement: it means the modelled shape and the photograph do not correspond (b
 transform, wrong model, heavy damage), and reporting the boundary value would silently
 size the measurement margin from noise.
 
+## Square registration marks
+
+`inkmap.find_square_marks` on `synth.mark_sheet()`: three bullseyes (rings 0.64, 0.32) and a solid square at the corners of a card, two QR finder patterns (7:5:3) inside it, rendered at ~60 px per mark in a 1200 × 900 frame with noise σ = 2. Twelve scenes per row, at random in-plane rotations, and again axis-aligned (0°), which is the hard case for sub-pixel edges: along a side that runs with the pixel grid, quantisation does not average out. "Perspective" jitters each corner of the card by up to that share of its span. A mark cut by the frame is not expected, and is correctly not reported; a false mark is one near no true mark, or unlike the true mark it sits on (a clipped bullseye's inner square reported as solid). The error is the distance from the true projective centre, from the scene's own transform.
+
+| rotation | perspective | blur (px) | marks found | misclassified | false marks | centre error median (px) | p95 (px) | max (px) |
+|---|---|---|---|---|---|---|---|---|
+| random | 0.00 | 0.5 | 60/60 | 0 | 0 | 0.009 | 0.026 | 0.032 |
+| random | 0.00 | 1.0 | 60/60 | 0 | 0 | 0.006 | 0.030 | 0.040 |
+| random | 0.00 | 1.5 | 60/60 | 0 | 0 | 0.010 | 0.033 | 0.048 |
+| random | 0.00 | 2.0 | 60/60 | 0 | 0 | 0.016 | 0.035 | 0.070 |
+| random | 0.05 | 0.5 | 65/65 | 0 | 0 | 0.008 | 0.024 | 0.047 |
+| random | 0.05 | 1.0 | 65/65 | 0 | 0 | 0.008 | 0.016 | 0.019 |
+| random | 0.05 | 1.5 | 65/65 | 0 | 0 | 0.011 | 0.027 | 0.032 |
+| random | 0.05 | 2.0 | 65/65 | 0 | 0 | 0.018 | 0.033 | 0.055 |
+| random | 0.10 | 0.5 | 65/65 | 0 | 0 | 0.009 | 0.036 | 0.097 |
+| random | 0.10 | 1.0 | 65/65 | 0 | 0 | 0.008 | 0.027 | 0.048 |
+| random | 0.10 | 1.5 | 65/65 | 0 | 0 | 0.013 | 0.033 | 0.052 |
+| random | 0.10 | 2.0 | 63/65 | 0 | 0 | 0.020 | 0.045 | 0.051 |
+| random | 0.15 | 0.5 | 65/65 | 0 | 0 | 0.008 | 0.045 | 0.061 |
+| random | 0.15 | 1.0 | 65/65 | 0 | 0 | 0.010 | 0.052 | 0.066 |
+| random | 0.15 | 1.5 | 65/65 | 0 | 0 | 0.013 | 0.066 | 0.071 |
+| random | 0.15 | 2.0 | 64/65 | 0 | 0 | 0.023 | 0.068 | 0.085 |
+| 0° | 0.00 | 1.0 | 72/72 | 0 | 0 | 0.016 | 0.092 | 0.101 |
+| 0° | 0.00 | 1.5 | 72/72 | 0 | 0 | 0.017 | 0.073 | 0.082 |
+| 0° | 0.05 | 1.0 | 72/72 | 0 | 0 | 0.019 | 0.070 | 0.092 |
+| 0° | 0.05 | 1.5 | 72/72 | 0 | 0 | 0.018 | 0.057 | 0.077 |
+| 0° | 0.10 | 1.0 | 72/72 | 0 | 0 | 0.013 | 0.045 | 0.092 |
+| 0° | 0.10 | 1.5 | 72/72 | 0 | 0 | 0.013 | 0.053 | 0.104 |
+| 0° | 0.15 | 1.0 | 71/72 | 0 | 0 | 0.010 | 0.048 | 0.128 |
+| 0° | 0.15 | 1.5 | 70/72 | 0 | 0 | 0.013 | 0.049 | 0.118 |
+
+The two refinements that earn these numbers, measured on the same layout while developing: fitting each side to the grey image's mid-level edge crossings rather than to the binary contour's pixels (axis-aligned worst case 0.57 px → 0.16 px), and taking a nested mark's centre as the side-weighted mean of its squares' centres, which a homography maps to one point (nested worst case 0.16 px → 0.10 px). Reproduce with `python scripts/validate.py marks`.
+
+Where it stops: each ring must be several blur widths across. With the same layout at ~30 px per mark, blur 1.5 px merges a bullseye's rings and it is lost; marks over `max_side_share` of the frame (10% by default) are not looked for, since a mark wider than the local-mean window is hollowed by its own ink; raising it widens the window with it. A disc under ~10 px radius cannot be told from a square of its size, and a QR symbol's clusters of data modules come back as small solid marks.
+
+`sigma_px` is calibrated on these sheets (rotations, perspective up to 0.15, blur 0.7–1.5 px, noise 1–4) so that the median centre error over sigma is 1.09 for solid marks and 1.01 for nested ones. The tail is heavier than a Gaussian's: the 95th percentile of that ratio is 3–6, so weigh marks by sigma, but do not gate on it.
+
 ## Real photographs
 
 189 CC-licensed photographs of QR codes in the wild from Wikimedia Commons — signs,

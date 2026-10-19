@@ -92,3 +92,100 @@ LOCATE_RETRY_PADDING = 0.5
 #: and only from 4 px are they all right (synthetic pages, ``locate(scale=0.5)``).
 #: Such placements are re-located on a full-resolution crop. See ``locate``.
 MIN_COARSE_PIXELS_PER_FEATURE = 4.0
+
+# --- Square registration marks ---------------------------------------------- #
+
+#: A pixel is foreground when it is darker than this share of the local mean
+#: brightness. Relative rather than absolute, so that an unevenly lit sheet (3.5:1 from
+#: one side to the other) and a dim frame are binarised alike.
+MARK_DARK_SHARE = 0.72
+
+#: ...and darker than the local mean by at least this many grey levels (of 255).
+#: Without a floor, sensor noise on a near-black table is "darker than 72% of the local
+#: mean" everywhere, and the contour search drowns in blobs.
+MARK_MIN_CONTRAST = 6.0
+
+#: The local mean is taken over a window this share of the frame's shorter side: wider
+#: than any mark, so a mark's own ink does not raise the threshold inside it.
+MARK_LOCAL_WINDOW_SHARE = 0.12
+
+#: A contour within this many pixels of the frame's edge is cut by it. Its shape is not
+#: the mark's, and a clipped mark's centre is wrong by a share of its side, so it is
+#: dropped rather than measured.
+MARK_BORDER_PX = 2
+
+#: A contour is a quadrilateral when a polygon within this share of its perimeter fits
+#: it with four vertices (``cv2.approxPolyDP``'s epsilon).
+MARK_POLY_EPSILON_SHARE = 0.04
+
+#: A quadrilateral whose opposite sides differ by more than this factor is not a square
+#: seen at any plausible incidence.
+MARK_MAX_SIDE_RATIO = 2.5
+
+#: A hole smaller than this share of its square's area is noise: the square is solid.
+MARK_MIN_HOLE_AREA_SHARE = 0.02
+
+#: Contour points within this share of a side's length from either corner are left out
+#: of that side's line fit: the corner is where binarisation rounds the outline.
+MARK_CORNER_TRIM_SHARE = 0.15
+
+#: Each side's line is refined against the grey image along profiles this many pixels
+#: either side of it (and no more than MARK_EDGE_PROFILE_SHARE of the side's length),
+#: long enough to bracket a blurred edge, short enough not to reach a ring's next edge.
+MARK_EDGE_PROFILE_PX = 2.5
+MARK_EDGE_PROFILE_SHARE = 0.15
+
+#: Spacing of the samples along each edge profile, in pixels.
+MARK_EDGE_STEP_PX = 0.25
+
+#: Refinement passes per side. The first takes the line from the contour's quantised
+#: position to the edge; the second re-centres the profiles on it.
+MARK_EDGE_ITERATIONS = 2
+
+#: A refined edge crossing further than this from the fitted line (or three times the
+#: line's scatter, if larger) is an outlier -- a glare bite, a speck -- and is refitted
+#: without.
+MARK_EDGE_OUTLIER_PX = 0.75
+
+#: A quadrilateral whose refined sides scatter about their lines by more than this
+#: (rms, in pixels), or this share of its side if larger, is not a square: a disc's
+#: outline also fits four lines, but its scatter grows with its size (0.35 px for a
+#: 10 px radius, 1 px for 20 px), where a square's stays at the noise floor. A disc
+#: under ~10 px radius cannot be told from a square this way.
+MARK_MAX_SIDE_SCATTER_PX = 0.25
+MARK_MAX_SIDE_SCATTER_SHARE = 0.01
+
+#: The smallest square considered at all, in pixels on a side. Lower than any mark's
+#: own ``min_side_px``, because a nested mark's inner square is a third of its side and
+#: must be found for the mark to be.
+MARK_MIN_QUAD_SIDE_PX = 5.0
+
+#: The local-mean window is kept at least this many times the largest mark looked for
+#: (``max_side_share``): a mark wider than the window raises its own threshold and is
+#: hollowed by its own ink.
+MARK_WINDOW_OVER_MAX_SIDE = 1.2
+
+#: A square in a hole less than this many times its own area is the inner square of a
+#: nested mark (a bullseye's hole is 4x its inner square, a QR finder's 2.8x), not a
+#: mark of its own. A sheet's outline or a form's box holds its marks in a far larger
+#: hole.
+MARK_NESTED_HOLE_AREA_RATIO = 9.0
+
+#: A quadrilateral whose mean opposite-side lengths differ by more than this factor is
+#: a rectangle, not a square: 1.6 is a square seen at about 51 degrees of incidence.
+MARK_MAX_ASPECT = 1.6
+
+#: A solid square whose neighbourhood out to this many sides runs off the frame, and
+#: holds more than MARK_CLIP_GUARD_INK_SHARE foreground, may be the inner square of a
+#: nested mark the frame cuts, and is dropped. A bullseye's outer edge is 1.06 inner
+#: sides out from its inner square, a QR finder's 0.67.
+MARK_CLIP_GUARD_SHARE = 1.2
+MARK_CLIP_GUARD_INK_SHARE = 0.02
+
+#: ``sigma_px`` calibration, fitted on synthetic sheets (rotations, perspective up to
+#: 0.15, blur 0.7-1.5 px, noise 1-4) so that the median centre error is about sigma for
+#: both kinds of mark. A nested mark's term is this share of the rms distance of its
+#: squares' centres from their mean; a solid mark, with nothing to disagree with, gets
+#: this floor (its side-fit scatter alone understated its error ~4x).
+MARK_RING_SPREAD_SHARE = 0.5
+MARK_SOLID_SIGMA_FLOOR_PX = 0.015
