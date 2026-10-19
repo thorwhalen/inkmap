@@ -6,6 +6,11 @@
 ## Pages in this subsection
 
 - [inkmap](inkmap.html.md): inkmap – per-pixel foreground coverage for photographed marks.
+- [inkmap.locate](inkmap.locate.html.md): Locators: finding where a model sits in an image.
+- [inkmap.locate.barcode](inkmap.locate.barcode.html.md): Locating linear (1-D) barcodes.
+- [inkmap.locate.marks](inkmap.locate.marks.html.md): Find square registration marks: solid squares and nested squares, sub-pixel.
+- [inkmap.locate.patch](inkmap.locate.patch.html.md): Locate a plain printed patch – a uniform colour rectangle – and the substrate round it.
+- [inkmap.locate.qr](inkmap.locate.qr.html.md): Locating QR symbols: a cascade of interchangeable strategies.
 - [inkmap.models](inkmap.models.html.md): Shape models: what the foreground is expected to look like.
 - [inkmap.models.base](inkmap.models.base.html.md): What a &#42;model&#42; is, and how it becomes pixels.
 - [inkmap.models.freeform](inkmap.models.freeform.html.md): Models for shapes that are not on a grid: rasters, polygons, and text.

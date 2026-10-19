@@ -1,0 +1,19 @@
+inkmap.locate.patch
+===================
+
+.. automodule:: inkmap.locate.patch
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      locate_patch
+      locate_patch_centre
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      PatchRegions
+   

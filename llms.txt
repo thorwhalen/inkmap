@@ -8,6 +8,11 @@
 - [inkmap](index.html.md): Per-pixel foreground coverage for photographed marks.
 - [API reference](api.html.md): | &#96;inkmap&#96;   | inkmap -- per-pixel foreground coverage for photographed marks.   |
 - [inkmap](_autosummary/inkmap.html.md): inkmap – per-pixel foreground coverage for photographed marks.
+- [inkmap.locate](_autosummary/inkmap.locate.html.md): Locators: finding where a model sits in an image.
+- [inkmap.locate.barcode](_autosummary/inkmap.locate.barcode.html.md): Locating linear (1-D) barcodes.
+- [inkmap.locate.marks](_autosummary/inkmap.locate.marks.html.md): Find square registration marks: solid squares and nested squares, sub-pixel.
+- [inkmap.locate.patch](_autosummary/inkmap.locate.patch.html.md): Locate a plain printed patch – a uniform colour rectangle – and the substrate round it.
+- [inkmap.locate.qr](_autosummary/inkmap.locate.qr.html.md): Locating QR symbols: a cascade of interchangeable strategies.
 - [inkmap.models](_autosummary/inkmap.models.html.md): Shape models: what the foreground is expected to look like.
 - [inkmap.models.base](_autosummary/inkmap.models.base.html.md): What a &#42;model&#42; is, and how it becomes pixels.
 - [inkmap.models.freeform](_autosummary/inkmap.models.freeform.html.md): Models for shapes that are not on a grid: rasters, polygons, and text.
@@ -21,7 +26,7 @@
 - [inkmap.types](_autosummary/inkmap.types.html.md): The data types the whole package speaks in.
 - [inkmap.viz](_autosummary/inkmap.viz.html.md): Visual overlays, for checking that a result is actually right.
 - [For AI agents](ai-agents.html.md): &#96;inkmap&#96; ships artifacts for coding agents alongside its code. This page lists
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-19 12:49 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-19 13:07 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
 
 ## Optional
 

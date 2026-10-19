@@ -1,0 +1,15 @@
+inkmap.locate.qr
+================
+
+.. automodule:: inkmap.locate.qr
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      locate_qr_opencv
+      locate_qr_aruco
+      locate_qr_zxing
+      sample_matrix
+   

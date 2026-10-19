@@ -20,7 +20,6 @@
       observed_coverage
       confidence
       measurement_weight
-      locate
       find_square_marks
       locate_patch
    
@@ -44,6 +43,7 @@
    :toctree:
    :recursive:
 
+   locate
    models
    geometry
    photometry

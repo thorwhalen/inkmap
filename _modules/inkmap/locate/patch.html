@@ -114,6 +114,7 @@
   <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../_autosummary/inkmap.html">inkmap</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/inkmap.locate.html">inkmap.locate</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/inkmap.models.html">inkmap.models</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/inkmap.geometry.html">inkmap.geometry</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/inkmap.photometry.html">inkmap.photometry</a></li>
@@ -248,7 +249,7 @@
 </span><span id="line-70">
 </span><span id="line-71">
 <div class="viewcode-block" id="PatchRegions">
-<a class="viewcode-back" href="../../../_autosummary/inkmap.html#inkmap.PatchRegions">[docs]</a>
+<a class="viewcode-back" href="../../../_autosummary/inkmap.locate.patch.html#inkmap.PatchRegions">[docs]</a>
 </span><span id="line-72"><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </span><span id="line-73"><span class="k">class</span><span class="w"> </span><span class="nc">PatchRegions</span><span class="p">:</span>
 </span><span id="line-74"><span class="w">    </span><span class="sd">"""A located patch: masks over the frame, its geometry, and how far to trust them.</span>
@@ -332,7 +333,7 @@
 </span><span id="line-151">
 </span><span id="line-152">
 <div class="viewcode-block" id="locate_patch">
-<a class="viewcode-back" href="../../../_autosummary/inkmap.html#inkmap.locate_patch">[docs]</a>
+<a class="viewcode-back" href="../../../_autosummary/inkmap.locate.patch.html#inkmap.locate_patch">[docs]</a>
 </span><span id="line-153"><span class="k">def</span><span class="w"> </span><span class="nf">locate_patch</span><span class="p">(</span>
 </span><span id="line-154">    <span class="n">image</span><span class="p">,</span>
 </span><span id="line-155">    <span class="o">*</span><span class="p">,</span>
@@ -673,6 +674,8 @@
 </span><span id="line-489">    <span class="k">return</span> <span class="p">((</span><span class="n">values</span> <span class="o">-</span> <span class="n">seed_value</span><span class="p">)</span> <span class="o">@</span> <span class="p">(</span><span class="n">direction</span> <span class="o">/</span> <span class="n">norm</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 </span><span id="line-490">
 </span><span id="line-491">
+<div class="viewcode-block" id="locate_patch_centre">
+<a class="viewcode-back" href="../../../_autosummary/inkmap.locate.patch.html#inkmap.locate_patch_centre">[docs]</a>
 </span><span id="line-492"><span class="k">def</span><span class="w"> </span><span class="nf">locate_patch_centre</span><span class="p">(</span><span class="n">bgr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">gray</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Placement</span><span class="p">]:</span>
 </span><span id="line-493"><span class="w">    </span><span class="sd">"""A :data:`~inkmap.locate.LOCATORS` strategy: the patch at the frame's centre.</span>
 </span><span id="line-494">
@@ -681,7 +684,8 @@
 </span><span id="line-497"><span class="sd">    verdict is ``ok``.</span>
 </span><span id="line-498"><span class="sd">    """</span>
 </span><span id="line-499">    <span class="n">regions</span> <span class="o">=</span> <span class="n">locate_patch</span><span class="p">(</span><span class="n">bgr</span><span class="p">)</span>
-</span><span id="line-500">    <span class="k">return</span> <span class="p">[</span><span class="n">regions</span><span class="o">.</span><span class="n">placement</span><span class="p">]</span> <span class="k">if</span> <span class="n">regions</span><span class="o">.</span><span class="n">ok</span> <span class="ow">and</span> <span class="n">regions</span><span class="o">.</span><span class="n">quad</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[]</span>
+</span><span id="line-500">    <span class="k">return</span> <span class="p">[</span><span class="n">regions</span><span class="o">.</span><span class="n">placement</span><span class="p">]</span> <span class="k">if</span> <span class="n">regions</span><span class="o">.</span><span class="n">ok</span> <span class="ow">and</span> <span class="n">regions</span><span class="o">.</span><span class="n">quad</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[]</span></div>
+
 </span><span id="line-501">
 </span><span id="line-502">
 </span><span id="line-503"><span class="k">def</span><span class="w"> </span><span class="nf">_seed_point</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">w</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">h</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
@@ -935,7 +939,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=59fadc99"></script>
+    <script src="../../../_static/documentation_options.js?v=6e0256f3"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

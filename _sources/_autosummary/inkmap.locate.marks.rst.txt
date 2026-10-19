@@ -1,0 +1,27 @@
+inkmap.locate.marks
+===================
+
+.. automodule:: inkmap.locate.marks
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      BULLSEYE_RINGS
+      QR_FINDER_RINGS
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      find_square_marks
+      ring_ratios
+      quad_centre
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      SquareMark
+   

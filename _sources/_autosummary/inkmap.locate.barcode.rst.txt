@@ -1,0 +1,13 @@
+inkmap.locate.barcode
+=====================
+
+.. automodule:: inkmap.locate.barcode
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      locate_barcode_zxing
+      profile_to_bars
+   

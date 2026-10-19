@@ -1,4 +1,4 @@
-> built 2026-10-19 12:49 UTC from 1342444 (main) · inkmap 0.1.5. Details: build_info.json
+> built 2026-10-19 13:07 UTC from 0fc1fd2 (main) · inkmap 0.1.6. Details: build_info.json
 
 # index.html.md
 
@@ -1146,7 +1146,6 @@ continuous value is **coverage**, after ISO 12647-2:2013 3.1 *area coverage*. Se
 | [`observed_coverage`](_autosummary/inkmap.html.md#inkmap.observed_coverage)(gray, placement, \*[, ...])      | Apparent coverage read from the photograph itself (Murray-Davies).             |
 | [`confidence`](_autosummary/inkmap.html.md#inkmap.confidence)(gray, placement, coverage, \*[, ...])   | How much to trust the coverage value at each pixel, in `[0, 1]`.               |
 | [`measurement_weight`](_autosummary/inkmap.html.md#inkmap.measurement_weight)(coverage, \*[, ...])            | Blur-aware weight in `[0, 1]`: how safe each pixel is to *measure*.            |
-| [`locate`](_autosummary/inkmap.html.md#inkmap.locate)(bgr, gray, \*[, locators, first_hit, ...])  | Run locator strategies and merge their results, de-duplicating by position.    |
 | [`find_square_marks`](_autosummary/inkmap.html.md#inkmap.find_square_marks)(gray, \*[, min_side_px, ...])    | Every solid or nested square mark in `gray` (2-D, 0-255 scale), largest first. |
 | [`locate_patch`](_autosummary/inkmap.html.md#inkmap.locate_patch)(image, \*[, seed, seed_share, ...])   | The uniform patch at `seed`, and the ring of substrate just outside it.        |
 
@@ -1529,7 +1528,7 @@ the placements back – several times faster on large photographs, with refineme
 restoring sub-pixel geometry. Codes need about 4 px per module *after* downscaling
 (`config.MIN_COARSE_PIXELS_PER_FEATURE`); those below are re-located at full
 resolution. `None` (default) locates at full resolution. See
-[`inkmap.locate()`](_autosummary/inkmap.html.md#inkmap.locate) (its `scale`). Ignored when `model`/`quad` are given.
+[`inkmap.locate.locate()`](_autosummary/inkmap.locate.html.md#inkmap.locate.locate) (its `scale`). Ignored when `model`/`quad` are given.
 
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`InkMap`](_autosummary/inkmap.types.html.md#inkmap.types.InkMap)]
@@ -1554,7 +1553,7 @@ printed glyphs come back as solid marks too. Telling the registration marks from
 them, by size, ring ratio and layout, is the caller’s.
 
 * **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`SquareMark`](_autosummary/inkmap.html.md#inkmap.SquareMark)]
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`SquareMark`](_autosummary/inkmap.locate.marks.html.md#inkmap.locate.marks.SquareMark)]
 
 ### inkmap.foreground(image, \*\*kwargs)
 
@@ -1566,58 +1565,6 @@ foreground”.
 
 * **Return type:**
   `ndarray`
-
-### inkmap.locate(bgr, gray, , locators=('qr_zxing', 'qr_aruco', 'qr_opencv', 'barcode_zxing'), first_hit=False, scale=None, full_res_retry=True)
-
-Run locator strategies and merge their results, de-duplicating by position.
-
-Strategies are tried in order. With `first_hit=True` the cascade stops at the
-first strategy that finds anything – cheaper, and usually right when you know there
-is one mark. Otherwise every strategy runs and results merge, which is what earns
-the recall when an image holds several marks that no single detector finds all of.
-
-**Coarse-to-fine.** `scale` (`0 < scale <= 1`) runs the cascade on a copy of the
-frame downscaled by that factor (`cv2.INTER_AREA`), then maps every placement back
-to full-resolution pixels. Locating costs roughly in proportion to pixel count, so
-on a 4000 x 3000 photograph 0.5 is about 4x faster and 0.35 about 7x. `None` (the
-default) or `1` locate at full resolution, exactly as without the argument.
-
-Every locator – a registered name or your own callable – is handed the
-*downscaled* `bgr` and `gray` (and, on a retry, a full-resolution crop), and
-must return placements in the coordinates of the frame it was given; mapping them
-back to the full frame is done here. A locator that bakes in absolute pixel sizes
-or positions will misbehave under `scale`.
-
-The mapping is one affine `A` (small -> full pixels), in the pixel-centre
-convention `cv2.resize` uses, `x_full = (x_small + 0.5) / scale - 0.5`, applied
-to both `quad` and `transform` (`A @ transform`). Locator name and payload are
-kept; `metadata["locate_scale"]` records the scale used. Corner conventions differ
-by locator (OpenCV’s are inclusive pixel indices, zxing’s are the continuous outer
-boundary), so a locator’s own half-pixel bias is magnified by `1 / scale` on the
-way up – a pixel or so at 0.5. That does not matter downstream when
-`inkmap.analyze()` refines (its default), which pins the transform to sub-pixel
-accuracy at full resolution anyway.
-
-**The model is the fragile part, not the geometry.** Locators read the model off
-the frame they are given – a QR’s module count and module matrix, a barcode’s bar
-pattern – and refinement cannot repair a wrong model, it only fits its geometry.
-Below about `config.MIN_COARSE_PIXELS_PER_FEATURE` (4) pixels per module in the
-downscaled frame those reads go wrong while the code still decodes: a 25 x 25 QR
-read as 21 x 21, or tens of flipped modules. So, with `full_res_retry` (default
-on; only meaningful with `scale < 1`), a coarse placement is re-located on a
-padded full-resolution crop around it when either its `payload` is `None` (found
-but not decoded – typically a small, far-away code) or its pixels per feature in
-the downscaled frame are under that floor. The full-resolution result replaces it
-(`metadata["locate_retry"]` names the reason, `"undecoded"` or
-`"undersampled"`, and `locate_scale` becomes 1.0). Crops are small, so this
-costs little; pick `scale` so your codes clear the floor (at 0.5, 8 px per module
-at full resolution) and it never triggers. A coarse placement under the floor that
-is kept anyway – `full_res_retry=False`, or the crop found nothing – carries
-`metadata["locate_undersampled"] = True`: treat its model as unreliable. A mark
-the coarse pass misses entirely is not recovered: lower the downscaling instead.
-
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Placement`](_autosummary/inkmap.types.html.md#inkmap.types.Placement)]
 
 ### inkmap.locate_patch(image, , seed='centre', seed_share=0.04, min_delta_e=4.0, max_delta_e=25.0, edge_margin_share=0.08, ring_share=(0.02, 0.06), min_area_share=0.01, min_rectangularity=0.85, min_substrate_px=50, min_substrate_lift=1.0, max_substrate_chroma=15.0, min_side_share=0.15, min_edge_step=3.0)
 
@@ -1642,7 +1589,7 @@ shaded paper. A failed verdict on a leaked region is retried at a tighter
 threshold.
 
 * **Return type:**
-  [`PatchRegions`](_autosummary/inkmap.html.md#inkmap.PatchRegions)
+  [`PatchRegions`](_autosummary/inkmap.locate.patch.html.md#inkmap.locate.patch.PatchRegions)
 
 ### inkmap.measurability(ink_map, , min_pixels=50)
 
@@ -1756,8 +1703,9 @@ The piecewise IEC 61966-2-1 curve, not the 2.2 power approximation.
 
 ### Modules
 
-| [`models`](_autosummary/inkmap.models.html.md#module-inkmap.models)         | Shape models: what the foreground is expected to look like.                                  |
+| [`locate`](_autosummary/inkmap.locate.html.md#module-inkmap.locate)         | Locators: finding where a model sits in an image.                                            |
 |--------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
+| [`models`](_autosummary/inkmap.models.html.md#module-inkmap.models)         | Shape models: what the foreground is expected to look like.                                  |
 | [`geometry`](_autosummary/inkmap.geometry.html.md#module-inkmap.geometry)     | Model space <-> image space: transforms, and refining them against the photograph.           |
 | [`photometry`](_autosummary/inkmap.photometry.html.md#module-inkmap.photometry) | Turning masks into measurements that are actually valid.                                     |
 | [`config`](_autosummary/inkmap.config.html.md#module-inkmap.config)         | Tunable defaults, in one place.                                                              |
@@ -1766,6 +1714,747 @@ The piecewise IEC 61966-2-1 curve, not the 2.2 power approximation.
 | [`synth`](_autosummary/inkmap.synth.html.md#module-inkmap.synth)           | Synthetic scenes with exact ground truth.                                                    |
 | [`types`](_autosummary/inkmap.types.html.md#module-inkmap.types)           | The data types the whole package speaks in.                                                  |
 | [`viz`](_autosummary/inkmap.viz.html.md#module-inkmap.viz)               | Visual overlays, for checking that a result is actually right.                               |
+
+
+# _autosummary/inkmap.locate.barcode.html.md
+
+# inkmap.locate.barcode
+
+Locating linear (1-D) barcodes.
+
+Geometry comes from zxing-cpp, which handles EAN-13/8, UPC-A/E, Code 128, Code 39,
+Code 93, ITF, Codabar and DataBar. The *bar pattern* is then read off the image rather
+than re-encoded from the decoded text, for the same reason as QR: encoders make choices
+(Code 128 code-set switching, check-digit placement, ITF padding) that the decoded
+string does not pin down, so re-encoding can silently produce a different pattern.
+
+Reading it from the image needs the module width – the narrowest bar. That is
+estimated from the run lengths of the thresholded profile, which is what a real decoder
+does, and it is the one number that turns a picture of stripes into a model.
+
+### Functions
+
+| [`locate_barcode_zxing`](_autosummary/inkmap.locate.barcode.html.md#inkmap.locate.barcode.locate_barcode_zxing)(bgr, gray)           | Locate linear barcodes with zxing-cpp and model their bar pattern.   |
+|--------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
+| [`profile_to_bars`](_autosummary/inkmap.locate.barcode.html.md#inkmap.locate.barcode.profile_to_bars)(profile, \*[, n_modules]) | Quantise a 1-D profile into a bar pattern.                           |
+
+### inkmap.locate.barcode.locate_barcode_zxing(bgr, gray)
+
+Locate linear barcodes with zxing-cpp and model their bar pattern.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Placement`](_autosummary/inkmap.types.html.md#inkmap.types.Placement)]
+
+### inkmap.locate.barcode.profile_to_bars(profile, , n_modules=None)
+
+Quantise a 1-D profile into a bar pattern.
+
+Returns `(bars, module_px)`. Thresholds at the midpoint of the profile’s range,
+per ISO/IEC 15416 3.5. `n_modules` pins the module count when the symbology fixes
+it; otherwise the module width is fitted from the run lengths.
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[`ndarray`, [`float`](https://docs.python.org/3/builtins/functions.html#float)] | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+
+# _autosummary/inkmap.locate.html.md
+
+# inkmap.locate
+
+Locators: finding where a model sits in an image.
+
+A locator is a plain function `(bgr, gray) -> list[Placement]`, so registering your
+own needs no subclassing:
+
+> from inkmap import locate
+
+> locate.LOCATORS[“mine”] = my_locator
+> inkmap.find_all(photo, locators=[“mine”, “qr_zxing”])
+
+For the many cases where the mark cannot be auto-detected – a letter, a logo, a shape
+with no decoder in the world – [`place()`](_autosummary/inkmap.locate.html.md#inkmap.locate.place) is the universal entry point: you supply
+the model and where its corners are, and the rest of the package proceeds identically.
+That is the seam that makes this work for “anything the user provides a model for”.
+
+Plain registration marks – solid squares and nested-square bullseyes, which carry no
+code to decode – are found by [`find_square_marks()`](_autosummary/inkmap.locate.html.md#inkmap.locate.find_square_marks), which returns their
+projective sub-pixel centres rather than placements of a model. A plain printed
+patch – a uniform colour rectangle, no code – and the ring of substrate round it are
+found by [`locate_patch()`](_autosummary/inkmap.locate.html.md#inkmap.locate.locate_patch), seeded at a point inside it.
+
+### Module Attributes
+
+| [`LOCATORS`](_autosummary/inkmap.locate.html.md#inkmap.locate.LOCATORS)   | `LOCATORS["mine"] = my_locator`.   |
+|-------------------------------------------------------------|------------------------------------|
+
+### Functions
+
+| [`locate`](_autosummary/inkmap.locate.html.md#inkmap.locate.locate)(bgr, gray, \*[, locators, first_hit, ...])   | Run locator strategies and merge their results, de-duplicating by position.                            |
+|------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
+| [`place`](_autosummary/inkmap.locate.html.md#inkmap.locate.place)(model, quad, \*[, ...])                       | Place a model at a known quadrilateral -- the universal escape hatch.                                  |
+| [`validated_scale`](_autosummary/inkmap.locate.html.md#inkmap.locate.validated_scale)(scale)                              | Check a locate scale; `None` means full resolution (and so does `1`).                                  |
+| [`locate_qr_opencv`](_autosummary/inkmap.locate.html.md#inkmap.locate.locate_qr_opencv)(bgr, gray)                         | OpenCV's classic `QRCodeDetector`.                                                                     |
+| [`locate_qr_aruco`](_autosummary/inkmap.locate.html.md#inkmap.locate.locate_qr_aruco)(bgr, gray)                          | OpenCV's `QRCodeDetectorAruco` -- finds the finder patterns as Aruco-like markers.                     |
+| [`locate_qr_zxing`](_autosummary/inkmap.locate.html.md#inkmap.locate.locate_qr_zxing)(bgr, gray)                          | zxing-cpp.                                                                                             |
+| [`locate_barcode_zxing`](_autosummary/inkmap.locate.html.md#inkmap.locate.locate_barcode_zxing)(bgr, gray)                     | Locate linear barcodes with zxing-cpp and model their bar pattern.                                     |
+| [`find_square_marks`](_autosummary/inkmap.locate.html.md#inkmap.locate.find_square_marks)(gray, \*[, min_side_px, ...])     | Every solid or nested square mark in `gray` (2-D, 0-255 scale), largest first.                         |
+| [`quad_centre`](_autosummary/inkmap.locate.html.md#inkmap.locate.quad_centre)(corners)                                | Where the diagonals of a quadrilateral cross: the projective centre of a square.                       |
+| [`ring_ratios`](_autosummary/inkmap.locate.html.md#inkmap.locate.ring_ratios)(outer_area, inner_areas)                | Side ratios of nested squares from their areas: `sqrt(inner / outer)`.                                 |
+| [`locate_patch`](_autosummary/inkmap.locate.html.md#inkmap.locate.locate_patch)(image, \*[, seed, seed_share, ...])    | The uniform patch at `seed`, and the ring of substrate just outside it.                                |
+| [`locate_patch_centre`](_autosummary/inkmap.locate.html.md#inkmap.locate.locate_patch_centre)(bgr, gray)                      | A [`LOCATORS`](_autosummary/inkmap.locate.html.md#inkmap.locate.LOCATORS) strategy: the patch at the frame's centre. |
+
+### Classes
+
+| [`SquareMark`](_autosummary/inkmap.locate.html.md#inkmap.locate.SquareMark)(centre, corners, side_px[, ...])      | One square mark found in an image.                                              |
+|---------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
+| [`PatchRegions`](_autosummary/inkmap.locate.html.md#inkmap.locate.PatchRegions)(patch, substrate, region, quad, ok) | A located patch: masks over the frame, its geometry, and how far to trust them. |
+
+### inkmap.locate.LOCATORS *: [dict](https://docs.python.org/3/builtins/stdtypes.html#dict)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Callable](https://docs.python.org/3/library/typing.html#typing.Callable)[[ndarray, ndarray], [list](https://docs.python.org/3/builtins/stdtypes.html#list)[[Placement](_autosummary/inkmap.types.html.md#inkmap.types.Placement)]]]* *= {'barcode_zxing': <function locate_barcode_zxing>, 'patch': <function locate_patch_centre>, 'qr_aruco': <function locate_qr_aruco>, 'qr_opencv': <function locate_qr_opencv>, 'qr_zxing': <function locate_qr_zxing>}*
+
+`LOCATORS["mine"] = my_locator`.
+
+* **Type:**
+  Registry of locator strategies. Add your own
+
+### *class* inkmap.locate.PatchRegions(patch, substrate, region, quad, ok, notes=(), seed_lab=(nan, nan, nan), threshold_delta_e=nan, area_share=0.0, rectangularity=0.0, touches_border=False, hole_share=0.0, outline_deviation_px=nan, substrate_px=0, ring_px=(0.0, 0.0))
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A located patch: masks over the frame, its geometry, and how far to trust them.
+
+`patch` is the interior, eroded clear of the edge; `substrate` a ring of bare
+substrate just outside; `region` the whole patch, uneroded. `quad` is the
+patch’s corners, clockwise as seen on screen from the one nearest the image’s
+top-left, to a fraction of a pixel when its sides could be fitted (`None` if no
+region was found). `ok` is `not notes`.
+
+The rest say why: `seed_lab` the patch colour, `threshold_delta_e` the split
+used, `area_share` of the frame, `rectangularity` (region over fitted quad),
+`outline_deviation_px` (95th percentile of the outline’s distance from the
+fitted sides), `hole_share` (share of the interior not the patch’s colour),
+`substrate_px`, and `ring_px` (the ring’s inner and outer distance).
+
+#### *property* placement *: [Placement](_autosummary/inkmap.types.html.md#inkmap.types.Placement) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+The patch and its substrate ring as a placement, or `None` without a quad.
+
+The model is the patch as foreground inside a border of background as wide as
+the substrate ring’s outer edge, in units of about one pixel. So
+`inkmap.analyze()` and [`inkmap.measure()`](_autosummary/inkmap.html.md#inkmap.measure) treat the patch as any other
+mark, and `measure` compares the patch with the substrate round it. The
+placement’s `quad` is that bordered model’s, not the patch’s: the patch’s own
+corners are `quad`. `measure` averages the whole border, background
+and all, where `substrate` keeps only its paper-like pixels: on a thin
+paper border, measure with `substrate` instead.
+
+### *class* inkmap.locate.SquareMark(centre, corners, side_px, rings=(), sigma_px=nan, centres=())
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One square mark found in an image. Coordinates are pixels, `(x, y)`.
+
+`corners` are the outer square’s, clockwise as seen on screen, starting from the
+one nearest the image’s top-left. A square has no intrinsic first corner, so that
+order is a convention, not an identification. `rings` is the side of each nested
+square as a fraction of the outer one, outermost first (empty for a solid mark).
+`centres` are the outer square’s centre followed by each nested square’s, each
+where that square’s diagonals cross; `centre` is their mean weighted by side,
+which for a solid mark is the outer square’s own.
+
+#### ring_error(expected)
+
+Largest difference between these ring ratios and `expected`; inf if unlike.
+
+```pycon
+>>> SquareMark((0, 0), np.zeros((4, 2)), 10.0, rings=(0.7, 0.4)).ring_error(
+...     QR_FINDER_RINGS
+... )
+0.028...
+>>> SquareMark((0, 0), np.zeros((4, 2)), 10.0).ring_error(BULLSEYE_RINGS)
+inf
+```
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
+### inkmap.locate.find_square_marks(gray, , min_side_px=8.0, max_side_share=0.1, polarity=Polarity.FOREGROUND_IS_DARK, dark_share=0.72, min_contrast=6.0, local_window_share=0.12)
+
+Every solid or nested square mark in `gray` (2-D, 0-255 scale), largest first.
+
+A mark’s outer square must be at least `min_side_px` on a side and at most
+`max_side_share` of the frame’s shorter side. Nested marks report their ring
+ratios; solid marks report none. `polarity` says whether the marks read darker
+than the substrate (the usual case) or brighter.
+
+The foreground is binarised relative to the local mean brightness: a pixel is
+foreground when it is darker than `dark_share` of the mean over a window
+`local_window_share` of the frame’s shorter side, and darker by at least
+`min_contrast` grey levels. The window is widened to stay wider than the largest
+mark looked for, since a mark wider than it is hollowed by its own ink.
+
+Anything square is a candidate: a QR symbol’s clusters of data modules and some
+printed glyphs come back as solid marks too. Telling the registration marks from
+them, by size, ring ratio and layout, is the caller’s.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`SquareMark`](_autosummary/inkmap.locate.marks.html.md#inkmap.locate.marks.SquareMark)]
+
+### inkmap.locate.locate(bgr, gray, , locators=('qr_zxing', 'qr_aruco', 'qr_opencv', 'barcode_zxing'), first_hit=False, scale=None, full_res_retry=True)
+
+Run locator strategies and merge their results, de-duplicating by position.
+
+Strategies are tried in order. With `first_hit=True` the cascade stops at the
+first strategy that finds anything – cheaper, and usually right when you know there
+is one mark. Otherwise every strategy runs and results merge, which is what earns
+the recall when an image holds several marks that no single detector finds all of.
+
+**Coarse-to-fine.** `scale` (`0 < scale <= 1`) runs the cascade on a copy of the
+frame downscaled by that factor (`cv2.INTER_AREA`), then maps every placement back
+to full-resolution pixels. Locating costs roughly in proportion to pixel count, so
+on a 4000 x 3000 photograph 0.5 is about 4x faster and 0.35 about 7x. `None` (the
+default) or `1` locate at full resolution, exactly as without the argument.
+
+Every locator – a registered name or your own callable – is handed the
+*downscaled* `bgr` and `gray` (and, on a retry, a full-resolution crop), and
+must return placements in the coordinates of the frame it was given; mapping them
+back to the full frame is done here. A locator that bakes in absolute pixel sizes
+or positions will misbehave under `scale`.
+
+The mapping is one affine `A` (small -> full pixels), in the pixel-centre
+convention `cv2.resize` uses, `x_full = (x_small + 0.5) / scale - 0.5`, applied
+to both `quad` and `transform` (`A @ transform`). Locator name and payload are
+kept; `metadata["locate_scale"]` records the scale used. Corner conventions differ
+by locator (OpenCV’s are inclusive pixel indices, zxing’s are the continuous outer
+boundary), so a locator’s own half-pixel bias is magnified by `1 / scale` on the
+way up – a pixel or so at 0.5. That does not matter downstream when
+`inkmap.analyze()` refines (its default), which pins the transform to sub-pixel
+accuracy at full resolution anyway.
+
+**The model is the fragile part, not the geometry.** Locators read the model off
+the frame they are given – a QR’s module count and module matrix, a barcode’s bar
+pattern – and refinement cannot repair a wrong model, it only fits its geometry.
+Below about `config.MIN_COARSE_PIXELS_PER_FEATURE` (4) pixels per module in the
+downscaled frame those reads go wrong while the code still decodes: a 25 x 25 QR
+read as 21 x 21, or tens of flipped modules. So, with `full_res_retry` (default
+on; only meaningful with `scale < 1`), a coarse placement is re-located on a
+padded full-resolution crop around it when either its `payload` is `None` (found
+but not decoded – typically a small, far-away code) or its pixels per feature in
+the downscaled frame are under that floor. The full-resolution result replaces it
+(`metadata["locate_retry"]` names the reason, `"undecoded"` or
+`"undersampled"`, and `locate_scale` becomes 1.0). Crops are small, so this
+costs little; pick `scale` so your codes clear the floor (at 0.5, 8 px per module
+at full resolution) and it never triggers. A coarse placement under the floor that
+is kept anyway – `full_res_retry=False`, or the crop found nothing – carries
+`metadata["locate_undersampled"] = True`: treat its model as unreliable. A mark
+the coarse pass misses entirely is not recovered: lower the downscaling instead.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Placement`](_autosummary/inkmap.types.html.md#inkmap.types.Placement)]
+
+### inkmap.locate.locate_barcode_zxing(bgr, gray)
+
+Locate linear barcodes with zxing-cpp and model their bar pattern.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Placement`](_autosummary/inkmap.types.html.md#inkmap.types.Placement)]
+
+### inkmap.locate.locate_patch(image, , seed='centre', seed_share=0.04, min_delta_e=4.0, max_delta_e=25.0, edge_margin_share=0.08, ring_share=(0.02, 0.06), min_area_share=0.01, min_rectangularity=0.85, min_substrate_px=50, min_substrate_lift=1.0, max_substrate_chroma=15.0, min_side_share=0.15, min_edge_step=3.0)
+
+The uniform patch at `seed`, and the ring of substrate just outside it.
+
+`image` is a path, a BGR (or BGRA) array, or a grey array, 8-bit. `seed` is
+`"centre"` or an `(x, y)` pixel inside the patch; its colour is the median of a
+window `seed_share` of the frame’s shorter side across. Pixels within the Otsu
+split of the CIELAB distance to it, clamped to `[min_delta_e, max_delta_e]`, are
+candidates, and the connected candidate region at the seed is the patch.
+
+`edge_margin_share` erodes the interior, and `ring_share` places the
+substrate ring, both as shares of the patch’s shorter side. The verdict fails, with
+a note saying why, when the patch is under `min_area_share` of the frame, less
+rectangular than `min_rectangularity` (area over its minimum-area rectangle’s:
+where a pale patch leaked into the paper), cut by the frame’s edge, or when the
+ring holds under `min_substrate_px` pixels of substrate, substrate no lighter than
+the patch by `min_substrate_lift` L\*, or substrate on fewer than three sides
+(`min_side_share` of that side’s ring each), or when a side of the patch has no
+colour step of `min_edge_step` across it – the sign of a region that leaked into
+shaded paper. A failed verdict on a leaked region is retried at a tighter
+threshold.
+
+* **Return type:**
+  [`PatchRegions`](_autosummary/inkmap.locate.patch.html.md#inkmap.locate.patch.PatchRegions)
+
+### inkmap.locate.locate_patch_centre(bgr, gray)
+
+A [`LOCATORS`](_autosummary/inkmap.locate.html.md#inkmap.locate.LOCATORS) strategy: the patch at the frame’s centre.
+
+Registered as `"patch"` but not in the default cascade, so
+`inkmap.find(photo, locators=["patch"])` opts in. Returns nothing unless the
+verdict is `ok`.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Placement`](_autosummary/inkmap.types.html.md#inkmap.types.Placement)]
+
+### inkmap.locate.locate_qr_aruco(bgr, gray)
+
+OpenCV’s `QRCodeDetectorAruco` – finds the finder patterns as Aruco-like
+markers. Notably more robust than the classic detector on real photographs.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Placement`](_autosummary/inkmap.types.html.md#inkmap.types.Placement)]
+
+### inkmap.locate.locate_qr_opencv(bgr, gray)
+
+OpenCV’s classic `QRCodeDetector`. Corners are inclusive pixel indices.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Placement`](_autosummary/inkmap.types.html.md#inkmap.types.Placement)]
+
+### inkmap.locate.locate_qr_zxing(bgr, gray)
+
+zxing-cpp. Highest recall of the three, and its corners are the continuous outer
+boundary (spanning exactly `N * scale`), not inclusive pixel indices.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Placement`](_autosummary/inkmap.types.html.md#inkmap.types.Placement)]
+
+### inkmap.locate.place(model, quad, , inclusive_pixel_corners=False, locator='manual', \*\*metadata)
+
+Place a model at a known quadrilateral – the universal escape hatch.
+
+`quad` is four `(x, y)` image points in the *model’s* own corner order: the
+point corresponding to model-space `(0, 0)` first, then clockwise. Order matters
+and is not inferred: sorting corners by image position silently mislabels them once
+the mark is rotated past 45 degrees.
+
+Use this for anything without a decoder – printed letters, logos, engraved marks –
+or when you already know where the mark is and only want the coverage machinery.
+
+* **Return type:**
+  [`Placement`](_autosummary/inkmap.types.html.md#inkmap.types.Placement)
+
+### inkmap.locate.quad_centre(corners)
+
+Where the diagonals of a quadrilateral cross: the projective centre of a square.
+
+`corners` must be in cyclic order (either direction). `None` if degenerate.
+
+```pycon
+>>> quad_centre([(0, 0), (4, 0), (4, 2), (0, 2)])
+(2.0, 1.0)
+```
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)] | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### inkmap.locate.ring_ratios(outer_area, inner_areas)
+
+Side ratios of nested squares from their areas: `sqrt(inner / outer)`.
+
+```pycon
+>>> ring_ratios(100.0, (64.0, 16.0))
+(0.8, 0.4)
+```
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
+
+### inkmap.locate.validated_scale(scale)
+
+Check a locate scale; `None` means full resolution (and so does `1`).
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### Modules
+
+| [`barcode`](_autosummary/inkmap.locate.barcode.html.md#module-inkmap.locate.barcode)   | Locating linear (1-D) barcodes.                                                           |
+|-----------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|
+| [`marks`](_autosummary/inkmap.locate.marks.html.md#module-inkmap.locate.marks)       | Find square registration marks: solid squares and nested squares, sub-pixel.              |
+| [`patch`](_autosummary/inkmap.locate.patch.html.md#module-inkmap.locate.patch)       | Locate a plain printed patch -- a uniform colour rectangle -- and the substrate round it. |
+| [`qr`](_autosummary/inkmap.locate.qr.html.md#module-inkmap.locate.qr)             | Locating QR symbols: a cascade of interchangeable strategies.                             |
+
+
+# _autosummary/inkmap.locate.marks.html.md
+
+# inkmap.locate.marks
+
+Find square registration marks: solid squares and nested squares, sub-pixel.
+
+The other locators here find marks that have a decoder. Printed targets also carry
+plain registration marks – a solid square, or a bullseye of nested squares at each
+corner of a sheet, as on OMR forms – and pose estimation needs their centres to a small
+fraction of a pixel. [`find_square_marks()`](_autosummary/inkmap.locate.marks.html.md#inkmap.locate.marks.find_square_marks) finds them:
+
+```default
+from inkmap.locate import BULLSEYE_RINGS, find_square_marks
+
+marks = find_square_marks(gray)
+bullseyes = [m for m in marks if m.ring_error(BULLSEYE_RINGS) < 0.06]
+bullseyes[0].centre, bullseyes[0].sigma_px
+```
+
+It knows what a square mark looks like, not which mark is which on a particular layout:
+naming them, by ring ratio and by where they sit relative to each other, is the
+caller’s.
+
+A **nested** mark is a foreground square holding a background square holding a
+foreground square. A bullseye (rings at 0.64 and 0.32 of the side) and a QR symbol’s
+finder pattern (7:5:3 modules) are both of this kind, and they are told apart by their
+ring ratios, which perspective barely changes. A **solid** mark is a foreground square
+with nothing inside it, and reports no rings.
+
+**Centres are projective.** The centre of a square seen in perspective is where its
+image’s diagonals cross, not the centroid of its pixels, which is pulled towards the
+near side. Each side is fitted as a line to its contour points, the corners are the
+lines’ intersections, and the centre is where the diagonals cross. The sides are
+placed on the grey image’s mid-level edge, not on the binarised outline, so the
+threshold does not move them: one that grew the foreground would move all four sides
+out alike, which leaves the diagonals’ crossing in place for a square seen head-on but
+not for one in strong perspective. The mid-level edge is exact for a linear sensor
+response; a gamma-encoded image moves a blurred edge a little (a worst centre error of
+0.16 px was measured at strong perspective and blur 2 px with gamma 1/2.2).
+
+**Uncertainty.** Each mark carries `sigma_px`, an estimate of how far its centre is
+from the truth: the scatter of the side fits over the square root of the points per
+side, combined, for a nested mark, with the disagreement between its squares’ centres
+(its centre is their side-weighted mean, since perspective maps them to one point),
+and for a solid mark, which has nothing to disagree with, with a fixed floor for the
+biases the fit cannot see. Both are calibrated on synthetic sheets so that the median
+centre error is about `sigma_px`; the tail is heavier than a Gaussian’s (one mark in
+twenty is off by 3-6 sigma), so weigh marks by it, but do not gate on it. A mark cut by
+the frame’s edge is dropped, never measured.
+
+**Limits.** Each ring must be several blur widths across to survive binarisation: at
+blur 1.5 px a bullseye needs roughly 40 px or more, a solid square 10 px. Marks over
+`max_side_share` of the frame (10% by default) are not looked for; raising it widens
+the local-mean window with it, which tolerates uneven lighting less well. A disc under
+about 10 px radius fits four lines as well as a square of its size does, so it cannot
+be told from one. Anything square is a candidate, so a QR symbol’s clusters of data
+modules come back as small solid marks.
+
+### Module Attributes
+
+| [`BULLSEYE_RINGS`](_autosummary/inkmap.locate.marks.html.md#inkmap.locate.marks.BULLSEYE_RINGS)   | background at 0.64, foreground at 0.32.                                           |
+|-------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| [`QR_FINDER_RINGS`](_autosummary/inkmap.locate.marks.html.md#inkmap.locate.marks.QR_FINDER_RINGS)  | 7 modules of foreground, 5 of background, 3 of foreground (ISO/IEC 18004 §6.3.3). |
+
+### Functions
+
+| [`find_square_marks`](_autosummary/inkmap.locate.marks.html.md#inkmap.locate.marks.find_square_marks)(gray, \*[, min_side_px, ...])   | Every solid or nested square mark in `gray` (2-D, 0-255 scale), largest first.   |
+|----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
+| [`ring_ratios`](_autosummary/inkmap.locate.marks.html.md#inkmap.locate.marks.ring_ratios)(outer_area, inner_areas)              | Side ratios of nested squares from their areas: `sqrt(inner / outer)`.           |
+| [`quad_centre`](_autosummary/inkmap.locate.marks.html.md#inkmap.locate.marks.quad_centre)(corners)                              | Where the diagonals of a quadrilateral cross: the projective centre of a square. |
+
+### Classes
+
+| [`SquareMark`](_autosummary/inkmap.locate.marks.html.md#inkmap.locate.marks.SquareMark)(centre, corners, side_px[, ...])   | One square mark found in an image.   |
+|------------------------------------------------------------------------------------------------|--------------------------------------|
+
+### inkmap.locate.marks.BULLSEYE_RINGS *= (0.64, 0.32)*
+
+background at
+0.64, foreground at 0.32.
+
+* **Type:**
+  Side of each inner square of a bullseye as a fraction of the outer
+
+### inkmap.locate.marks.QR_FINDER_RINGS *= (0.7142857142857143, 0.42857142857142855)*
+
+7 modules of foreground, 5 of background, 3 of foreground
+(ISO/IEC 18004 §6.3.3).
+
+* **Type:**
+  A QR finder pattern
+
+### *class* inkmap.locate.marks.SquareMark(centre, corners, side_px, rings=(), sigma_px=nan, centres=())
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One square mark found in an image. Coordinates are pixels, `(x, y)`.
+
+`corners` are the outer square’s, clockwise as seen on screen, starting from the
+one nearest the image’s top-left. A square has no intrinsic first corner, so that
+order is a convention, not an identification. `rings` is the side of each nested
+square as a fraction of the outer one, outermost first (empty for a solid mark).
+`centres` are the outer square’s centre followed by each nested square’s, each
+where that square’s diagonals cross; `centre` is their mean weighted by side,
+which for a solid mark is the outer square’s own.
+
+#### ring_error(expected)
+
+Largest difference between these ring ratios and `expected`; inf if unlike.
+
+```pycon
+>>> SquareMark((0, 0), np.zeros((4, 2)), 10.0, rings=(0.7, 0.4)).ring_error(
+...     QR_FINDER_RINGS
+... )
+0.028...
+>>> SquareMark((0, 0), np.zeros((4, 2)), 10.0).ring_error(BULLSEYE_RINGS)
+inf
+```
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
+### inkmap.locate.marks.find_square_marks(gray, , min_side_px=8.0, max_side_share=0.1, polarity=Polarity.FOREGROUND_IS_DARK, dark_share=0.72, min_contrast=6.0, local_window_share=0.12)
+
+Every solid or nested square mark in `gray` (2-D, 0-255 scale), largest first.
+
+A mark’s outer square must be at least `min_side_px` on a side and at most
+`max_side_share` of the frame’s shorter side. Nested marks report their ring
+ratios; solid marks report none. `polarity` says whether the marks read darker
+than the substrate (the usual case) or brighter.
+
+The foreground is binarised relative to the local mean brightness: a pixel is
+foreground when it is darker than `dark_share` of the mean over a window
+`local_window_share` of the frame’s shorter side, and darker by at least
+`min_contrast` grey levels. The window is widened to stay wider than the largest
+mark looked for, since a mark wider than it is hollowed by its own ink.
+
+Anything square is a candidate: a QR symbol’s clusters of data modules and some
+printed glyphs come back as solid marks too. Telling the registration marks from
+them, by size, ring ratio and layout, is the caller’s.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`SquareMark`](_autosummary/inkmap.locate.marks.html.md#inkmap.locate.marks.SquareMark)]
+
+### inkmap.locate.marks.quad_centre(corners)
+
+Where the diagonals of a quadrilateral cross: the projective centre of a square.
+
+`corners` must be in cyclic order (either direction). `None` if degenerate.
+
+```pycon
+>>> quad_centre([(0, 0), (4, 0), (4, 2), (0, 2)])
+(2.0, 1.0)
+```
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)] | [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### inkmap.locate.marks.ring_ratios(outer_area, inner_areas)
+
+Side ratios of nested squares from their areas: `sqrt(inner / outer)`.
+
+```pycon
+>>> ring_ratios(100.0, (64.0, 16.0))
+(0.8, 0.4)
+```
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`...`](https://docs.python.org/3/builtins/constants.html#Ellipsis)]
+
+
+# _autosummary/inkmap.locate.patch.html.md
+
+# inkmap.locate.patch
+
+Locate a plain printed patch – a uniform colour rectangle – and the substrate round it.
+
+The other locators start from something with a decoder or from a quad you supply. A
+single printed colour patch on a paper strip has neither: no code, no registration
+marks, an arbitrary background. To measure the patch against its own paper, a caller
+needs three things, and [`locate_patch()`](_autosummary/inkmap.locate.patch.html.md#inkmap.locate.patch.locate_patch) returns them:
+
+```default
+import inkmap
+
+regions = inkmap.locate_patch(photo)            # seeded at the frame's centre
+regions = inkmap.locate_patch(photo, seed=(x, y))
+regions.patch, regions.substrate, regions.ok, regions.notes
+```
+
+- `patch`: the patch’s interior, eroded clear of its blurred edge;
+- `substrate`: a narrow ring of bare substrate just outside it;
+- `ok` and `notes`: whether to trust them, and if not, why.
+
+`regions.quad` is the patch’s four corners to a fraction of a pixel, and
+`regions.placement` the same as a [`Placement`](_autosummary/inkmap.types.html.md#inkmap.types.Placement), so the rest of
+inkmap (`analyze`, `measure`) works on a patch unchanged.
+
+**How.** The patch colour is the median CIELAB colour of a small window round the
+seed. Every pixel’s distance to it is split by Otsu’s threshold (clamped to a Delta E
+range), and the connected region holding the seed window is kept, closed and filled.
+Its sides are then fitted to the *colour* edge – the mid-level crossing of that
+Delta E image – so a pale patch on white paper, whose lightness barely differs from
+the paper’s, is placed as precisely as a dark one.
+
+**Substrate.** The ring lies between two distances from the patch, scaled to the
+patch’s own size, and keeps only its light, low-chroma pixels: a thin paper border is
+easily overshot onto the background, which is why the ring is narrow by default. The
+paper must also be lighter than the patch, and be found on at least three of its four
+sides.
+
+**The verdict** fails, with a note saying why, on a patch that is too small, cut by
+the frame, without substrate on three sides, or that is not the shape and colour of a
+printed patch: an outline straying from the fitted sides (a leak, a rounded corner), no
+colour step across a side (a leak into shaded paper), two colours in the region or a
+large blob of another one inside it (a seed near the patch’s edge or on the paper). On
+a failed verdict the region is split again at a tighter threshold, which is how a pale
+patch on white paper is found at all; if no split passes, the first answer is returned
+with the last split’s reason appended. Text, specks or glare on the patch are left out
+of `PatchRegions.patch`; ring pixels not of the paper’s colour (a neighbouring
+light patch) are left out of `PatchRegions.substrate`.
+
+**Limits.** The patch colour is one global seed colour, so strong uneven light defeats
+a pale patch: with lightness falling 40% across the frame, a patch a Delta E of ~10
+from its paper is mostly refused (correctly, but refused). Coloured paper is refused
+too. Corners are good to about 0.3 px at blur up to 1.5 px, pale patches included
+(`python scripts/validate.py patch`). A 4000 x 3000 frame takes about 1.5 s.
+
+**On flash bursts,** seed on an unlit frame (or the median of the unlit frames): under
+flash a pale patch clips to the paper’s white and the region leaks.
+
+### Functions
+
+| [`locate_patch`](_autosummary/inkmap.locate.patch.html.md#inkmap.locate.patch.locate_patch)(image, \*[, seed, seed_share, ...])   | The uniform patch at `seed`, and the ring of substrate just outside it.                                                       |
+|-----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| [`locate_patch_centre`](_autosummary/inkmap.locate.patch.html.md#inkmap.locate.patch.locate_patch_centre)(bgr, gray)                     | A [`LOCATORS`](_autosummary/inkmap.locate.html.md#inkmap.locate.LOCATORS) strategy: the patch at the frame's centre. |
+
+### Classes
+
+| [`PatchRegions`](_autosummary/inkmap.locate.patch.html.md#inkmap.locate.patch.PatchRegions)(patch, substrate, region, quad, ok)   | A located patch: masks over the frame, its geometry, and how far to trust them.   |
+|-----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+
+### *class* inkmap.locate.patch.PatchRegions(patch, substrate, region, quad, ok, notes=(), seed_lab=(nan, nan, nan), threshold_delta_e=nan, area_share=0.0, rectangularity=0.0, touches_border=False, hole_share=0.0, outline_deviation_px=nan, substrate_px=0, ring_px=(0.0, 0.0))
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+A located patch: masks over the frame, its geometry, and how far to trust them.
+
+`patch` is the interior, eroded clear of the edge; `substrate` a ring of bare
+substrate just outside; `region` the whole patch, uneroded. `quad` is the
+patch’s corners, clockwise as seen on screen from the one nearest the image’s
+top-left, to a fraction of a pixel when its sides could be fitted (`None` if no
+region was found). `ok` is `not notes`.
+
+The rest say why: `seed_lab` the patch colour, `threshold_delta_e` the split
+used, `area_share` of the frame, `rectangularity` (region over fitted quad),
+`outline_deviation_px` (95th percentile of the outline’s distance from the
+fitted sides), `hole_share` (share of the interior not the patch’s colour),
+`substrate_px`, and `ring_px` (the ring’s inner and outer distance).
+
+#### *property* placement *: [Placement](_autosummary/inkmap.types.html.md#inkmap.types.Placement) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+The patch and its substrate ring as a placement, or `None` without a quad.
+
+The model is the patch as foreground inside a border of background as wide as
+the substrate ring’s outer edge, in units of about one pixel. So
+`inkmap.analyze()` and [`inkmap.measure()`](_autosummary/inkmap.html.md#inkmap.measure) treat the patch as any other
+mark, and `measure` compares the patch with the substrate round it. The
+placement’s `quad` is that bordered model’s, not the patch’s: the patch’s own
+corners are `quad`. `measure` averages the whole border, background
+and all, where `substrate` keeps only its paper-like pixels: on a thin
+paper border, measure with `substrate` instead.
+
+### inkmap.locate.patch.locate_patch(image, , seed='centre', seed_share=0.04, min_delta_e=4.0, max_delta_e=25.0, edge_margin_share=0.08, ring_share=(0.02, 0.06), min_area_share=0.01, min_rectangularity=0.85, min_substrate_px=50, min_substrate_lift=1.0, max_substrate_chroma=15.0, min_side_share=0.15, min_edge_step=3.0)
+
+The uniform patch at `seed`, and the ring of substrate just outside it.
+
+`image` is a path, a BGR (or BGRA) array, or a grey array, 8-bit. `seed` is
+`"centre"` or an `(x, y)` pixel inside the patch; its colour is the median of a
+window `seed_share` of the frame’s shorter side across. Pixels within the Otsu
+split of the CIELAB distance to it, clamped to `[min_delta_e, max_delta_e]`, are
+candidates, and the connected candidate region at the seed is the patch.
+
+`edge_margin_share` erodes the interior, and `ring_share` places the
+substrate ring, both as shares of the patch’s shorter side. The verdict fails, with
+a note saying why, when the patch is under `min_area_share` of the frame, less
+rectangular than `min_rectangularity` (area over its minimum-area rectangle’s:
+where a pale patch leaked into the paper), cut by the frame’s edge, or when the
+ring holds under `min_substrate_px` pixels of substrate, substrate no lighter than
+the patch by `min_substrate_lift` L\*, or substrate on fewer than three sides
+(`min_side_share` of that side’s ring each), or when a side of the patch has no
+colour step of `min_edge_step` across it – the sign of a region that leaked into
+shaded paper. A failed verdict on a leaked region is retried at a tighter
+threshold.
+
+* **Return type:**
+  [`PatchRegions`](_autosummary/inkmap.locate.patch.html.md#inkmap.locate.patch.PatchRegions)
+
+### inkmap.locate.patch.locate_patch_centre(bgr, gray)
+
+A [`LOCATORS`](_autosummary/inkmap.locate.html.md#inkmap.locate.LOCATORS) strategy: the patch at the frame’s centre.
+
+Registered as `"patch"` but not in the default cascade, so
+`inkmap.find(photo, locators=["patch"])` opts in. Returns nothing unless the
+verdict is `ok`.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Placement`](_autosummary/inkmap.types.html.md#inkmap.types.Placement)]
+
+
+# _autosummary/inkmap.locate.qr.html.md
+
+# inkmap.locate.qr
+
+Locating QR symbols: a cascade of interchangeable strategies.
+
+Measured on 189 real photographs from Wikimedia Commons (varied angle, lighting,
+substrate, print quality):
+
+| locator            | images detected   |
+|--------------------|-------------------|
+| zxing-cpp          | 74%               |
+| OpenCV Aruco-based | 68%               |
+| OpenCV classic     | 43%               |
+| **union**          | **80%**           |
+
+So OpenCV alone forfeits about 37 points of recall. All three are permissively licensed
+(Apache-2.0) and ship as wheels. Deliberately *not* used: `qrdet`/`qreader`, whose
+MIT metadata is misleading – they depend on `ultralytics`, which is AGPL-3.0.
+
+## Getting the module matrix
+
+Decoding gives the payload, but the payload does **not** determine the module pattern:
+error-correction level and mask pattern are encoder choices not recoverable from the
+text, so re-encoding the payload can yield a differently-sized, differently-masked
+matrix. It is a silent-wrong-answer path and is not used here. The pattern is read from
+the image instead: OpenCV’s `straight_qrcode` is a bit-exact sample, and where that
+is unavailable the grid is sampled directly.
+
+### Functions
+
+| [`locate_qr_opencv`](_autosummary/inkmap.locate.qr.html.md#inkmap.locate.qr.locate_qr_opencv)(bgr, gray)                     | OpenCV's classic `QRCodeDetector`.                                                 |
+|--------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
+| [`locate_qr_aruco`](_autosummary/inkmap.locate.qr.html.md#inkmap.locate.qr.locate_qr_aruco)(bgr, gray)                      | OpenCV's `QRCodeDetectorAruco` -- finds the finder patterns as Aruco-like markers. |
+| [`locate_qr_zxing`](_autosummary/inkmap.locate.qr.html.md#inkmap.locate.qr.locate_qr_zxing)(bgr, gray)                      | zxing-cpp.                                                                         |
+| [`sample_matrix`](_autosummary/inkmap.locate.qr.html.md#inkmap.locate.qr.sample_matrix)(gray, transform, n, \*[, window]) | Read the module matrix off the image at the grid intersections.                    |
+
+### inkmap.locate.qr.locate_qr_aruco(bgr, gray)
+
+OpenCV’s `QRCodeDetectorAruco` – finds the finder patterns as Aruco-like
+markers. Notably more robust than the classic detector on real photographs.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Placement`](_autosummary/inkmap.types.html.md#inkmap.types.Placement)]
+
+### inkmap.locate.qr.locate_qr_opencv(bgr, gray)
+
+OpenCV’s classic `QRCodeDetector`. Corners are inclusive pixel indices.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Placement`](_autosummary/inkmap.types.html.md#inkmap.types.Placement)]
+
+### inkmap.locate.qr.locate_qr_zxing(bgr, gray)
+
+zxing-cpp. Highest recall of the three, and its corners are the continuous outer
+boundary (spanning exactly `N * scale`), not inclusive pixel indices.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Placement`](_autosummary/inkmap.types.html.md#inkmap.types.Placement)]
+
+### inkmap.locate.qr.sample_matrix(gray, transform, n, , window=3)
+
+Read the module matrix off the image at the grid intersections.
+
+ISO/IEC 18004’s reference decode algorithm samples a small area centred on each
+grid intersection and thresholds. Used when no decoder handed us a matrix – notably
+when the print is too faint to decode, which is exactly the case that must still
+work.
+
+* **Return type:**
+  `ndarray`
 
 
 # _autosummary/inkmap.models.base.html.md
@@ -2821,18 +3510,16 @@ leaving only interiors. If weight is empty, the image cannot support a measureme
 
 # About this build
 
-This documentation was built on **2026-10-19 12:49 UTC** from commit <a href="https://github.com/thorwhalen/inkmap/commit/1342444c23d8f3ade4d3dce16914e5be192beef8"><code>1342444</code></a> on branch <code>main</code>, for **inkmap 0.1.5** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-19 13:07 UTC** from commit <a href="https://github.com/thorwhalen/inkmap/commit/0fc1fd26f4430a300baeda429cb1616c0764485b"><code>0fc1fd2</code></a> on branch <code>main</code>, for **inkmap 0.1.6** (from <code>pyproject.toml</code>).
 
-#### WARNING
-The documentation and the package may be misaligned:
-
-- The documented version (0.1.5) is behind the latest release on PyPI (0.1.6): `pip install inkmap` gives newer code than these docs describe.
+#### NOTE
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 
 ## Source
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/inkmap/commit/1342444c23d8f3ade4d3dce16914e5be192beef8"><code>1342444c23d8f3ade4d3dce16914e5be192beef8</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/inkmap/commit/0fc1fd26f4430a300baeda429cb1616c0764485b"><code>0fc1fd26f4430a300baeda429cb1616c0764485b</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
 | Tags at this commit | none                                                                                                                                                     |
 | Working tree        | clean                                                                                                                                                    |
@@ -2843,9 +3530,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/inkmap</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/inkmap/actions/runs/39254792483">39254792483</a>    |
+| Run          | <a href="https://github.com/thorwhalen/inkmap/actions/runs/39257224074">39257224074</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>1342444c23d8f3ade4d3dce16914e5be192beef8</code> (in the history of the built commit) |
+| Event commit | <code>0fc1fd26f4430a300baeda429cb1616c0764485b</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -2870,13 +3557,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/inkmap/0.1.6/">0.1.6</a>, newer than the documented version (0.1.5).
+Latest release: <a href="https://pypi.org/project/inkmap/0.1.6/">0.1.6</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/inkmap && cd inkmap
-git checkout 1342444c23d8f3ade4d3dce16914e5be192beef8
+git checkout 0fc1fd26f4430a300baeda429cb1616c0764485b
 pip install "epythet==0.2.18"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

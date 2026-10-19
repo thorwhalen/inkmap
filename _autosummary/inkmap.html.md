@@ -69,7 +69,6 @@ continuous value is **coverage**, after ISO 12647-2:2013 3.1 *area coverage*. Se
 | [`observed_coverage`](#inkmap.observed_coverage)(gray, placement, \*[, ...])      | Apparent coverage read from the photograph itself (Murray-Davies).             |
 | [`confidence`](#inkmap.confidence)(gray, placement, coverage, \*[, ...])   | How much to trust the coverage value at each pixel, in `[0, 1]`.               |
 | [`measurement_weight`](#inkmap.measurement_weight)(coverage, \*[, ...])            | Blur-aware weight in `[0, 1]`: how safe each pixel is to *measure*.            |
-| [`locate`](#inkmap.locate)(bgr, gray, \*[, locators, first_hit, ...])  | Run locator strategies and merge their results, de-duplicating by position.    |
 | [`find_square_marks`](#inkmap.find_square_marks)(gray, \*[, min_side_px, ...])    | Every solid or nested square mark in `gray` (2-D, 0-255 scale), largest first. |
 | [`locate_patch`](#inkmap.locate_patch)(image, \*[, seed, seed_share, ...])   | The uniform patch at `seed`, and the ring of substrate just outside it.        |
 
@@ -452,7 +451,7 @@ the placements back – several times faster on large photographs, with refineme
 restoring sub-pixel geometry. Codes need about 4 px per module *after* downscaling
 (`config.MIN_COARSE_PIXELS_PER_FEATURE`); those below are re-located at full
 resolution. `None` (default) locates at full resolution. See
-[`inkmap.locate()`](#inkmap.locate) (its `scale`). Ignored when `model`/`quad` are given.
+[`inkmap.locate.locate()`](inkmap.locate.html.md#inkmap.locate.locate) (its `scale`). Ignored when `model`/`quad` are given.
 
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`InkMap`](inkmap.types.html.md#inkmap.types.InkMap)]
@@ -477,7 +476,7 @@ printed glyphs come back as solid marks too. Telling the registration marks from
 them, by size, ring ratio and layout, is the caller’s.
 
 * **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`SquareMark`](#inkmap.SquareMark)]
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`SquareMark`](inkmap.locate.marks.html.md#inkmap.locate.marks.SquareMark)]
 
 ### inkmap.foreground(image, \*\*kwargs)
 
@@ -489,58 +488,6 @@ foreground”.
 
 * **Return type:**
   `ndarray`
-
-### inkmap.locate(bgr, gray, , locators=('qr_zxing', 'qr_aruco', 'qr_opencv', 'barcode_zxing'), first_hit=False, scale=None, full_res_retry=True)
-
-Run locator strategies and merge their results, de-duplicating by position.
-
-Strategies are tried in order. With `first_hit=True` the cascade stops at the
-first strategy that finds anything – cheaper, and usually right when you know there
-is one mark. Otherwise every strategy runs and results merge, which is what earns
-the recall when an image holds several marks that no single detector finds all of.
-
-**Coarse-to-fine.** `scale` (`0 < scale <= 1`) runs the cascade on a copy of the
-frame downscaled by that factor (`cv2.INTER_AREA`), then maps every placement back
-to full-resolution pixels. Locating costs roughly in proportion to pixel count, so
-on a 4000 x 3000 photograph 0.5 is about 4x faster and 0.35 about 7x. `None` (the
-default) or `1` locate at full resolution, exactly as without the argument.
-
-Every locator – a registered name or your own callable – is handed the
-*downscaled* `bgr` and `gray` (and, on a retry, a full-resolution crop), and
-must return placements in the coordinates of the frame it was given; mapping them
-back to the full frame is done here. A locator that bakes in absolute pixel sizes
-or positions will misbehave under `scale`.
-
-The mapping is one affine `A` (small -> full pixels), in the pixel-centre
-convention `cv2.resize` uses, `x_full = (x_small + 0.5) / scale - 0.5`, applied
-to both `quad` and `transform` (`A @ transform`). Locator name and payload are
-kept; `metadata["locate_scale"]` records the scale used. Corner conventions differ
-by locator (OpenCV’s are inclusive pixel indices, zxing’s are the continuous outer
-boundary), so a locator’s own half-pixel bias is magnified by `1 / scale` on the
-way up – a pixel or so at 0.5. That does not matter downstream when
-`inkmap.analyze()` refines (its default), which pins the transform to sub-pixel
-accuracy at full resolution anyway.
-
-**The model is the fragile part, not the geometry.** Locators read the model off
-the frame they are given – a QR’s module count and module matrix, a barcode’s bar
-pattern – and refinement cannot repair a wrong model, it only fits its geometry.
-Below about `config.MIN_COARSE_PIXELS_PER_FEATURE` (4) pixels per module in the
-downscaled frame those reads go wrong while the code still decodes: a 25 x 25 QR
-read as 21 x 21, or tens of flipped modules. So, with `full_res_retry` (default
-on; only meaningful with `scale < 1`), a coarse placement is re-located on a
-padded full-resolution crop around it when either its `payload` is `None` (found
-but not decoded – typically a small, far-away code) or its pixels per feature in
-the downscaled frame are under that floor. The full-resolution result replaces it
-(`metadata["locate_retry"]` names the reason, `"undecoded"` or
-`"undersampled"`, and `locate_scale` becomes 1.0). Crops are small, so this
-costs little; pick `scale` so your codes clear the floor (at 0.5, 8 px per module
-at full resolution) and it never triggers. A coarse placement under the floor that
-is kept anyway – `full_res_retry=False`, or the crop found nothing – carries
-`metadata["locate_undersampled"] = True`: treat its model as unreliable. A mark
-the coarse pass misses entirely is not recovered: lower the downscaling instead.
-
-* **Return type:**
-  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Placement`](inkmap.types.html.md#inkmap.types.Placement)]
 
 ### inkmap.locate_patch(image, , seed='centre', seed_share=0.04, min_delta_e=4.0, max_delta_e=25.0, edge_margin_share=0.08, ring_share=(0.02, 0.06), min_area_share=0.01, min_rectangularity=0.85, min_substrate_px=50, min_substrate_lift=1.0, max_substrate_chroma=15.0, min_side_share=0.15, min_edge_step=3.0)
 
@@ -565,7 +512,7 @@ shaded paper. A failed verdict on a leaked region is retried at a tighter
 threshold.
 
 * **Return type:**
-  [`PatchRegions`](#inkmap.PatchRegions)
+  [`PatchRegions`](inkmap.locate.patch.html.md#inkmap.locate.patch.PatchRegions)
 
 ### inkmap.measurability(ink_map, , min_pixels=50)
 
@@ -679,8 +626,9 @@ The piecewise IEC 61966-2-1 curve, not the 2.2 power approximation.
 
 ### Modules
 
-| [`models`](inkmap.models.html.md#module-inkmap.models)         | Shape models: what the foreground is expected to look like.                                  |
+| [`locate`](inkmap.locate.html.md#module-inkmap.locate)         | Locators: finding where a model sits in an image.                                            |
 |--------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
+| [`models`](inkmap.models.html.md#module-inkmap.models)         | Shape models: what the foreground is expected to look like.                                  |
 | [`geometry`](inkmap.geometry.html.md#module-inkmap.geometry)     | Model space <-> image space: transforms, and refining them against the photograph.           |
 | [`photometry`](inkmap.photometry.html.md#module-inkmap.photometry) | Turning masks into measurements that are actually valid.                                     |
 | [`config`](inkmap.config.html.md#module-inkmap.config)         | Tunable defaults, in one place.                                                              |

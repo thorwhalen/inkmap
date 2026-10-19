@@ -1,0 +1,46 @@
+inkmap.locate
+=============
+
+.. automodule:: inkmap.locate
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      LOCATORS
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      locate
+      place
+      validated_scale
+      locate_qr_opencv
+      locate_qr_aruco
+      locate_qr_zxing
+      locate_barcode_zxing
+      find_square_marks
+      quad_centre
+      ring_ratios
+      locate_patch
+      locate_patch_centre
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      SquareMark
+      PatchRegions
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   barcode
+   marks
+   patch
+   qr

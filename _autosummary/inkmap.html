@@ -35,7 +35,7 @@
 <link href="../_static/epythet.css?v=ded595e6" rel="stylesheet" type="text/css"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
-<link href="inkmap.models.html" rel="next" title="inkmap.models"/>
+<link href="inkmap.locate.html" rel="next" title="inkmap.locate"/>
 <link href="../api.html" rel="prev" title="API reference"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
@@ -84,6 +84,7 @@
 <ul class="current">
 <li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="../api.html">API reference<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
 <li class="toctree-l2 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="current reference internal expandable" href="#">inkmap<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-cloak="" x-show="expanded">
+<li class="toctree-l3"><a class="reference internal" href="inkmap.locate.html">inkmap.locate</a></li>
 <li class="toctree-l3"><a class="reference internal" href="inkmap.models.html">inkmap.models</a></li>
 <li class="toctree-l3"><a class="reference internal" href="inkmap.geometry.html">inkmap.geometry</a></li>
 <li class="toctree-l3"><a class="reference internal" href="inkmap.photometry.html">inkmap.photometry</a></li>
@@ -205,13 +206,10 @@ continuous value is <strong>coverage</strong>, after ISO 12647-2:2013 3.1 <em>ar
 <tr class="row-even"><td><p><a class="reference internal" href="#inkmap.measurement_weight" title="inkmap.measurement_weight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">measurement_weight</span></code></a>(coverage, *[, ...])</p></td>
 <td><p>Blur-aware weight in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>: how safe each pixel is to <em>measure</em>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.locate" title="inkmap.locate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">locate</span></code></a>(bgr, gray, *[, locators, first_hit, ...])</p></td>
-<td><p>Run locator strategies and merge their results, de-duplicating by position.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.find_square_marks" title="inkmap.find_square_marks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_square_marks</span></code></a>(gray, *[, min_side_px, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.find_square_marks" title="inkmap.find_square_marks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_square_marks</span></code></a>(gray, *[, min_side_px, ...])</p></td>
 <td><p>Every solid or nested square mark in <code class="docutils literal notranslate"><span class="pre">gray</span></code> (2-D, 0-255 scale), largest first.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.locate_patch" title="inkmap.locate_patch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">locate_patch</span></code></a>(image, *[, seed, seed_share, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.locate_patch" title="inkmap.locate_patch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">locate_patch</span></code></a>(image, *[, seed, seed_share, ...])</p></td>
 <td><p>The uniform patch at <code class="docutils literal notranslate"><span class="pre">seed</span></code>, and the ring of substrate just outside it.</p></td>
 </tr>
 </tbody>
@@ -661,7 +659,7 @@ the placements back – several times faster on large photographs, with refineme
 restoring sub-pixel geometry. Codes need about 4 px per module <em>after</em> downscaling
 (<code class="docutils literal notranslate"><span class="pre">config.MIN_COARSE_PIXELS_PER_FEATURE</span></code>); those below are re-located at full
 resolution. <code class="docutils literal notranslate"><span class="pre">None</span></code> (default) locates at full resolution. See
-<a class="reference internal" href="#inkmap.locate" title="inkmap.locate"><code class="xref py py-func docutils literal notranslate"><span class="pre">inkmap.locate()</span></code></a> (its <code class="docutils literal notranslate"><span class="pre">scale</span></code>). Ignored when <code class="docutils literal notranslate"><span class="pre">model</span></code>/<code class="docutils literal notranslate"><span class="pre">quad</span></code> are given.</p>
+<a class="reference internal" href="inkmap.locate.html#inkmap.locate.locate" title="inkmap.locate.locate"><code class="xref py py-func docutils literal notranslate"><span class="pre">inkmap.locate.locate()</span></code></a> (its <code class="docutils literal notranslate"><span class="pre">scale</span></code>). Ignored when <code class="docutils literal notranslate"><span class="pre">model</span></code>/<code class="docutils literal notranslate"><span class="pre">quad</span></code> are given.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="inkmap.types.html#inkmap.types.InkMap" title="inkmap.types.InkMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">InkMap</span></code></a>]</span></p>
@@ -686,7 +684,7 @@ printed glyphs come back as solid marks too. Telling the registration marks from
 them, by size, ring ratio and layout, is the caller’s.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="#inkmap.SquareMark" title="inkmap.locate.marks.SquareMark"><code class="xref py py-class docutils literal notranslate"><span class="pre">SquareMark</span></code></a>]</span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="inkmap.locate.marks.html#inkmap.locate.marks.SquareMark" title="inkmap.locate.marks.SquareMark"><code class="xref py py-class docutils literal notranslate"><span class="pre">SquareMark</span></code></a>]</span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -700,56 +698,6 @@ foreground”.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="inkmap.locate">
-<span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">locate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bgr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gray</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">locators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('qr_zxing',</span> <span class="pre">'qr_aruco',</span> <span class="pre">'qr_opencv',</span> <span class="pre">'barcode_zxing')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_hit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_res_retry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/locate.html#locate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.locate" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.locate'">¶</a></dt>
-<dd><p>Run locator strategies and merge their results, de-duplicating by position.</p>
-<p>Strategies are tried in order. With <code class="docutils literal notranslate"><span class="pre">first_hit=True</span></code> the cascade stops at the
-first strategy that finds anything – cheaper, and usually right when you know there
-is one mark. Otherwise every strategy runs and results merge, which is what earns
-the recall when an image holds several marks that no single detector finds all of.</p>
-<p><strong>Coarse-to-fine.</strong> <code class="docutils literal notranslate"><span class="pre">scale</span></code> (<code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">&lt;</span> <span class="pre">scale</span> <span class="pre">&lt;=</span> <span class="pre">1</span></code>) runs the cascade on a copy of the
-frame downscaled by that factor (<code class="docutils literal notranslate"><span class="pre">cv2.INTER_AREA</span></code>), then maps every placement back
-to full-resolution pixels. Locating costs roughly in proportion to pixel count, so
-on a 4000 x 3000 photograph 0.5 is about 4x faster and 0.35 about 7x. <code class="docutils literal notranslate"><span class="pre">None</span></code> (the
-default) or <code class="docutils literal notranslate"><span class="pre">1</span></code> locate at full resolution, exactly as without the argument.</p>
-<p>Every locator – a registered name or your own callable – is handed the
-<em>downscaled</em> <code class="docutils literal notranslate"><span class="pre">bgr</span></code> and <code class="docutils literal notranslate"><span class="pre">gray</span></code> (and, on a retry, a full-resolution crop), and
-must return placements in the coordinates of the frame it was given; mapping them
-back to the full frame is done here. A locator that bakes in absolute pixel sizes
-or positions will misbehave under <code class="docutils literal notranslate"><span class="pre">scale</span></code>.</p>
-<p>The mapping is one affine <code class="docutils literal notranslate"><span class="pre">A</span></code> (small -&gt; full pixels), in the pixel-centre
-convention <code class="docutils literal notranslate"><span class="pre">cv2.resize</span></code> uses, <code class="docutils literal notranslate"><span class="pre">x_full</span> <span class="pre">=</span> <span class="pre">(x_small</span> <span class="pre">+</span> <span class="pre">0.5)</span> <span class="pre">/</span> <span class="pre">scale</span> <span class="pre">-</span> <span class="pre">0.5</span></code>, applied
-to both <code class="docutils literal notranslate"><span class="pre">quad</span></code> and <code class="docutils literal notranslate"><span class="pre">transform</span></code> (<code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">@</span> <span class="pre">transform</span></code>). Locator name and payload are
-kept; <code class="docutils literal notranslate"><span class="pre">metadata["locate_scale"]</span></code> records the scale used. Corner conventions differ
-by locator (OpenCV’s are inclusive pixel indices, zxing’s are the continuous outer
-boundary), so a locator’s own half-pixel bias is magnified by <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">/</span> <span class="pre">scale</span></code> on the
-way up – a pixel or so at 0.5. That does not matter downstream when
-<code class="xref py py-func docutils literal notranslate"><span class="pre">inkmap.analyze()</span></code> refines (its default), which pins the transform to sub-pixel
-accuracy at full resolution anyway.</p>
-<p><strong>The model is the fragile part, not the geometry.</strong> Locators read the model off
-the frame they are given – a QR’s module count and module matrix, a barcode’s bar
-pattern – and refinement cannot repair a wrong model, it only fits its geometry.
-Below about <code class="docutils literal notranslate"><span class="pre">config.MIN_COARSE_PIXELS_PER_FEATURE</span></code> (4) pixels per module in the
-downscaled frame those reads go wrong while the code still decodes: a 25 x 25 QR
-read as 21 x 21, or tens of flipped modules. So, with <code class="docutils literal notranslate"><span class="pre">full_res_retry</span></code> (default
-on; only meaningful with <code class="docutils literal notranslate"><span class="pre">scale</span> <span class="pre">&lt;</span> <span class="pre">1</span></code>), a coarse placement is re-located on a
-padded full-resolution crop around it when either its <code class="docutils literal notranslate"><span class="pre">payload</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code> (found
-but not decoded – typically a small, far-away code) or its pixels per feature in
-the downscaled frame are under that floor. The full-resolution result replaces it
-(<code class="docutils literal notranslate"><span class="pre">metadata["locate_retry"]</span></code> names the reason, <code class="docutils literal notranslate"><span class="pre">"undecoded"</span></code> or
-<code class="docutils literal notranslate"><span class="pre">"undersampled"</span></code>, and <code class="docutils literal notranslate"><span class="pre">locate_scale</span></code> becomes 1.0). Crops are small, so this
-costs little; pick <code class="docutils literal notranslate"><span class="pre">scale</span></code> so your codes clear the floor (at 0.5, 8 px per module
-at full resolution) and it never triggers. A coarse placement under the floor that
-is kept anyway – <code class="docutils literal notranslate"><span class="pre">full_res_retry=False</span></code>, or the crop found nothing – carries
-<code class="docutils literal notranslate"><span class="pre">metadata["locate_undersampled"]</span> <span class="pre">=</span> <span class="pre">True</span></code>: treat its model as unreliable. A mark
-the coarse pass misses entirely is not recovered: lower the downscaling instead.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" rel="nofollow noopener" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a>[<a class="reference internal" href="inkmap.types.html#inkmap.types.Placement" title="inkmap.types.Placement"><code class="xref py py-class docutils literal notranslate"><span class="pre">Placement</span></code></a>]</span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -775,7 +723,7 @@ shaded paper. A failed verdict on a leaked region is retried at a tighter
 threshold.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#inkmap.PatchRegions" title="inkmap.locate.patch.PatchRegions"><code class="xref py py-class docutils literal notranslate"><span class="pre">PatchRegions</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="inkmap.locate.patch.html#inkmap.locate.patch.PatchRegions" title="inkmap.locate.patch.PatchRegions"><code class="xref py py-class docutils literal notranslate"><span class="pre">PatchRegions</span></code></a></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -898,31 +846,34 @@ arithmetic that claims to be about light.</p>
 <p class="rubric">Modules</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="inkmap.models.html#module-inkmap.models" title="inkmap.models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="inkmap.locate.html#module-inkmap.locate" title="inkmap.locate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">locate</span></code></a></p></td>
+<td><p>Locators: finding where a model sits in an image.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="inkmap.models.html#module-inkmap.models" title="inkmap.models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models</span></code></a></p></td>
 <td><p>Shape models: what the foreground is expected to look like.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="inkmap.geometry.html#module-inkmap.geometry" title="inkmap.geometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geometry</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="inkmap.geometry.html#module-inkmap.geometry" title="inkmap.geometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geometry</span></code></a></p></td>
 <td><p>Model space &lt;-&gt; image space: transforms, and refining them against the photograph.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="inkmap.photometry.html#module-inkmap.photometry" title="inkmap.photometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">photometry</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="inkmap.photometry.html#module-inkmap.photometry" title="inkmap.photometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">photometry</span></code></a></p></td>
 <td><p>Turning masks into measurements that are actually valid.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="inkmap.config.html#module-inkmap.config" title="inkmap.config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="inkmap.config.html#module-inkmap.config" title="inkmap.config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config</span></code></a></p></td>
 <td><p>Tunable defaults, in one place.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="inkmap.corpus.html#module-inkmap.corpus" title="inkmap.corpus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">corpus</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="inkmap.corpus.html#module-inkmap.corpus" title="inkmap.corpus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">corpus</span></code></a></p></td>
 <td><p>The real-photograph test corpus: 384 photographed marks in the wild, from Wikimedia Commons.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="inkmap.coverage.html#module-inkmap.coverage" title="inkmap.coverage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coverage</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="inkmap.coverage.html#module-inkmap.coverage" title="inkmap.coverage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coverage</span></code></a></p></td>
 <td><p>Per-pixel foreground coverage: the 0..1 value, and which one you want.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="inkmap.synth.html#module-inkmap.synth" title="inkmap.synth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">synth</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="inkmap.synth.html#module-inkmap.synth" title="inkmap.synth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">synth</span></code></a></p></td>
 <td><p>Synthetic scenes with exact ground truth.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="inkmap.types.html#module-inkmap.types" title="inkmap.types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">types</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="inkmap.types.html#module-inkmap.types" title="inkmap.types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">types</span></code></a></p></td>
 <td><p>The data types the whole package speaks in.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="inkmap.viz.html#module-inkmap.viz" title="inkmap.viz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">viz</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="inkmap.viz.html#module-inkmap.viz" title="inkmap.viz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">viz</span></code></a></p></td>
 <td><p>Visual overlays, for checking that a result is actually right.</p></td>
 </tr>
 </tbody>
@@ -996,7 +947,6 @@ arithmetic that claims to be about light.</p>
 <li><a :data-current="activeSection === '#inkmap.find_all'" class="reference internal" href="#inkmap.find_all"><code class="docutils literal notranslate"><span class="pre">find_all()</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.find_square_marks'" class="reference internal" href="#inkmap.find_square_marks"><code class="docutils literal notranslate"><span class="pre">find_square_marks()</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.foreground'" class="reference internal" href="#inkmap.foreground"><code class="docutils literal notranslate"><span class="pre">foreground()</span></code></a></li>
-<li><a :data-current="activeSection === '#inkmap.locate'" class="reference internal" href="#inkmap.locate"><code class="docutils literal notranslate"><span class="pre">locate()</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.locate_patch'" class="reference internal" href="#inkmap.locate_patch"><code class="docutils literal notranslate"><span class="pre">locate_patch()</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.measurability'" class="reference internal" href="#inkmap.measurability"><code class="docutils literal notranslate"><span class="pre">measurability()</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.measure'" class="reference internal" href="#inkmap.measure"><code class="docutils literal notranslate"><span class="pre">measure()</span></code></a></li>
@@ -1018,7 +968,7 @@ arithmetic that claims to be about light.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=59fadc99"></script>
+<script src="../_static/documentation_options.js?v=6e0256f3"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

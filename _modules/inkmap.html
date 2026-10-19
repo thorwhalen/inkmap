@@ -114,6 +114,7 @@
   <ul>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">API reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../_autosummary/inkmap.html">inkmap</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_autosummary/inkmap.locate.html">inkmap.locate</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/inkmap.models.html">inkmap.models</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/inkmap.geometry.html">inkmap.geometry</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/inkmap.photometry.html">inkmap.photometry</a></li>
@@ -222,14 +223,14 @@
 </span><span id="line-50"><span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
 </span><span id="line-51"><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 </span><span id="line-52">
-</span><span id="line-53"><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">coverage</span> <span class="k">as</span> <span class="n">_coverage</span><span class="p">,</span> <span class="n">geometry</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">photometry</span>
-</span><span id="line-54"><span class="kn">from</span><span class="w"> </span><span class="nn">.coverage</span><span class="w"> </span><span class="kn">import</span> <span class="n">confidence</span><span class="p">,</span> <span class="n">coverage_map</span><span class="p">,</span> <span class="n">measurement_weight</span><span class="p">,</span> <span class="n">observed_coverage</span>
-</span><span id="line-55"><span class="kn">from</span><span class="w"> </span><span class="nn">.locate</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-</span><span id="line-56">    <span class="n">LOCATORS</span><span class="p">,</span>
-</span><span id="line-57">    <span class="n">PatchRegions</span><span class="p">,</span>
-</span><span id="line-58">    <span class="n">SquareMark</span><span class="p">,</span>
-</span><span id="line-59">    <span class="n">find_square_marks</span><span class="p">,</span>
-</span><span id="line-60">    <span class="n">locate</span><span class="p">,</span>
+</span><span id="line-53"><span class="c1"># ``locate`` is the locator package, and callable as the cascade: locate(bgr, gray).</span>
+</span><span id="line-54"><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">coverage</span> <span class="k">as</span> <span class="n">_coverage</span><span class="p">,</span> <span class="n">geometry</span><span class="p">,</span> <span class="n">locate</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">photometry</span>
+</span><span id="line-55"><span class="kn">from</span><span class="w"> </span><span class="nn">.coverage</span><span class="w"> </span><span class="kn">import</span> <span class="n">confidence</span><span class="p">,</span> <span class="n">coverage_map</span><span class="p">,</span> <span class="n">measurement_weight</span><span class="p">,</span> <span class="n">observed_coverage</span>
+</span><span id="line-56"><span class="kn">from</span><span class="w"> </span><span class="nn">.locate</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span id="line-57">    <span class="n">LOCATORS</span><span class="p">,</span>
+</span><span id="line-58">    <span class="n">PatchRegions</span><span class="p">,</span>
+</span><span id="line-59">    <span class="n">SquareMark</span><span class="p">,</span>
+</span><span id="line-60">    <span class="n">find_square_marks</span><span class="p">,</span>
 </span><span id="line-61">    <span class="n">locate_patch</span><span class="p">,</span>
 </span><span id="line-62">    <span class="n">place</span><span class="p">,</span>
 </span><span id="line-63">    <span class="n">validated_scale</span><span class="p">,</span>
@@ -389,7 +390,7 @@
 </span><span id="line-215"><span class="sd">    restoring sub-pixel geometry. Codes need about 4 px per module *after* downscaling</span>
 </span><span id="line-216"><span class="sd">    (``config.MIN_COARSE_PIXELS_PER_FEATURE``); those below are re-located at full</span>
 </span><span id="line-217"><span class="sd">    resolution. ``None`` (default) locates at full resolution. See</span>
-</span><span id="line-218"><span class="sd">    :func:`inkmap.locate` (its ``scale``). Ignored when ``model``/``quad`` are given.</span>
+</span><span id="line-218"><span class="sd">    :func:`inkmap.locate.locate` (its ``scale``). Ignored when ``model``/``quad`` are given.</span>
 </span><span id="line-219"><span class="sd">    """</span>
 </span><span id="line-220">    <span class="n">locate_scale</span> <span class="o">=</span> <span class="n">validated_scale</span><span class="p">(</span><span class="n">locate_scale</span><span class="p">)</span>
 </span><span id="line-221">    <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -404,7 +405,7 @@
 </span><span id="line-230">    <span class="k">else</span><span class="p">:</span>
 </span><span id="line-231">        <span class="n">bgr</span> <span class="o">=</span> <span class="n">_as_bgr</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
 </span><span id="line-232">        <span class="n">gray</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">bgr</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2GRAY</span><span class="p">)</span>
-</span><span id="line-233">        <span class="n">placements</span> <span class="o">=</span> <span class="n">locate</span><span class="p">(</span><span class="n">bgr</span><span class="p">,</span> <span class="n">gray</span><span class="p">,</span> <span class="n">locators</span><span class="o">=</span><span class="n">locators</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">locate_scale</span><span class="p">)</span>
+</span><span id="line-233">        <span class="n">placements</span> <span class="o">=</span> <span class="n">locate</span><span class="o">.</span><span class="n">locate</span><span class="p">(</span><span class="n">bgr</span><span class="p">,</span> <span class="n">gray</span><span class="p">,</span> <span class="n">locators</span><span class="o">=</span><span class="n">locators</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">locate_scale</span><span class="p">)</span>
 </span><span id="line-234">
 </span><span id="line-235">    <span class="k">return</span> <span class="n">analyze</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
@@ -485,7 +486,7 @@
 </footer>
     </div>
     
-    <script src="../_static/documentation_options.js?v=59fadc99"></script>
+    <script src="../_static/documentation_options.js?v=6e0256f3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

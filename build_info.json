@@ -1,32 +1,32 @@
 {
   "schema_version": 1,
-  "built_at": "2026-10-19T12:49:49Z",
+  "built_at": "2026-10-19T13:07:40Z",
   "package": {
     "name": "inkmap",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "display_name": "inkmap",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "1342444c23d8f3ade4d3dce16914e5be192beef8",
-    "short_commit": "1342444",
+    "commit": "0fc1fd26f4430a300baeda429cb1616c0764485b",
+    "short_commit": "0fc1fd2",
     "branch": "main",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/thorwhalen/inkmap",
-    "commit_url": "https://github.com/thorwhalen/inkmap/commit/1342444c23d8f3ade4d3dce16914e5be192beef8",
+    "commit_url": "https://github.com/thorwhalen/inkmap/commit/0fc1fd26f4430a300baeda429cb1616c0764485b",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/inkmap",
-    "sha": "1342444c23d8f3ade4d3dce16914e5be192beef8",
+    "sha": "0fc1fd26f4430a300baeda429cb1616c0764485b",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "39254792483",
-    "run_url": "https://github.com/thorwhalen/inkmap/actions/runs/39254792483",
+    "run_id": "39257224074",
+    "run_url": "https://github.com/thorwhalen/inkmap/actions/runs/39257224074",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -55,21 +55,19 @@
     "docs_dir": "docsrc"
   },
   "site": {
-    "modules_documented": 13,
-    "objects_documented": 226
+    "modules_documented": 18,
+    "objects_documented": 257
   },
   "pypi": {
     "checked": true,
     "latest": "0.1.6",
-    "relation": "behind",
+    "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/thorwhalen/inkmap && cd inkmap\ngit checkout 1342444c23d8f3ade4d3dce16914e5be192beef8\npip install \"epythet==0.2.18\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/thorwhalen/inkmap && cd inkmap\ngit checkout 0fc1fd26f4430a300baeda429cb1616c0764485b\npip install \"epythet==0.2.18\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
-    "aligned": false,
-    "notes": [
-      "The documented version (0.1.5) is behind the latest release on PyPI (0.1.6): `pip install inkmap` gives newer code than these docs describe."
-    ]
+    "aligned": true,
+    "notes": []
   }
 }

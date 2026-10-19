@@ -114,6 +114,7 @@
   <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../_autosummary/inkmap.html">inkmap</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/inkmap.locate.html">inkmap.locate</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/inkmap.models.html">inkmap.models</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/inkmap.geometry.html">inkmap.geometry</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/inkmap.photometry.html">inkmap.photometry</a></li>
@@ -259,7 +260,7 @@
 </span><span id="line-81">
 </span><span id="line-82">
 <div class="viewcode-block" id="SquareMark">
-<a class="viewcode-back" href="../../../_autosummary/inkmap.html#inkmap.SquareMark">[docs]</a>
+<a class="viewcode-back" href="../../../_autosummary/inkmap.locate.marks.html#inkmap.SquareMark">[docs]</a>
 </span><span id="line-83"><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </span><span id="line-84"><span class="k">class</span><span class="w"> </span><span class="nc">SquareMark</span><span class="p">:</span>
 </span><span id="line-85"><span class="w">    </span><span class="sd">"""One square mark found in an image. Coordinates are pixels, ``(x, y)``.</span>
@@ -285,7 +286,7 @@
 </span><span id="line-105">        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">rings</span>
 </span><span id="line-106">
 <div class="viewcode-block" id="SquareMark.ring_error">
-<a class="viewcode-back" href="../../../_autosummary/inkmap.html#inkmap.SquareMark.ring_error">[docs]</a>
+<a class="viewcode-back" href="../../../_autosummary/inkmap.locate.marks.html#inkmap.SquareMark.ring_error">[docs]</a>
 </span><span id="line-107">    <span class="k">def</span><span class="w"> </span><span class="nf">ring_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expected</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 </span><span id="line-108"><span class="w">        </span><span class="sd">"""Largest difference between these ring ratios and ``expected``; inf if unlike.</span>
 </span><span id="line-109">
@@ -303,6 +304,8 @@
 
 </span><span id="line-120">
 </span><span id="line-121">
+<div class="viewcode-block" id="quad_centre">
+<a class="viewcode-back" href="../../../_autosummary/inkmap.locate.marks.html#inkmap.quad_centre">[docs]</a>
 </span><span id="line-122"><span class="k">def</span><span class="w"> </span><span class="nf">quad_centre</span><span class="p">(</span><span class="n">corners</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="line-123"><span class="w">    </span><span class="sd">"""Where the diagonals of a quadrilateral cross: the projective centre of a square.</span>
 </span><span id="line-124">
@@ -313,20 +316,24 @@
 </span><span id="line-129"><span class="sd">    """</span>
 </span><span id="line-130">    <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">corners</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 </span><span id="line-131">    <span class="n">hit</span> <span class="o">=</span> <span class="n">_line_intersection</span><span class="p">((</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-</span><span id="line-132">    <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">hit</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">hit</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">hit</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+</span><span id="line-132">    <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">hit</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">hit</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">hit</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span></div>
+
 </span><span id="line-133">
 </span><span id="line-134">
+<div class="viewcode-block" id="ring_ratios">
+<a class="viewcode-back" href="../../../_autosummary/inkmap.locate.marks.html#inkmap.ring_ratios">[docs]</a>
 </span><span id="line-135"><span class="k">def</span><span class="w"> </span><span class="nf">ring_ratios</span><span class="p">(</span><span class="n">outer_area</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">inner_areas</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
 </span><span id="line-136"><span class="w">    </span><span class="sd">"""Side ratios of nested squares from their areas: ``sqrt(inner / outer)``.</span>
 </span><span id="line-137">
 </span><span id="line-138"><span class="sd">    &gt;&gt;&gt; ring_ratios(100.0, (64.0, 16.0))</span>
 </span><span id="line-139"><span class="sd">    (0.8, 0.4)</span>
 </span><span id="line-140"><span class="sd">    """</span>
-</span><span id="line-141">    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span> <span class="o">/</span> <span class="n">outer_area</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">inner_areas</span><span class="p">)</span>
+</span><span id="line-141">    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span> <span class="o">/</span> <span class="n">outer_area</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">inner_areas</span><span class="p">)</span></div>
+
 </span><span id="line-142">
 </span><span id="line-143">
 <div class="viewcode-block" id="find_square_marks">
-<a class="viewcode-back" href="../../../_autosummary/inkmap.html#inkmap.find_square_marks">[docs]</a>
+<a class="viewcode-back" href="../../../_autosummary/inkmap.locate.marks.html#inkmap.find_square_marks">[docs]</a>
 </span><span id="line-144"><span class="k">def</span><span class="w"> </span><span class="nf">find_square_marks</span><span class="p">(</span>
 </span><span id="line-145">    <span class="n">gray</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
 </span><span id="line-146">    <span class="o">*</span><span class="p">,</span>
@@ -746,7 +753,7 @@
 </footer>
     </div>
     
-    <script src="../../../_static/documentation_options.js?v=59fadc99"></script>
+    <script src="../../../_static/documentation_options.js?v=6e0256f3"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
