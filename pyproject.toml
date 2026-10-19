@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "inkmap"
-version = "0.1.6"
+version = "0.1.7"
 description = "Per-pixel foreground coverage for photographed marks -- QR, barcodes, text, any shape you can model"
 readme = "README.md"
 requires-python = ">=3.10"
