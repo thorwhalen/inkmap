@@ -189,3 +189,95 @@ MARK_CLIP_GUARD_INK_SHARE = 0.02
 #: this floor (its side-fit scatter alone understated its error ~4x).
 MARK_RING_SPREAD_SHARE = 0.5
 MARK_SOLID_SIGMA_FLOOR_PX = 0.015
+
+# --- Plain patches ----------------------------------------------------------- #
+
+#: The patch colour is the median over a window this share of the frame's shorter side
+#: across, round the seed. Small, so that a seed near the patch's edge still takes the
+#: patch's colour, not the paper's.
+PATCH_SEED_SHARE = 0.04
+
+#: The CIELAB distance (Delta E) that splits patch from not-patch is Otsu's threshold,
+#: clamped to this range: below 4 the split follows noise, above 25 a pale patch leaks
+#: into white paper.
+PATCH_MIN_DELTA_E = 4.0
+PATCH_MAX_DELTA_E = 25.0
+
+#: The interior is eroded clear of the patch's blurred edge by this share of its
+#: shorter side.
+PATCH_EDGE_MARGIN_SHARE = 0.08
+
+#: The substrate ring runs between these shares of the patch's shorter side outside
+#: it. Narrow on purpose: a thin paper border is easily overshot onto the background.
+PATCH_RING_SHARE = (0.02, 0.06)
+
+#: Verdict thresholds. A patch under this share of the frame is too small to trust.
+PATCH_MIN_AREA_SHARE = 0.01
+#: Area over the minimum-area rectangle's: a pale patch that leaked into the paper
+#: is no longer rectangular. (A rectangle seen in perspective scores ~0.9-1.)
+PATCH_MIN_RECTANGULARITY = 0.85
+#: The ring must hold at least this many substrate pixels...
+PATCH_MIN_SUBSTRATE_PX = 50
+#: ...whose median L* exceeds the patch's by at least this much (paper is lighter)...
+PATCH_MIN_SUBSTRATE_LIFT = 1.0
+#: ...and which are low-chroma (C*ab under this): paper, not a coloured table.
+PATCH_MAX_SUBSTRATE_CHROMA = 15.0
+#: ...on at least three sides, each holding substrate in this share of its ring.
+PATCH_MIN_SIDE_SHARE = 0.15
+
+#: A patch's outline is four-sided when a polygon within this share of its perimeter
+#: fits it with four vertices.
+PATCH_POLY_EPSILON_SHARE = 0.02
+
+#: How many times the patch region may be re-split by Otsu within itself, peeling off
+#: the paper a pale patch was first merged with (one is usually enough).
+PATCH_MAX_RESPLITS = 3
+
+#: The patch's sides are fitted to its colour edge along the direction from the patch's
+#: colour to the median colour of this band outside it (in pixels from its outline).
+PATCH_EDGE_BAND_PX = (2.0, 6.0)
+
+#: A patch must show a colour step of at least this (in Delta E along the patch-to-
+#: paper direction) across every side, measured between PATCH_EDGE_STEP_OFFSET_PX
+#: inside and outside it. A leaked region's boundary through shaded paper has none.
+PATCH_MIN_EDGE_STEP = 3.0
+PATCH_EDGE_STEP_OFFSET_PX = (2.0, 4.0)
+
+#: The substrate ring's lightness is split (paper from a darker background) only when
+#: its two Otsu classes are this many L* apart; shading alone spreads paper less.
+PATCH_SUBSTRATE_SPLIT_GAP = 15.0
+
+#: A patch side is refined against the image only where its edge steps by at least
+#: this many 8-bit levels (along the patch-to-paper colour direction).
+PATCH_MIN_EDGE_CONTRAST = 3.0
+
+#: A patch side's edge level is taken per profile and smoothed over this many profiles
+#: (pixels) along the side, rather than once for the whole side: uneven light moves it
+#: along a long side, which on a faint edge tilts the fitted line.
+PATCH_EDGE_LEVEL_WINDOW = 25
+
+#: The thresholded outline must lie within this many pixels of the fitted sides (95th
+#: percentile): a lobe leaked into shaded paper, or a rounded corner, strays further.
+PATCH_MAX_OUTLINE_DEVIATION_PX = 2.0
+
+#: Pixels of the interior that are not the patch's colour are always left out of it.
+#: The verdict fails when one connected blob of them covers more than this share of
+#: the interior (another patch, or the patch itself inside a region seeded on the
+#: paper: 7-8% in the cases seen), or when all of them together cover more than
+#: PATCH_MAX_OFF_COLOUR_SHARE (text, specks or glare obscuring the patch).
+PATCH_MAX_HOLE_SHARE = 0.05
+PATCH_MAX_OFF_COLOUR_SHARE = 0.25
+
+#: Substrate pixels must be within this Delta E of the ring's median paper colour: a
+#: neighbouring light-grey patch, or a white table, can pass for paper otherwise.
+PATCH_SUBSTRATE_MAX_DELTA_E = 8.0
+
+#: Interior pixels further from the seed colour than the patch's median distance plus
+#: this many robust deviations (1.4826 MAD) are left out, with a pixel round them:
+#: the fringe of text or glare on the patch.
+PATCH_INTERIOR_MADS = 4.0
+
+#: Two colours are distinct when their Otsu split along the principal axis is at least
+#: this many pooled deviations apart. One evenly spread population -- a patch under a
+#: lighting gradient -- scores about 3.5; a patch beside its paper, far more.
+PATCH_TWO_COLOUR_SEPARATION = 5.0

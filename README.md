@@ -210,6 +210,23 @@ bullseyes = [m for m in marks if m.ring_error(BULLSEYE_RINGS) < 0.06]
 
 Nested marks are told apart by their ring ratios (bullseye 0.64/0.32, QR finder 5/7 and 3/7), which perspective barely changes. Anything square is a candidate (a QR symbol's data modules too), so which mark is which on your layout stays with you; marks over 10% of the frame need `max_side_share=`. On synthetic sheets at up to 15% corner perspective and blur ≤ 2 px, the worst centre error is 0.13 px ([validation](docs/validation.md#square-registration-marks)).
 
+## Plain patches
+
+A single printed colour patch on a paper strip has no code and no marks to locate it by. `locate_patch` finds it from a seed point and returns the three things a measurement of the patch against its own paper needs: its interior, clear of the edge; a narrow ring of bare substrate round it; and a verdict on whether to trust them.
+
+```python
+regions = inkmap.locate_patch(photo)              # seeded at the frame's centre
+regions = inkmap.locate_patch(photo, seed=(x, y))
+regions.patch, regions.substrate                  # boolean masks over the frame
+regions.ok, regions.notes                         # the verdict, and why not
+regions.quad                                      # (4, 2) sub-pixel corners
+
+ink = inkmap.analyze(photo, [regions.placement])[0]   # or: find(photo, locators=["patch"])
+inkmap.measure(photo, ink)                        # patch vs the substrate round it
+```
+
+The patch is grown from the seed's CIELAB colour and its sides fitted to the colour edge, so a pale patch on white paper is placed as well as a dark one. The verdict refuses a patch that leaked into the paper, is cut by the frame, or has no paper round it; see [validation](docs/validation.md#plain-patches). On flash bursts, seed on an unlit frame: under flash a pale patch clips to white.
+
 ## Extending it
 
 ```python

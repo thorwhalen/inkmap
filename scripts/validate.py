@@ -15,6 +15,10 @@ from inkmap.coverage import measurement_weight
 
 TRIALS = 12
 
+#: Scenes for the patch table are drawn from seeds never used while developing the
+#: locator (0-11 were), so the table is not tuned to its own test set.
+HELD_OUT_SEED = 1000
+
 
 def _corner_rms(estimated: np.ndarray, truth: np.ndarray, model) -> float:
     a = geometry.transform_to_quad(estimated, model)
@@ -242,12 +246,78 @@ def square_marks() -> None:
         )
 
 
+def plain_patches() -> None:
+    """locate_patch on synth.render_patch: verdict, corner error and mask purity."""
+    from inkmap.locate import locate_patch
+
+    print("\n## Plain patches")
+    print(
+        "\n| patch | perspective | blur (px) | ok | corner error median (px) "
+        "| max (px) | patch px off the patch | substrate px off the paper |"
+    )
+    print("|---|---|---|---|---|---|---|---|")
+    colours = {
+        "dark grey": (40, 40, 45),
+        "blue": (160, 90, 40),
+        "red": (50, 50, 190),
+        "pale blue": (205, 215, 225),
+    }
+
+    def truth_mask(quad, shape):
+        mask = np.zeros(shape, np.uint8)
+        cv2.fillConvexPoly(mask, np.round(quad * 16).astype(np.int32), 1, shift=4)
+        return mask.astype(bool)
+
+    for name, bgr in colours.items():
+        for perspective in (0.0, 0.05, 0.1):
+            for blur in (1.0, 1.5):
+                ok, errors, spill, table = 0, [], 0, 0
+                for t in range(HELD_OUT_SEED, HELD_OUT_SEED + TRIALS):
+                    rng = np.random.default_rng(t)
+                    scene = synth.render_patch(
+                        patch_bgr=bgr,
+                        perspective=perspective,
+                        rotation=float(rng.uniform(-45, 45)),
+                        blur=blur,
+                        noise=2.0,
+                        gradient=0.2,
+                        background_texture=10.0,
+                        rng=t,
+                    )
+                    regions = locate_patch(scene.image)
+                    ok += regions.ok
+                    if not regions.ok:
+                        continue
+                    # Order-free: "clockwise from the top-left" flips at 45 degrees.
+                    errors.append(
+                        min(
+                            np.abs(
+                                np.roll(regions.quad, k, axis=0) - scene.patch_quad
+                            ).max()
+                            for k in range(4)
+                        )
+                    )
+                    shape = scene.image.shape[:2]
+                    spill += int(
+                        (regions.patch & ~truth_mask(scene.patch_quad, shape)).sum()
+                    )
+                    table += int(
+                        (regions.substrate & ~truth_mask(scene.paper_quad, shape)).sum()
+                    )
+                e = np.array(errors) if errors else np.array([np.nan])
+                print(
+                    f"| {name} | {perspective:.2f} | {blur:.1f} | {ok}/{TRIALS} "
+                    f"| {np.median(e):.3f} | {e.max():.3f} | {spill} | {table} |"
+                )
+
+
 SECTIONS = {
     "geometry": geometry_accuracy,
     "coverage": coverage_accuracy,
     "photometry": photometric_bias,
     "blur": blur_estimation,
     "marks": square_marks,
+    "patch": plain_patches,
 }
 
 
