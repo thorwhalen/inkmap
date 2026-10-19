@@ -54,7 +54,7 @@ Whether a trustworthy measurement is possible on this image at all.
 `pixels_per_feature / blur_sigma`. Below ~6 the blur is wide relative to the
 mark’s smallest feature and no erosion leaves uncontaminated pixels.
 
-### *class* inkmap.photometry.Measurement(foreground_mean, foreground_std, foreground_median, background_mean, background_std, background_median, n_foreground, n_background, measurability=None, metadata=<factory>)
+### *class* inkmap.photometry.Measurement(foreground_mean, foreground_std, foreground_median, background_mean, background_std, background_median, n_foreground, n_background, measurability=None, metadata=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 

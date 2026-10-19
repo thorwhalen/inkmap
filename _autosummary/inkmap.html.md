@@ -70,6 +70,7 @@ continuous value is **coverage**, after ISO 12647-2:2013 3.1 *area coverage*. Se
 | [`confidence`](#inkmap.confidence)(gray, placement, coverage, \*[, ...])   | How much to trust the coverage value at each pixel, in `[0, 1]`.               |
 | [`measurement_weight`](#inkmap.measurement_weight)(coverage, \*[, ...])            | Blur-aware weight in `[0, 1]`: how safe each pixel is to *measure*.            |
 | [`locate`](#inkmap.locate)(bgr, gray, \*[, locators, first_hit, ...])  | Run locator strategies and merge their results, de-duplicating by position.    |
+| [`find_square_marks`](#inkmap.find_square_marks)(gray, \*[, min_side_px, ...])    | Every solid or nested square mark in `gray` (2-D, 0-255 scale), largest first. |
 
 ### Classes
 
@@ -81,8 +82,9 @@ continuous value is **coverage**, after ISO 12647-2:2013 3.1 *area coverage*. Se
 | [`Model`](#inkmap.Model)(\*args, \*\*kwargs)                         | The shape of a mark, in its own coordinate system.                                 |
 | [`Measurement`](#inkmap.Measurement)(foreground_mean, foreground_std, ...) | Aggregated signal over foreground and background, with its validity attached.      |
 | [`Measurability`](#inkmap.Measurability)(ok, pixels_per_feature, ...[, ...]) | Whether a trustworthy measurement is possible on this image at all.                |
+| [`SquareMark`](#inkmap.SquareMark)(centre, corners, side_px[, ...])       | One square mark found in an image.                                                 |
 
-### *class* inkmap.InkMap(coverage, region, placement, polarity=Polarity.FOREGROUND_IS_DARK, weight=None, blur_sigma=None, metadata=<factory>)
+### *class* inkmap.InkMap(coverage, region, placement, polarity=Polarity.FOREGROUND_IS_DARK, weight=None, blur_sigma=None, metadata=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -155,7 +157,7 @@ Whether a trustworthy measurement is possible on this image at all.
 `pixels_per_feature / blur_sigma`. Below ~6 the blur is wide relative to the
 mark’s smallest feature and no erosion leaves uncontaminated pixels.
 
-### *class* inkmap.Measurement(foreground_mean, foreground_std, foreground_median, background_mean, background_std, background_median, n_foreground, n_background, measurability=None, metadata=<factory>)
+### *class* inkmap.Measurement(foreground_mean, foreground_std, foreground_median, background_mean, background_std, background_median, n_foreground, n_background, measurability=None, metadata=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -217,7 +219,7 @@ Must be vectorised: it is called with millions of points.
 * **Return type:**
   `ndarray`
 
-### *class* inkmap.Placement(model, transform, quad, locator='', payload=None, refined=False, score=None, metadata=<factory>)
+### *class* inkmap.Placement(model, transform, quad, locator='', payload=None, refined=False, score=None, metadata=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -326,6 +328,36 @@ reference region than the background *inside* the mark.
 
 Outside the mark and its margin.
 
+### *class* inkmap.SquareMark(centre, corners, side_px, rings=(), sigma_px=nan, centres=())
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One square mark found in an image. Coordinates are pixels, `(x, y)`.
+
+`corners` are the outer square’s, clockwise as seen on screen, starting from the
+one nearest the image’s top-left. A square has no intrinsic first corner, so that
+order is a convention, not an identification. `rings` is the side of each nested
+square as a fraction of the outer one, outermost first (empty for a solid mark).
+`centres` are the outer square’s centre followed by each nested square’s, each
+where that square’s diagonals cross; `centre` is their mean weighted by side,
+which for a solid mark is the outer square’s own.
+
+#### ring_error(expected)
+
+Largest difference between these ring ratios and `expected`; inf if unlike.
+
+```pycon
+>>> SquareMark((0, 0), np.zeros((4, 2)), 10.0, rings=(0.7, 0.4)).ring_error(
+...     QR_FINDER_RINGS
+... )
+0.028...
+>>> SquareMark((0, 0), np.zeros((4, 2)), 10.0).ring_error(BULLSEYE_RINGS)
+inf
+```
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
 ### inkmap.confidence(gray, placement, coverage, , polarity=Polarity.FOREGROUND_IS_DARK)
 
 How much to trust the coverage value at each pixel, in `[0, 1]`.
@@ -391,6 +423,28 @@ resolution. `None` (default) locates at full resolution. See
 
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`InkMap`](inkmap.types.html.md#inkmap.types.InkMap)]
+
+### inkmap.find_square_marks(gray, , min_side_px=8.0, max_side_share=0.1, polarity=Polarity.FOREGROUND_IS_DARK, dark_share=0.72, min_contrast=6.0, local_window_share=0.12)
+
+Every solid or nested square mark in `gray` (2-D, 0-255 scale), largest first.
+
+A mark’s outer square must be at least `min_side_px` on a side and at most
+`max_side_share` of the frame’s shorter side. Nested marks report their ring
+ratios; solid marks report none. `polarity` says whether the marks read darker
+than the substrate (the usual case) or brighter.
+
+The foreground is binarised relative to the local mean brightness: a pixel is
+foreground when it is darker than `dark_share` of the mean over a window
+`local_window_share` of the frame’s shorter side, and darker by at least
+`min_contrast` grey levels. The window is widened to stay wider than the largest
+mark looked for, since a mark wider than it is hollowed by its own ink.
+
+Anything square is a candidate: a QR symbol’s clusters of data modules and some
+printed glyphs come back as solid marks too. Telling the registration marks from
+them, by size, ring ratio and layout, is the caller’s.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`SquareMark`](#inkmap.SquareMark)]
 
 ### inkmap.foreground(image, \*\*kwargs)
 

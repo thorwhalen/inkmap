@@ -30,6 +30,7 @@
 <meta content="inkmap" name="twitter:title"/>
 <link href="_static/pygments.css?v=d75fae25" rel="stylesheet" type="text/css"/>
 <link href="_static/theme.css?v=d6d7c91b" rel="stylesheet" type="text/css"/>
+<link href="_static/sphinx_autodoc_typehints.css?v=057ac668" rel="stylesheet" type="text/css"/>
 <link href="_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
 <link href="_static/epythet.css?v=ded595e6" rel="stylesheet" type="text/css"/>
 <link href="search.html" rel="search" title="Search"/>
@@ -343,6 +344,21 @@ barcode defect the evaluation caught and forced a fix for (round-trip 5% → 48%
 <p>Locating is a large share of the cost on big frames and scales with pixel count, so <code class="docutils literal notranslate"><span class="pre">find_all(photo,</span> <span class="pre">locate_scale=0.5)</span></code> (or <code class="docutils literal notranslate"><span class="pre">locate(bgr,</span> <span class="pre">gray,</span> <span class="pre">scale=0.5)</span></code>) runs the detectors on an <code class="docutils literal notranslate"><span class="pre">INTER_AREA</span></code>-downscaled copy and maps the placements back to full resolution; refinement then pins them to sub-pixel accuracy as usual, so coverage maps match the full-resolution ones. On a 4000 x 3000 photograph of a page with 8 QR codes, locating took 1,129 ms at full resolution, 288 ms at 0.5 and 152 ms at 0.35, with all 8 codes found and decoded (on a slower 2-core server, a synthetic page of the same size: 11.6 s, 2.5 s and 1.1 s).</p>
 <p>Use it when your codes are large in the frame: a code’s modules should still span about 4 px after downscaling (<code class="docutils literal notranslate"><span class="pre">config.MIN_COARSE_PIXELS_PER_FEATURE</span></code>), i.e. 8 px at full resolution for 0.5 and about 11.5 px for 0.35. Below that the module count and pattern read off the small frame go wrong even though the code still decodes (at 2 px a 25 x 25 QR reads as 21 x 21), and refinement cannot repair a wrong model. So, with <code class="docutils literal notranslate"><span class="pre">full_res_retry=True</span></code> (the default), any coarse placement under that floor, or found but not decoded, is re-located on a full-resolution crop around it (<code class="docutils literal notranslate"><span class="pre">metadata["locate_retry"]</span></code> says why). The crops are small, but if every code needs one the speedup is gone, so pick the scale from your smallest code. With <code class="docutils literal notranslate"><span class="pre">full_res_retry=False</span></code>, placements under the floor are kept and marked <code class="docutils literal notranslate"><span class="pre">metadata["locate_undersampled"]</span> <span class="pre">=</span> <span class="pre">True</span></code>; do not trust their model. Custom locators run on the downscaled frame and must return coordinates in the frame they are given. A code the coarse pass misses entirely is not recovered, so lower the downscaling instead. The default, <code class="docutils literal notranslate"><span class="pre">None</span></code>, locates at full resolution exactly as before.</p>
 </section>
+<section id="registration-marks">
+<h2>Registration marks<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#registration-marks" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#registration-marks'">¶</a></h2>
+<p>Printed targets often carry plain marks with no code to decode: a solid square, or nested-square bullseyes at the corners of a sheet, as on OMR forms. <code class="docutils literal notranslate"><span class="pre">find_square_marks</span></code> finds them and returns each one’s projective centre to a small fraction of a pixel, which is what pose estimation needs:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">inkmap.locate</span><span class="w"> </span><span class="kn">import</span> <span class="n">BULLSEYE_RINGS</span><span class="p">,</span> <span class="n">find_square_marks</span>
+</span><span id="line-2">
+</span><span id="line-3"><span class="n">marks</span> <span class="o">=</span> <span class="n">find_square_marks</span><span class="p">(</span><span class="n">gray</span><span class="p">)</span>                 <span class="c1"># largest first</span>
+</span><span id="line-4"><span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">marks</span><span class="p">:</span>
+</span><span id="line-5">    <span class="n">m</span><span class="o">.</span><span class="n">centre</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">sigma_px</span>                        <span class="c1"># sub-pixel centre, its typical error</span>
+</span><span id="line-6">    <span class="n">m</span><span class="o">.</span><span class="n">corners</span>                                   <span class="c1"># (4, 2), clockwise from the top-left</span>
+</span><span id="line-7">    <span class="n">m</span><span class="o">.</span><span class="n">rings</span>                                     <span class="c1"># () for a solid square</span>
+</span><span id="line-8"><span class="n">bullseyes</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">marks</span> <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">ring_error</span><span class="p">(</span><span class="n">BULLSEYE_RINGS</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.06</span><span class="p">]</span>
+</span></code></pre></div>
+</div>
+<p>Nested marks are told apart by their ring ratios (bullseye 0.64/0.32, QR finder 5/7 and 3/7), which perspective barely changes. Anything square is a candidate (a QR symbol’s data modules too), so which mark is which on your layout stays with you; marks over 10% of the frame need <code class="docutils literal notranslate"><span class="pre">max_side_share=</span></code>. On synthetic sheets at up to 15% corner perspective and blur ≤ 2 px, the worst centre error is 0.13 px (<a class="reference internal" href="#docs/validation.md#square-registration-marks"><span class="xref myst">validation</span></a>).</p>
+</section>
 <section id="extending-it">
 <h2>Extending it<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#extending-it" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#extending-it'">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">inkmap</span><span class="o">.</span><span class="n">LOCATORS</span><span class="p">[</span><span class="s2">"mine"</span><span class="p">]</span> <span class="o">=</span> <span class="n">my_locator</span>          <span class="c1"># (bgr, gray) -&gt; list[Placement]</span>
@@ -412,7 +428,7 @@ Pillow only for <code class="docutils literal notranslate"><span class="pre">Gly
 
 </section>
 </section>
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-14 00:19 UTC from <a href="https://github.com/thorwhalen/inkmap/commit/28b9d1092af3a8c89e96d11ac2cd6f1b9834407b">28b9d10</a> (main) · inkmap 0.1.3 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-19 11:24 UTC from <a href="https://github.com/thorwhalen/inkmap/commit/4c6de7db71b785b6af098c14eb4189e84dc121d6">4c6de7d</a> (main) · inkmap 0.1.4 · <a href="about-this-build.html">about this build</a></p>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
@@ -423,6 +439,7 @@ Pillow only for <code class="docutils literal notranslate"><span class="pre">Gly
 <li><a :data-current="activeSection === '#how-it-works'" class="reference internal" href="#how-it-works">How it works</a></li>
 <li><a :data-current="activeSection === '#how-well-it-works'" class="reference internal" href="#how-well-it-works">How well it works</a></li>
 <li><a :data-current="activeSection === '#large-photographs-locate-coarse-refine-fine'" class="reference internal" href="#large-photographs-locate-coarse-refine-fine">Large photographs: locate coarse, refine fine</a></li>
+<li><a :data-current="activeSection === '#registration-marks'" class="reference internal" href="#registration-marks">Registration marks</a></li>
 <li><a :data-current="activeSection === '#extending-it'" class="reference internal" href="#extending-it">Extending it</a></li>
 <li><a :data-current="activeSection === '#skills-for-ai-agents'" class="reference internal" href="#skills-for-ai-agents">Skills for AI agents</a></li>
 <li><a :data-current="activeSection === '#test-data'" class="reference internal" href="#test-data">Test data</a></li>
@@ -442,7 +459,7 @@ Pillow only for <code class="docutils literal notranslate"><span class="pre">Gly
 </div>
 </footer>
 </div>
-<script src="_static/documentation_options.js?v=360bc84d"></script>
+<script src="_static/documentation_options.js?v=fd825880"></script>
 <script src="_static/doctools.js?v=fd6eb6e6"></script>
 <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="_static/clipboard.min.js?v=a7894cd8"></script>

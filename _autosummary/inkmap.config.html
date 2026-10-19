@@ -30,6 +30,7 @@
 <meta content="inkmap.config | inkmap" name="twitter:title"/>
 <link href="../_static/pygments.css?v=d75fae25" rel="stylesheet" type="text/css"/>
 <link href="../_static/theme.css?v=d6d7c91b" rel="stylesheet" type="text/css"/>
+<link href="../_static/sphinx_autodoc_typehints.css?v=057ac668" rel="stylesheet" type="text/css"/>
 <link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
 <link href="../_static/epythet.css?v=ded595e6" rel="stylesheet" type="text/css"/>
 <link href="../search.html" rel="search" title="Search"/>
@@ -176,6 +177,63 @@ at call time, so overriding one is a call-site concern, not global mutable state
 <tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.MIN_COARSE_PIXELS_PER_FEATURE" title="inkmap.config.MIN_COARSE_PIXELS_PER_FEATURE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MIN_COARSE_PIXELS_PER_FEATURE</span></code></a></p></td>
 <td><p>below this many image pixels per model feature (a QR module, a barcode's narrowest bar) <em>in the downscaled frame</em>, the model a locator reads off that frame is unreliable even when the code decodes -- with modules at 2 px a 25 x 25 QR is read as 21 x 21, at 2.5-3.5 px tens of its 625 modules flip, and only from 4 px are they all right (synthetic pages, <code class="docutils literal notranslate"><span class="pre">locate(scale=0.5)</span></code>).</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.MARK_DARK_SHARE" title="inkmap.config.MARK_DARK_SHARE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MARK_DARK_SHARE</span></code></a></p></td>
+<td><p>A pixel is foreground when it is darker than this share of the local mean brightness.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.MARK_MIN_CONTRAST" title="inkmap.config.MARK_MIN_CONTRAST"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MARK_MIN_CONTRAST</span></code></a></p></td>
+<td><p>...and darker than the local mean by at least this many grey levels (of 255).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.MARK_LOCAL_WINDOW_SHARE" title="inkmap.config.MARK_LOCAL_WINDOW_SHARE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MARK_LOCAL_WINDOW_SHARE</span></code></a></p></td>
+<td><p>wider than any mark, so a mark's own ink does not raise the threshold inside it.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.MARK_BORDER_PX" title="inkmap.config.MARK_BORDER_PX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MARK_BORDER_PX</span></code></a></p></td>
+<td><p>A contour within this many pixels of the frame's edge is cut by it.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.MARK_POLY_EPSILON_SHARE" title="inkmap.config.MARK_POLY_EPSILON_SHARE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MARK_POLY_EPSILON_SHARE</span></code></a></p></td>
+<td><p>A contour is a quadrilateral when a polygon within this share of its perimeter fits it with four vertices (<code class="docutils literal notranslate"><span class="pre">cv2.approxPolyDP</span></code>'s epsilon).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.MARK_MAX_SIDE_RATIO" title="inkmap.config.MARK_MAX_SIDE_RATIO"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MARK_MAX_SIDE_RATIO</span></code></a></p></td>
+<td><p>A quadrilateral whose opposite sides differ by more than this factor is not a square seen at any plausible incidence.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.MARK_MIN_HOLE_AREA_SHARE" title="inkmap.config.MARK_MIN_HOLE_AREA_SHARE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MARK_MIN_HOLE_AREA_SHARE</span></code></a></p></td>
+<td><p>the square is solid.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.MARK_CORNER_TRIM_SHARE" title="inkmap.config.MARK_CORNER_TRIM_SHARE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MARK_CORNER_TRIM_SHARE</span></code></a></p></td>
+<td><p>Contour points within this share of a side's length from either corner are left out of that side's line fit: the corner is where binarisation rounds the outline.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.MARK_EDGE_PROFILE_PX" title="inkmap.config.MARK_EDGE_PROFILE_PX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MARK_EDGE_PROFILE_PX</span></code></a></p></td>
+<td><p>Each side's line is refined against the grey image along profiles this many pixels either side of it (and no more than MARK_EDGE_PROFILE_SHARE of the side's length), long enough to bracket a blurred edge, short enough not to reach a ring's next edge.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.MARK_EDGE_STEP_PX" title="inkmap.config.MARK_EDGE_STEP_PX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MARK_EDGE_STEP_PX</span></code></a></p></td>
+<td><p>Spacing of the samples along each edge profile, in pixels.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.MARK_EDGE_ITERATIONS" title="inkmap.config.MARK_EDGE_ITERATIONS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MARK_EDGE_ITERATIONS</span></code></a></p></td>
+<td><p>Refinement passes per side.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.MARK_EDGE_OUTLIER_PX" title="inkmap.config.MARK_EDGE_OUTLIER_PX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MARK_EDGE_OUTLIER_PX</span></code></a></p></td>
+<td><p>A refined edge crossing further than this from the fitted line (or three times the line's scatter, if larger) is an outlier -- a glare bite, a speck -- and is refitted without.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.MARK_MAX_SIDE_SCATTER_PX" title="inkmap.config.MARK_MAX_SIDE_SCATTER_PX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MARK_MAX_SIDE_SCATTER_PX</span></code></a></p></td>
+<td><p>A quadrilateral whose refined sides scatter about their lines by more than this (rms, in pixels), or this share of its side if larger, is not a square: a disc's outline also fits four lines, but its scatter grows with its size (0.35 px for a 10 px radius, 1 px for 20 px), where a square's stays at the noise floor.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.MARK_MIN_QUAD_SIDE_PX" title="inkmap.config.MARK_MIN_QUAD_SIDE_PX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MARK_MIN_QUAD_SIDE_PX</span></code></a></p></td>
+<td><p>The smallest square considered at all, in pixels on a side.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.MARK_WINDOW_OVER_MAX_SIDE" title="inkmap.config.MARK_WINDOW_OVER_MAX_SIDE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MARK_WINDOW_OVER_MAX_SIDE</span></code></a></p></td>
+<td><p>The local-mean window is kept at least this many times the largest mark looked for (<code class="docutils literal notranslate"><span class="pre">max_side_share</span></code>): a mark wider than the window raises its own threshold and is hollowed by its own ink.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.MARK_NESTED_HOLE_AREA_RATIO" title="inkmap.config.MARK_NESTED_HOLE_AREA_RATIO"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MARK_NESTED_HOLE_AREA_RATIO</span></code></a></p></td>
+<td><p>A square in a hole less than this many times its own area is the inner square of a nested mark (a bullseye's hole is 4x its inner square, a QR finder's 2.8x), not a mark of its own.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.MARK_MAX_ASPECT" title="inkmap.config.MARK_MAX_ASPECT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MARK_MAX_ASPECT</span></code></a></p></td>
+<td><p>A quadrilateral whose mean opposite-side lengths differ by more than this factor is a rectangle, not a square: 1.6 is a square seen at about 51 degrees of incidence.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.MARK_CLIP_GUARD_SHARE" title="inkmap.config.MARK_CLIP_GUARD_SHARE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MARK_CLIP_GUARD_SHARE</span></code></a></p></td>
+<td><p>A solid square whose neighbourhood out to this many sides runs off the frame, and holds more than MARK_CLIP_GUARD_INK_SHARE foreground, may be the inner square of a nested mark the frame cuts, and is dropped.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.MARK_RING_SPREAD_SHARE" title="inkmap.config.MARK_RING_SPREAD_SHARE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MARK_RING_SPREAD_SHARE</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sigma_px</span></code> calibration, fitted on synthetic sheets (rotations, perspective up to 0.15, blur 0.7-1.5 px, noise 1-4) so that the median centre error is about sigma for both kinds of mark.</p></td>
+</tr>
 </tbody>
 </table>
 <dl class="py data">
@@ -242,6 +300,145 @@ pass’s position error, while keeping the crop a small fraction of the frame.</
 4 matches the QR quiet zone required by ISO/IEC 18004.</p>
 </dd></dl>
 <dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.MARK_BORDER_PX">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">MARK_BORDER_PX</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.MARK_BORDER_PX" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.MARK_BORDER_PX'">¶</a></dt>
+<dd><p>A contour within this many pixels of the frame’s edge is cut by it. Its shape is not
+the mark’s, and a clipped mark’s centre is wrong by a share of its side, so it is
+dropped rather than measured.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.MARK_CLIP_GUARD_SHARE">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">MARK_CLIP_GUARD_SHARE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.2</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.MARK_CLIP_GUARD_SHARE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.MARK_CLIP_GUARD_SHARE'">¶</a></dt>
+<dd><p>A solid square whose neighbourhood out to this many sides runs off the frame, and
+holds more than MARK_CLIP_GUARD_INK_SHARE foreground, may be the inner square of a
+nested mark the frame cuts, and is dropped. A bullseye’s outer edge is 1.06 inner
+sides out from its inner square, a QR finder’s 0.67.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.MARK_CORNER_TRIM_SHARE">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">MARK_CORNER_TRIM_SHARE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.15</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.MARK_CORNER_TRIM_SHARE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.MARK_CORNER_TRIM_SHARE'">¶</a></dt>
+<dd><p>Contour points within this share of a side’s length from either corner are left out
+of that side’s line fit: the corner is where binarisation rounds the outline.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.MARK_DARK_SHARE">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">MARK_DARK_SHARE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.72</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.MARK_DARK_SHARE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.MARK_DARK_SHARE'">¶</a></dt>
+<dd><p>A pixel is foreground when it is darker than this share of the local mean
+brightness. Relative rather than absolute, so that an unevenly lit sheet (3.5:1 from
+one side to the other) and a dim frame are binarised alike.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.MARK_EDGE_ITERATIONS">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">MARK_EDGE_ITERATIONS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.MARK_EDGE_ITERATIONS" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.MARK_EDGE_ITERATIONS'">¶</a></dt>
+<dd><p>Refinement passes per side. The first takes the line from the contour’s quantised
+position to the edge; the second re-centres the profiles on it.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.MARK_EDGE_OUTLIER_PX">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">MARK_EDGE_OUTLIER_PX</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.75</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.MARK_EDGE_OUTLIER_PX" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.MARK_EDGE_OUTLIER_PX'">¶</a></dt>
+<dd><p>A refined edge crossing further than this from the fitted line (or three times the
+line’s scatter, if larger) is an outlier – a glare bite, a speck – and is refitted
+without.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.MARK_EDGE_PROFILE_PX">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">MARK_EDGE_PROFILE_PX</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2.5</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.MARK_EDGE_PROFILE_PX" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.MARK_EDGE_PROFILE_PX'">¶</a></dt>
+<dd><p>Each side’s line is refined against the grey image along profiles this many pixels
+either side of it (and no more than MARK_EDGE_PROFILE_SHARE of the side’s length),
+long enough to bracket a blurred edge, short enough not to reach a ring’s next edge.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.MARK_EDGE_STEP_PX">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">MARK_EDGE_STEP_PX</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.25</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.MARK_EDGE_STEP_PX" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.MARK_EDGE_STEP_PX'">¶</a></dt>
+<dd><p>Spacing of the samples along each edge profile, in pixels.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.MARK_LOCAL_WINDOW_SHARE">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">MARK_LOCAL_WINDOW_SHARE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.12</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.MARK_LOCAL_WINDOW_SHARE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.MARK_LOCAL_WINDOW_SHARE'">¶</a></dt>
+<dd><p>wider
+than any mark, so a mark’s own ink does not raise the threshold inside it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The local mean is taken over a window this share of the frame’s shorter side</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.MARK_MAX_ASPECT">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">MARK_MAX_ASPECT</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.6</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.MARK_MAX_ASPECT" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.MARK_MAX_ASPECT'">¶</a></dt>
+<dd><p>A quadrilateral whose mean opposite-side lengths differ by more than this factor is
+a rectangle, not a square: 1.6 is a square seen at about 51 degrees of incidence.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.MARK_MAX_SIDE_RATIO">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">MARK_MAX_SIDE_RATIO</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2.5</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.MARK_MAX_SIDE_RATIO" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.MARK_MAX_SIDE_RATIO'">¶</a></dt>
+<dd><p>A quadrilateral whose opposite sides differ by more than this factor is not a square
+seen at any plausible incidence.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.MARK_MAX_SIDE_SCATTER_PX">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">MARK_MAX_SIDE_SCATTER_PX</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.25</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.MARK_MAX_SIDE_SCATTER_PX" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.MARK_MAX_SIDE_SCATTER_PX'">¶</a></dt>
+<dd><p>A quadrilateral whose refined sides scatter about their lines by more than this
+(rms, in pixels), or this share of its side if larger, is not a square: a disc’s
+outline also fits four lines, but its scatter grows with its size (0.35 px for a
+10 px radius, 1 px for 20 px), where a square’s stays at the noise floor. A disc
+under ~10 px radius cannot be told from a square this way.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.MARK_MIN_CONTRAST">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">MARK_MIN_CONTRAST</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6.0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.MARK_MIN_CONTRAST" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.MARK_MIN_CONTRAST'">¶</a></dt>
+<dd><p>…and darker than the local mean by at least this many grey levels (of 255).
+Without a floor, sensor noise on a near-black table is “darker than 72% of the local
+mean” everywhere, and the contour search drowns in blobs.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.MARK_MIN_HOLE_AREA_SHARE">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">MARK_MIN_HOLE_AREA_SHARE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.02</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.MARK_MIN_HOLE_AREA_SHARE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.MARK_MIN_HOLE_AREA_SHARE'">¶</a></dt>
+<dd><p>the square is solid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A hole smaller than this share of its square’s area is noise</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.MARK_MIN_QUAD_SIDE_PX">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">MARK_MIN_QUAD_SIDE_PX</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5.0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.MARK_MIN_QUAD_SIDE_PX" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.MARK_MIN_QUAD_SIDE_PX'">¶</a></dt>
+<dd><p>The smallest square considered at all, in pixels on a side. Lower than any mark’s
+own <code class="docutils literal notranslate"><span class="pre">min_side_px</span></code>, because a nested mark’s inner square is a third of its side and
+must be found for the mark to be.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.MARK_NESTED_HOLE_AREA_RATIO">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">MARK_NESTED_HOLE_AREA_RATIO</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9.0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.MARK_NESTED_HOLE_AREA_RATIO" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.MARK_NESTED_HOLE_AREA_RATIO'">¶</a></dt>
+<dd><p>A square in a hole less than this many times its own area is the inner square of a
+nested mark (a bullseye’s hole is 4x its inner square, a QR finder’s 2.8x), not a
+mark of its own. A sheet’s outline or a form’s box holds its marks in a far larger
+hole.</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.MARK_POLY_EPSILON_SHARE">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">MARK_POLY_EPSILON_SHARE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.04</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.MARK_POLY_EPSILON_SHARE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.MARK_POLY_EPSILON_SHARE'">¶</a></dt>
+<dd><p>A contour is a quadrilateral when a polygon within this share of its perimeter fits
+it with four vertices (<code class="docutils literal notranslate"><span class="pre">cv2.approxPolyDP</span></code>’s epsilon).</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.MARK_RING_SPREAD_SHARE">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">MARK_RING_SPREAD_SHARE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.5</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.MARK_RING_SPREAD_SHARE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.MARK_RING_SPREAD_SHARE'">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">sigma_px</span></code> calibration, fitted on synthetic sheets (rotations, perspective up to
+0.15, blur 0.7-1.5 px, noise 1-4) so that the median centre error is about sigma for
+both kinds of mark. A nested mark’s term is this share of the rms distance of its
+squares’ centres from their mean; a solid mark, with nothing to disagree with, gets
+this floor (its side-fit scatter alone understated its error ~4x).</p>
+</dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.MARK_WINDOW_OVER_MAX_SIDE">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">MARK_WINDOW_OVER_MAX_SIDE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.2</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.MARK_WINDOW_OVER_MAX_SIDE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.MARK_WINDOW_OVER_MAX_SIDE'">¶</a></dt>
+<dd><p>The local-mean window is kept at least this many times the largest mark looked for
+(<code class="docutils literal notranslate"><span class="pre">max_side_share</span></code>): a mark wider than the window raises its own threshold and is
+hollowed by its own ink.</p>
+</dd></dl>
+<dl class="py data">
 <dt class="sig sig-object py" id="inkmap.config.MIN_COARSE_PIXELS_PER_FEATURE">
 <span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">MIN_COARSE_PIXELS_PER_FEATURE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4.0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.MIN_COARSE_PIXELS_PER_FEATURE" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.MIN_COARSE_PIXELS_PER_FEATURE'">¶</a></dt>
 <dd><p>below this many image pixels per model feature (a QR
@@ -300,6 +497,25 @@ kernel reflects interior content across the border and biases alignment ~0.45 px
 <li><a :data-current="activeSection === '#inkmap.config.EDGE_MARGIN_SIGMAS'" class="reference internal" href="#inkmap.config.EDGE_MARGIN_SIGMAS"><code class="docutils literal notranslate"><span class="pre">EDGE_MARGIN_SIGMAS</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.config.LOCATE_RETRY_PADDING'" class="reference internal" href="#inkmap.config.LOCATE_RETRY_PADDING"><code class="docutils literal notranslate"><span class="pre">LOCATE_RETRY_PADDING</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.config.MARGIN_UNITS'" class="reference internal" href="#inkmap.config.MARGIN_UNITS"><code class="docutils literal notranslate"><span class="pre">MARGIN_UNITS</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.MARK_BORDER_PX'" class="reference internal" href="#inkmap.config.MARK_BORDER_PX"><code class="docutils literal notranslate"><span class="pre">MARK_BORDER_PX</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.MARK_CLIP_GUARD_SHARE'" class="reference internal" href="#inkmap.config.MARK_CLIP_GUARD_SHARE"><code class="docutils literal notranslate"><span class="pre">MARK_CLIP_GUARD_SHARE</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.MARK_CORNER_TRIM_SHARE'" class="reference internal" href="#inkmap.config.MARK_CORNER_TRIM_SHARE"><code class="docutils literal notranslate"><span class="pre">MARK_CORNER_TRIM_SHARE</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.MARK_DARK_SHARE'" class="reference internal" href="#inkmap.config.MARK_DARK_SHARE"><code class="docutils literal notranslate"><span class="pre">MARK_DARK_SHARE</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.MARK_EDGE_ITERATIONS'" class="reference internal" href="#inkmap.config.MARK_EDGE_ITERATIONS"><code class="docutils literal notranslate"><span class="pre">MARK_EDGE_ITERATIONS</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.MARK_EDGE_OUTLIER_PX'" class="reference internal" href="#inkmap.config.MARK_EDGE_OUTLIER_PX"><code class="docutils literal notranslate"><span class="pre">MARK_EDGE_OUTLIER_PX</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.MARK_EDGE_PROFILE_PX'" class="reference internal" href="#inkmap.config.MARK_EDGE_PROFILE_PX"><code class="docutils literal notranslate"><span class="pre">MARK_EDGE_PROFILE_PX</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.MARK_EDGE_STEP_PX'" class="reference internal" href="#inkmap.config.MARK_EDGE_STEP_PX"><code class="docutils literal notranslate"><span class="pre">MARK_EDGE_STEP_PX</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.MARK_LOCAL_WINDOW_SHARE'" class="reference internal" href="#inkmap.config.MARK_LOCAL_WINDOW_SHARE"><code class="docutils literal notranslate"><span class="pre">MARK_LOCAL_WINDOW_SHARE</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.MARK_MAX_ASPECT'" class="reference internal" href="#inkmap.config.MARK_MAX_ASPECT"><code class="docutils literal notranslate"><span class="pre">MARK_MAX_ASPECT</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.MARK_MAX_SIDE_RATIO'" class="reference internal" href="#inkmap.config.MARK_MAX_SIDE_RATIO"><code class="docutils literal notranslate"><span class="pre">MARK_MAX_SIDE_RATIO</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.MARK_MAX_SIDE_SCATTER_PX'" class="reference internal" href="#inkmap.config.MARK_MAX_SIDE_SCATTER_PX"><code class="docutils literal notranslate"><span class="pre">MARK_MAX_SIDE_SCATTER_PX</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.MARK_MIN_CONTRAST'" class="reference internal" href="#inkmap.config.MARK_MIN_CONTRAST"><code class="docutils literal notranslate"><span class="pre">MARK_MIN_CONTRAST</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.MARK_MIN_HOLE_AREA_SHARE'" class="reference internal" href="#inkmap.config.MARK_MIN_HOLE_AREA_SHARE"><code class="docutils literal notranslate"><span class="pre">MARK_MIN_HOLE_AREA_SHARE</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.MARK_MIN_QUAD_SIDE_PX'" class="reference internal" href="#inkmap.config.MARK_MIN_QUAD_SIDE_PX"><code class="docutils literal notranslate"><span class="pre">MARK_MIN_QUAD_SIDE_PX</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.MARK_NESTED_HOLE_AREA_RATIO'" class="reference internal" href="#inkmap.config.MARK_NESTED_HOLE_AREA_RATIO"><code class="docutils literal notranslate"><span class="pre">MARK_NESTED_HOLE_AREA_RATIO</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.MARK_POLY_EPSILON_SHARE'" class="reference internal" href="#inkmap.config.MARK_POLY_EPSILON_SHARE"><code class="docutils literal notranslate"><span class="pre">MARK_POLY_EPSILON_SHARE</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.MARK_RING_SPREAD_SHARE'" class="reference internal" href="#inkmap.config.MARK_RING_SPREAD_SHARE"><code class="docutils literal notranslate"><span class="pre">MARK_RING_SPREAD_SHARE</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.MARK_WINDOW_OVER_MAX_SIDE'" class="reference internal" href="#inkmap.config.MARK_WINDOW_OVER_MAX_SIDE"><code class="docutils literal notranslate"><span class="pre">MARK_WINDOW_OVER_MAX_SIDE</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.config.MIN_COARSE_PIXELS_PER_FEATURE'" class="reference internal" href="#inkmap.config.MIN_COARSE_PIXELS_PER_FEATURE"><code class="docutils literal notranslate"><span class="pre">MIN_COARSE_PIXELS_PER_FEATURE</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.config.MIN_SCALE_OVER_SIGMA'" class="reference internal" href="#inkmap.config.MIN_SCALE_OVER_SIGMA"><code class="docutils literal notranslate"><span class="pre">MIN_SCALE_OVER_SIGMA</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.config.PURE_COVERAGE_TOL'" class="reference internal" href="#inkmap.config.PURE_COVERAGE_TOL"><code class="docutils literal notranslate"><span class="pre">PURE_COVERAGE_TOL</span></code></a></li>
@@ -319,7 +535,7 @@ kernel reflects interior content across the border and biases alignment ~0.45 px
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=360bc84d"></script>
+<script src="../_static/documentation_options.js?v=fd825880"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

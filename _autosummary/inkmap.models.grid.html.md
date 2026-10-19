@@ -11,7 +11,7 @@ rate – there is no intermediate bitmap to quantise them twice.
 |--------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
 | [`BarsModel`](#inkmap.models.grid.BarsModel)(bars[, height, metadata]) | A 1-D run of foreground/background bars, extruded vertically -- a linear barcode. |
 
-### *class* inkmap.models.grid.BarsModel(bars, height=20.0, metadata=<factory>)
+### *class* inkmap.models.grid.BarsModel(bars, height=20.0, metadata=dict())
 
 Bases: [`BaseModel`](inkmap.models.base.html.md#inkmap.models.base.BaseModel)
 
@@ -27,7 +27,7 @@ fixes the aspect ratio for rendering and refinement.
 
 One module – the narrowest bar, which is what must be resolved.
 
-### *class* inkmap.models.grid.MatrixModel(cells, metadata=<factory>)
+### *class* inkmap.models.grid.MatrixModel(cells, metadata=dict())
 
 Bases: [`BaseModel`](inkmap.models.base.html.md#inkmap.models.base.BaseModel)
 

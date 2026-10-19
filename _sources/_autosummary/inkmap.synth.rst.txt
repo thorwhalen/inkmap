@@ -12,6 +12,8 @@ inkmap.synth
       qr_model
       default_matrix
       degrade
+      nested_square
+      mark_sheet
    
    .. rubric:: Classes
 

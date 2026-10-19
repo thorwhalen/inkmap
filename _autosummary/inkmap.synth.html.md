@@ -24,13 +24,15 @@ Real photographs remain essential for *detection* rate – see [`inkmap.corpus`]
 | [`qr_model`](#inkmap.synth.qr_model)([payload, error])                       | A QR [`MatrixModel`](inkmap.models.html.md#inkmap.models.MatrixModel), from `payload` via segno. |
 | [`default_matrix`](#inkmap.synth.default_matrix)()                                 | The shipped QR module matrix (a real version-3 symbol), True = dark module.                                            |
 | [`degrade`](#inkmap.synth.degrade)(image, \*[, blur, noise, gradient, ...]) | Apply a capture-order degradation chain to a float image, returning uint8.                                             |
+| [`nested_square`](#inkmap.synth.nested_square)(side[, rings])                     | A square mark as a `(side, side)` cell grid: foreground, then alternating rings.                                       |
+| [`mark_sheet`](#inkmap.synth.mark_sheet)()                                     | A card of square registration marks, and where each one's centre truly is.                                             |
 
 ### Classes
 
 | [`Scene`](#inkmap.synth.Scene)(image, coverage, transform, model[, ...])   | A synthetic image together with the truth used to make it.   |
 |----------------------------------------------------------------------------------------------------|--------------------------------------------------------------|
 
-### *class* inkmap.synth.Scene(image, coverage, transform, model, params=<factory>)
+### *class* inkmap.synth.Scene(image, coverage, transform, model, params=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -61,6 +63,36 @@ works on a bare `pip install inkmap`, with no optional dependency.
 ### inkmap.synth.degrade(image, , blur=0.0, noise=0.0, gradient=0.0, glare=0.0, jpeg_quality=None, rng=None)
 
 Apply a capture-order degradation chain to a float image, returning uint8.
+
+* **Return type:**
+  `ndarray`
+
+### inkmap.synth.mark_sheet()
+
+A card of square registration marks, and where each one’s centre truly is.
+
+Three bullseyes and a solid square at the corners, as on an OMR form, and two QR
+finder patterns inside: 700 x 500 cells, marks 50 cells (42 for a finder). Render it
+with [`render()`](#inkmap.synth.render) at about 1.2 pixels per cell for ~60 px marks. Returns
+`(model, truth)`, `truth` being `(centre_uv, rings)` per mark in model units,
+so `cv2.perspectiveTransform` through a scene’s transform gives the true image
+centres.
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`MatrixModel`](inkmap.models.grid.html.md#inkmap.models.grid.MatrixModel), [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)], [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)]]]
+
+### inkmap.synth.nested_square(side, rings=())
+
+A square mark as a `(side, side)` cell grid: foreground, then alternating rings.
+
+`rings` are the sides of the nested squares as fractions of `side`, outermost
+first, alternating background and foreground. Each must leave an equal whole number
+of cells on both sides, or the mark would be off-centre – that is an error.
+
+```pycon
+>>> nested_square(7, (5 / 7, 3 / 7)).astype(int)[3]
+array([1, 0, 1, 1, 1, 0, 1])
+```
 
 * **Return type:**
   `ndarray`

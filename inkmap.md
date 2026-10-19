@@ -1,4 +1,4 @@
-> built 2026-10-14 00:19 UTC from 28b9d10 (main) · inkmap 0.1.3. Details: build_info.json
+> built 2026-10-19 11:24 UTC from 4c6de7d (main) · inkmap 0.1.4. Details: build_info.json
 
 # index.html.md
 
@@ -199,6 +199,23 @@ Locating is a large share of the cost on big frames and scales with pixel count,
 
 Use it when your codes are large in the frame: a code’s modules should still span about 4 px after downscaling (`config.MIN_COARSE_PIXELS_PER_FEATURE`), i.e. 8 px at full resolution for 0.5 and about 11.5 px for 0.35. Below that the module count and pattern read off the small frame go wrong even though the code still decodes (at 2 px a 25 x 25 QR reads as 21 x 21), and refinement cannot repair a wrong model. So, with `full_res_retry=True` (the default), any coarse placement under that floor, or found but not decoded, is re-located on a full-resolution crop around it (`metadata["locate_retry"]` says why). The crops are small, but if every code needs one the speedup is gone, so pick the scale from your smallest code. With `full_res_retry=False`, placements under the floor are kept and marked `metadata["locate_undersampled"] = True`; do not trust their model. Custom locators run on the downscaled frame and must return coordinates in the frame they are given. A code the coarse pass misses entirely is not recovered, so lower the downscaling instead. The default, `None`, locates at full resolution exactly as before.
 
+## Registration marks
+
+Printed targets often carry plain marks with no code to decode: a solid square, or nested-square bullseyes at the corners of a sheet, as on OMR forms. `find_square_marks` finds them and returns each one’s projective centre to a small fraction of a pixel, which is what pose estimation needs:
+
+```python
+from inkmap.locate import BULLSEYE_RINGS, find_square_marks
+
+marks = find_square_marks(gray)                 # largest first
+for m in marks:
+    m.centre, m.sigma_px                        # sub-pixel centre, its typical error
+    m.corners                                   # (4, 2), clockwise from the top-left
+    m.rings                                     # () for a solid square
+bullseyes = [m for m in marks if m.ring_error(BULLSEYE_RINGS) < 0.06]
+```
+
+Nested marks are told apart by their ring ratios (bullseye 0.64/0.32, QR finder 5/7 and 3/7), which perspective barely changes. Anything square is a candidate (a QR symbol’s data modules too), so which mark is which on your layout stays with you; marks over 10% of the frame need `max_side_share=`. On synthetic sheets at up to 15% corner perspective and blur ≤ 2 px, the worst centre error is 0.13 px ([validation]()).
+
 ## Extending it
 
 ```python
@@ -305,6 +322,25 @@ at call time, so overriding one is a call-site concern, not global mutable state
 | [`DEFAULT_LOCATORS`](_autosummary/inkmap.config.html.md#inkmap.config.DEFAULT_LOCATORS)              | Locator strategies tried by default, in order.                                                                                                                                                                                                                                                                                                                                          |
 | [`LOCATE_RETRY_PADDING`](_autosummary/inkmap.config.html.md#inkmap.config.LOCATE_RETRY_PADDING)          | a coarse placement that was not decoded, or is under `MIN_COARSE_PIXELS_PER_FEATURE`, is retried on a full-resolution crop around it, padded on each side by this fraction of the placement's larger bounding-box side.                                                                                                                                                                 |
 | [`MIN_COARSE_PIXELS_PER_FEATURE`](_autosummary/inkmap.config.html.md#inkmap.config.MIN_COARSE_PIXELS_PER_FEATURE) | below this many image pixels per model feature (a QR module, a barcode's narrowest bar) *in the downscaled frame*, the model a locator reads off that frame is unreliable even when the code decodes -- with modules at 2 px a 25 x 25 QR is read as 21 x 21, at 2.5-3.5 px tens of its 625 modules flip, and only from 4 px are they all right (synthetic pages, `locate(scale=0.5)`). |
+| [`MARK_DARK_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_DARK_SHARE)               | A pixel is foreground when it is darker than this share of the local mean brightness.                                                                                                                                                                                                                                                                                                   |
+| [`MARK_MIN_CONTRAST`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_MIN_CONTRAST)             | ...and darker than the local mean by at least this many grey levels (of 255).                                                                                                                                                                                                                                                                                                           |
+| [`MARK_LOCAL_WINDOW_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_LOCAL_WINDOW_SHARE)       | wider than any mark, so a mark's own ink does not raise the threshold inside it.                                                                                                                                                                                                                                                                                                        |
+| [`MARK_BORDER_PX`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_BORDER_PX)                | A contour within this many pixels of the frame's edge is cut by it.                                                                                                                                                                                                                                                                                                                     |
+| [`MARK_POLY_EPSILON_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_POLY_EPSILON_SHARE)       | A contour is a quadrilateral when a polygon within this share of its perimeter fits it with four vertices (`cv2.approxPolyDP`'s epsilon).                                                                                                                                                                                                                                               |
+| [`MARK_MAX_SIDE_RATIO`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_MAX_SIDE_RATIO)           | A quadrilateral whose opposite sides differ by more than this factor is not a square seen at any plausible incidence.                                                                                                                                                                                                                                                                   |
+| [`MARK_MIN_HOLE_AREA_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_MIN_HOLE_AREA_SHARE)      | the square is solid.                                                                                                                                                                                                                                                                                                                                                                    |
+| [`MARK_CORNER_TRIM_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_CORNER_TRIM_SHARE)        | Contour points within this share of a side's length from either corner are left out of that side's line fit: the corner is where binarisation rounds the outline.                                                                                                                                                                                                                       |
+| [`MARK_EDGE_PROFILE_PX`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_EDGE_PROFILE_PX)          | Each side's line is refined against the grey image along profiles this many pixels either side of it (and no more than MARK_EDGE_PROFILE_SHARE of the side's length), long enough to bracket a blurred edge, short enough not to reach a ring's next edge.                                                                                                                              |
+| [`MARK_EDGE_STEP_PX`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_EDGE_STEP_PX)             | Spacing of the samples along each edge profile, in pixels.                                                                                                                                                                                                                                                                                                                              |
+| [`MARK_EDGE_ITERATIONS`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_EDGE_ITERATIONS)          | Refinement passes per side.                                                                                                                                                                                                                                                                                                                                                             |
+| [`MARK_EDGE_OUTLIER_PX`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_EDGE_OUTLIER_PX)          | A refined edge crossing further than this from the fitted line (or three times the line's scatter, if larger) is an outlier -- a glare bite, a speck -- and is refitted without.                                                                                                                                                                                                        |
+| [`MARK_MAX_SIDE_SCATTER_PX`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_MAX_SIDE_SCATTER_PX)      | A quadrilateral whose refined sides scatter about their lines by more than this (rms, in pixels), or this share of its side if larger, is not a square: a disc's outline also fits four lines, but its scatter grows with its size (0.35 px for a 10 px radius, 1 px for 20 px), where a square's stays at the noise floor.                                                             |
+| [`MARK_MIN_QUAD_SIDE_PX`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_MIN_QUAD_SIDE_PX)         | The smallest square considered at all, in pixels on a side.                                                                                                                                                                                                                                                                                                                             |
+| [`MARK_WINDOW_OVER_MAX_SIDE`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_WINDOW_OVER_MAX_SIDE)     | The local-mean window is kept at least this many times the largest mark looked for (`max_side_share`): a mark wider than the window raises its own threshold and is hollowed by its own ink.                                                                                                                                                                                            |
+| [`MARK_NESTED_HOLE_AREA_RATIO`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_NESTED_HOLE_AREA_RATIO)   | A square in a hole less than this many times its own area is the inner square of a nested mark (a bullseye's hole is 4x its inner square, a QR finder's 2.8x), not a mark of its own.                                                                                                                                                                                                   |
+| [`MARK_MAX_ASPECT`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_MAX_ASPECT)               | A quadrilateral whose mean opposite-side lengths differ by more than this factor is a rectangle, not a square: 1.6 is a square seen at about 51 degrees of incidence.                                                                                                                                                                                                                   |
+| [`MARK_CLIP_GUARD_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_CLIP_GUARD_SHARE)         | A solid square whose neighbourhood out to this many sides runs off the frame, and holds more than MARK_CLIP_GUARD_INK_SHARE foreground, may be the inner square of a nested mark the frame cuts, and is dropped.                                                                                                                                                                        |
+| [`MARK_RING_SPREAD_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.MARK_RING_SPREAD_SHARE)        | `sigma_px` calibration, fitted on synthetic sheets (rotations, perspective up to 0.15, blur 0.7-1.5 px, noise 1-4) so that the median centre error is about sigma for both kinds of mark.                                                                                                                                                                                               |
 
 ### inkmap.config.BLACK_CLIP_LEVEL *= 2*
 
@@ -357,6 +393,122 @@ pass’s position error, while keeping the crop a small fraction of the frame.
 
 Default clear margin around a mark, in model units, labelled Region.MARGIN.
 4 matches the QR quiet zone required by ISO/IEC 18004.
+
+### inkmap.config.MARK_BORDER_PX *= 2*
+
+A contour within this many pixels of the frame’s edge is cut by it. Its shape is not
+the mark’s, and a clipped mark’s centre is wrong by a share of its side, so it is
+dropped rather than measured.
+
+### inkmap.config.MARK_CLIP_GUARD_SHARE *= 1.2*
+
+A solid square whose neighbourhood out to this many sides runs off the frame, and
+holds more than MARK_CLIP_GUARD_INK_SHARE foreground, may be the inner square of a
+nested mark the frame cuts, and is dropped. A bullseye’s outer edge is 1.06 inner
+sides out from its inner square, a QR finder’s 0.67.
+
+### inkmap.config.MARK_CORNER_TRIM_SHARE *= 0.15*
+
+Contour points within this share of a side’s length from either corner are left out
+of that side’s line fit: the corner is where binarisation rounds the outline.
+
+### inkmap.config.MARK_DARK_SHARE *= 0.72*
+
+A pixel is foreground when it is darker than this share of the local mean
+brightness. Relative rather than absolute, so that an unevenly lit sheet (3.5:1 from
+one side to the other) and a dim frame are binarised alike.
+
+### inkmap.config.MARK_EDGE_ITERATIONS *= 2*
+
+Refinement passes per side. The first takes the line from the contour’s quantised
+position to the edge; the second re-centres the profiles on it.
+
+### inkmap.config.MARK_EDGE_OUTLIER_PX *= 0.75*
+
+A refined edge crossing further than this from the fitted line (or three times the
+line’s scatter, if larger) is an outlier – a glare bite, a speck – and is refitted
+without.
+
+### inkmap.config.MARK_EDGE_PROFILE_PX *= 2.5*
+
+Each side’s line is refined against the grey image along profiles this many pixels
+either side of it (and no more than MARK_EDGE_PROFILE_SHARE of the side’s length),
+long enough to bracket a blurred edge, short enough not to reach a ring’s next edge.
+
+### inkmap.config.MARK_EDGE_STEP_PX *= 0.25*
+
+Spacing of the samples along each edge profile, in pixels.
+
+### inkmap.config.MARK_LOCAL_WINDOW_SHARE *= 0.12*
+
+wider
+than any mark, so a mark’s own ink does not raise the threshold inside it.
+
+* **Type:**
+  The local mean is taken over a window this share of the frame’s shorter side
+
+### inkmap.config.MARK_MAX_ASPECT *= 1.6*
+
+A quadrilateral whose mean opposite-side lengths differ by more than this factor is
+a rectangle, not a square: 1.6 is a square seen at about 51 degrees of incidence.
+
+### inkmap.config.MARK_MAX_SIDE_RATIO *= 2.5*
+
+A quadrilateral whose opposite sides differ by more than this factor is not a square
+seen at any plausible incidence.
+
+### inkmap.config.MARK_MAX_SIDE_SCATTER_PX *= 0.25*
+
+A quadrilateral whose refined sides scatter about their lines by more than this
+(rms, in pixels), or this share of its side if larger, is not a square: a disc’s
+outline also fits four lines, but its scatter grows with its size (0.35 px for a
+10 px radius, 1 px for 20 px), where a square’s stays at the noise floor. A disc
+under ~10 px radius cannot be told from a square this way.
+
+### inkmap.config.MARK_MIN_CONTRAST *= 6.0*
+
+…and darker than the local mean by at least this many grey levels (of 255).
+Without a floor, sensor noise on a near-black table is “darker than 72% of the local
+mean” everywhere, and the contour search drowns in blobs.
+
+### inkmap.config.MARK_MIN_HOLE_AREA_SHARE *= 0.02*
+
+the square is solid.
+
+* **Type:**
+  A hole smaller than this share of its square’s area is noise
+
+### inkmap.config.MARK_MIN_QUAD_SIDE_PX *= 5.0*
+
+The smallest square considered at all, in pixels on a side. Lower than any mark’s
+own `min_side_px`, because a nested mark’s inner square is a third of its side and
+must be found for the mark to be.
+
+### inkmap.config.MARK_NESTED_HOLE_AREA_RATIO *= 9.0*
+
+A square in a hole less than this many times its own area is the inner square of a
+nested mark (a bullseye’s hole is 4x its inner square, a QR finder’s 2.8x), not a
+mark of its own. A sheet’s outline or a form’s box holds its marks in a far larger
+hole.
+
+### inkmap.config.MARK_POLY_EPSILON_SHARE *= 0.04*
+
+A contour is a quadrilateral when a polygon within this share of its perimeter fits
+it with four vertices (`cv2.approxPolyDP`’s epsilon).
+
+### inkmap.config.MARK_RING_SPREAD_SHARE *= 0.5*
+
+`sigma_px` calibration, fitted on synthetic sheets (rotations, perspective up to
+0.15, blur 0.7-1.5 px, noise 1-4) so that the median centre error is about sigma for
+both kinds of mark. A nested mark’s term is this share of the rms distance of its
+squares’ centres from their mean; a solid mark, with nothing to disagree with, gets
+this floor (its side-fit scatter alone understated its error ~4x).
+
+### inkmap.config.MARK_WINDOW_OVER_MAX_SIDE *= 1.2*
+
+The local-mean window is kept at least this many times the largest mark looked for
+(`max_side_share`): a mark wider than the window raises its own threshold and is
+hollowed by its own ink.
 
 ### inkmap.config.MIN_COARSE_PIXELS_PER_FEATURE *= 4.0*
 
@@ -833,6 +985,7 @@ continuous value is **coverage**, after ISO 12647-2:2013 3.1 *area coverage*. Se
 | [`confidence`](_autosummary/inkmap.html.md#inkmap.confidence)(gray, placement, coverage, \*[, ...])   | How much to trust the coverage value at each pixel, in `[0, 1]`.               |
 | [`measurement_weight`](_autosummary/inkmap.html.md#inkmap.measurement_weight)(coverage, \*[, ...])            | Blur-aware weight in `[0, 1]`: how safe each pixel is to *measure*.            |
 | [`locate`](_autosummary/inkmap.html.md#inkmap.locate)(bgr, gray, \*[, locators, first_hit, ...])  | Run locator strategies and merge their results, de-duplicating by position.    |
+| [`find_square_marks`](_autosummary/inkmap.html.md#inkmap.find_square_marks)(gray, \*[, min_side_px, ...])    | Every solid or nested square mark in `gray` (2-D, 0-255 scale), largest first. |
 
 ### Classes
 
@@ -844,8 +997,9 @@ continuous value is **coverage**, after ISO 12647-2:2013 3.1 *area coverage*. Se
 | [`Model`](_autosummary/inkmap.html.md#inkmap.Model)(\*args, \*\*kwargs)                         | The shape of a mark, in its own coordinate system.                                 |
 | [`Measurement`](_autosummary/inkmap.html.md#inkmap.Measurement)(foreground_mean, foreground_std, ...) | Aggregated signal over foreground and background, with its validity attached.      |
 | [`Measurability`](_autosummary/inkmap.html.md#inkmap.Measurability)(ok, pixels_per_feature, ...[, ...]) | Whether a trustworthy measurement is possible on this image at all.                |
+| [`SquareMark`](_autosummary/inkmap.html.md#inkmap.SquareMark)(centre, corners, side_px[, ...])       | One square mark found in an image.                                                 |
 
-### *class* inkmap.InkMap(coverage, region, placement, polarity=Polarity.FOREGROUND_IS_DARK, weight=None, blur_sigma=None, metadata=<factory>)
+### *class* inkmap.InkMap(coverage, region, placement, polarity=Polarity.FOREGROUND_IS_DARK, weight=None, blur_sigma=None, metadata=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -918,7 +1072,7 @@ Whether a trustworthy measurement is possible on this image at all.
 `pixels_per_feature / blur_sigma`. Below ~6 the blur is wide relative to the
 mark’s smallest feature and no erosion leaves uncontaminated pixels.
 
-### *class* inkmap.Measurement(foreground_mean, foreground_std, foreground_median, background_mean, background_std, background_median, n_foreground, n_background, measurability=None, metadata=<factory>)
+### *class* inkmap.Measurement(foreground_mean, foreground_std, foreground_median, background_mean, background_std, background_median, n_foreground, n_background, measurability=None, metadata=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -980,7 +1134,7 @@ Must be vectorised: it is called with millions of points.
 * **Return type:**
   `ndarray`
 
-### *class* inkmap.Placement(model, transform, quad, locator='', payload=None, refined=False, score=None, metadata=<factory>)
+### *class* inkmap.Placement(model, transform, quad, locator='', payload=None, refined=False, score=None, metadata=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -1089,6 +1243,36 @@ reference region than the background *inside* the mark.
 
 Outside the mark and its margin.
 
+### *class* inkmap.SquareMark(centre, corners, side_px, rings=(), sigma_px=nan, centres=())
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One square mark found in an image. Coordinates are pixels, `(x, y)`.
+
+`corners` are the outer square’s, clockwise as seen on screen, starting from the
+one nearest the image’s top-left. A square has no intrinsic first corner, so that
+order is a convention, not an identification. `rings` is the side of each nested
+square as a fraction of the outer one, outermost first (empty for a solid mark).
+`centres` are the outer square’s centre followed by each nested square’s, each
+where that square’s diagonals cross; `centre` is their mean weighted by side,
+which for a solid mark is the outer square’s own.
+
+#### ring_error(expected)
+
+Largest difference between these ring ratios and `expected`; inf if unlike.
+
+```pycon
+>>> SquareMark((0, 0), np.zeros((4, 2)), 10.0, rings=(0.7, 0.4)).ring_error(
+...     QR_FINDER_RINGS
+... )
+0.028...
+>>> SquareMark((0, 0), np.zeros((4, 2)), 10.0).ring_error(BULLSEYE_RINGS)
+inf
+```
+
+* **Return type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
 ### inkmap.confidence(gray, placement, coverage, , polarity=Polarity.FOREGROUND_IS_DARK)
 
 How much to trust the coverage value at each pixel, in `[0, 1]`.
@@ -1154,6 +1338,28 @@ resolution. `None` (default) locates at full resolution. See
 
 * **Return type:**
   [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`InkMap`](_autosummary/inkmap.types.html.md#inkmap.types.InkMap)]
+
+### inkmap.find_square_marks(gray, , min_side_px=8.0, max_side_share=0.1, polarity=Polarity.FOREGROUND_IS_DARK, dark_share=0.72, min_contrast=6.0, local_window_share=0.12)
+
+Every solid or nested square mark in `gray` (2-D, 0-255 scale), largest first.
+
+A mark’s outer square must be at least `min_side_px` on a side and at most
+`max_side_share` of the frame’s shorter side. Nested marks report their ring
+ratios; solid marks report none. `polarity` says whether the marks read darker
+than the substrate (the usual case) or brighter.
+
+The foreground is binarised relative to the local mean brightness: a pixel is
+foreground when it is darker than `dark_share` of the mean over a window
+`local_window_share` of the frame’s shorter side, and darker by at least
+`min_contrast` grey levels. The window is widened to stay wider than the largest
+mark looked for, since a mark wider than it is hollowed by its own ink.
+
+Anything square is a candidate: a QR symbol’s clusters of data modules and some
+printed glyphs come back as solid marks too. Telling the registration marks from
+them, by size, ring ratio and layout, is the caller’s.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`SquareMark`](_autosummary/inkmap.html.md#inkmap.SquareMark)]
 
 ### inkmap.foreground(image, \*\*kwargs)
 
@@ -1486,7 +1692,7 @@ or the raster’s own edges become the accuracy limit rather than the photograph
 | [`PolygonModel`](_autosummary/inkmap.models.freeform.html.md#inkmap.models.freeform.PolygonModel)(polygons[, extent_override, ...]) | Foreground as closed outlines, with holes -- the exact case.          |
 | [`GlyphModel`](_autosummary/inkmap.models.freeform.html.md#inkmap.models.freeform.GlyphModel)(text[, font_path, font_size, ...])  | A run of printed text, rendered once at high resolution.              |
 
-### *class* inkmap.models.freeform.GlyphModel(text, font_path=None, font_size=256, padding=8, metadata=<factory>)
+### *class* inkmap.models.freeform.GlyphModel(text, font_path=None, font_size=256, padding=8, metadata=dict())
 
 Bases: [`BaseModel`](_autosummary/inkmap.models.base.html.md#inkmap.models.base.BaseModel)
 
@@ -1504,7 +1710,7 @@ pass `font_path`. Model space is the rendered pixel grid.
 
 Typical stroke width of the rendered text, in raster cells.
 
-### *class* inkmap.models.freeform.PolygonModel(polygons, extent_override=None, metadata=<factory>)
+### *class* inkmap.models.freeform.PolygonModel(polygons, extent_override=None, metadata=dict())
 
 Bases: [`BaseModel`](_autosummary/inkmap.models.base.html.md#inkmap.models.base.BaseModel)
 
@@ -1522,7 +1728,7 @@ Even-odd crossing test, vectorised over all points and all edges.
 * **Return type:**
   `ndarray`
 
-### *class* inkmap.models.freeform.RasterModel(mask, metadata=<factory>)
+### *class* inkmap.models.freeform.RasterModel(mask, metadata=dict())
 
 Bases: [`BaseModel`](_autosummary/inkmap.models.base.html.md#inkmap.models.base.BaseModel)
 
@@ -1555,7 +1761,7 @@ rate – there is no intermediate bitmap to quantise them twice.
 |--------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
 | [`BarsModel`](_autosummary/inkmap.models.grid.html.md#inkmap.models.grid.BarsModel)(bars[, height, metadata]) | A 1-D run of foreground/background bars, extruded vertically -- a linear barcode. |
 
-### *class* inkmap.models.grid.BarsModel(bars, height=20.0, metadata=<factory>)
+### *class* inkmap.models.grid.BarsModel(bars, height=20.0, metadata=dict())
 
 Bases: [`BaseModel`](_autosummary/inkmap.models.base.html.md#inkmap.models.base.BaseModel)
 
@@ -1571,7 +1777,7 @@ fixes the aspect ratio for rendering and refinement.
 
 One module – the narrowest bar, which is what must be resolved.
 
-### *class* inkmap.models.grid.MatrixModel(cells, metadata=<factory>)
+### *class* inkmap.models.grid.MatrixModel(cells, metadata=dict())
 
 Bases: [`BaseModel`](_autosummary/inkmap.models.base.html.md#inkmap.models.base.BaseModel)
 
@@ -1628,7 +1834,7 @@ class to inherit and no registration step.
 | [`PolygonModel`](_autosummary/inkmap.models.html.md#inkmap.models.PolygonModel)(polygons[, extent_override, ...]) | Foreground as closed outlines, with holes -- the exact case.                      |
 | [`GlyphModel`](_autosummary/inkmap.models.html.md#inkmap.models.GlyphModel)(text[, font_path, font_size, ...])  | A run of printed text, rendered once at high resolution.                          |
 
-### *class* inkmap.models.BarsModel(bars, height=20.0, metadata=<factory>)
+### *class* inkmap.models.BarsModel(bars, height=20.0, metadata=dict())
 
 Bases: [`BaseModel`](_autosummary/inkmap.models.base.html.md#inkmap.models.base.BaseModel)
 
@@ -1674,7 +1880,7 @@ photograph, and a hard-edged template correlates poorly with soft real edges.
 * **Return type:**
   `ndarray`
 
-### *class* inkmap.models.GlyphModel(text, font_path=None, font_size=256, padding=8, metadata=<factory>)
+### *class* inkmap.models.GlyphModel(text, font_path=None, font_size=256, padding=8, metadata=dict())
 
 Bases: [`BaseModel`](_autosummary/inkmap.models.base.html.md#inkmap.models.base.BaseModel)
 
@@ -1692,7 +1898,7 @@ pass `font_path`. Model space is the rendered pixel grid.
 
 Typical stroke width of the rendered text, in raster cells.
 
-### *class* inkmap.models.MatrixModel(cells, metadata=<factory>)
+### *class* inkmap.models.MatrixModel(cells, metadata=dict())
 
 Bases: [`BaseModel`](_autosummary/inkmap.models.base.html.md#inkmap.models.base.BaseModel)
 
@@ -1750,7 +1956,7 @@ Must be vectorised: it is called with millions of points.
 * **Return type:**
   `ndarray`
 
-### *class* inkmap.models.PolygonModel(polygons, extent_override=None, metadata=<factory>)
+### *class* inkmap.models.PolygonModel(polygons, extent_override=None, metadata=dict())
 
 Bases: [`BaseModel`](_autosummary/inkmap.models.base.html.md#inkmap.models.base.BaseModel)
 
@@ -1768,7 +1974,7 @@ Even-odd crossing test, vectorised over all points and all edges.
 * **Return type:**
   `ndarray`
 
-### *class* inkmap.models.RasterModel(mask, metadata=<factory>)
+### *class* inkmap.models.RasterModel(mask, metadata=dict())
 
 Bases: [`BaseModel`](_autosummary/inkmap.models.base.html.md#inkmap.models.base.BaseModel)
 
@@ -1858,7 +2064,7 @@ Whether a trustworthy measurement is possible on this image at all.
 `pixels_per_feature / blur_sigma`. Below ~6 the blur is wide relative to the
 mark’s smallest feature and no erosion leaves uncontaminated pixels.
 
-### *class* inkmap.photometry.Measurement(foreground_mean, foreground_std, foreground_median, background_mean, background_std, background_median, n_foreground, n_background, measurability=None, metadata=<factory>)
+### *class* inkmap.photometry.Measurement(foreground_mean, foreground_std, foreground_median, background_mean, background_std, background_median, n_foreground, n_background, measurability=None, metadata=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -1984,13 +2190,15 @@ Real photographs remain essential for *detection* rate – see [`inkmap.corpus`]
 | [`qr_model`](_autosummary/inkmap.synth.html.md#inkmap.synth.qr_model)([payload, error])                       | A QR [`MatrixModel`](_autosummary/inkmap.models.html.md#inkmap.models.MatrixModel), from `payload` via segno. |
 | [`default_matrix`](_autosummary/inkmap.synth.html.md#inkmap.synth.default_matrix)()                                 | The shipped QR module matrix (a real version-3 symbol), True = dark module.                                            |
 | [`degrade`](_autosummary/inkmap.synth.html.md#inkmap.synth.degrade)(image, \*[, blur, noise, gradient, ...]) | Apply a capture-order degradation chain to a float image, returning uint8.                                             |
+| [`nested_square`](_autosummary/inkmap.synth.html.md#inkmap.synth.nested_square)(side[, rings])                     | A square mark as a `(side, side)` cell grid: foreground, then alternating rings.                                       |
+| [`mark_sheet`](_autosummary/inkmap.synth.html.md#inkmap.synth.mark_sheet)()                                     | A card of square registration marks, and where each one's centre truly is.                                             |
 
 ### Classes
 
 | [`Scene`](_autosummary/inkmap.synth.html.md#inkmap.synth.Scene)(image, coverage, transform, model[, ...])   | A synthetic image together with the truth used to make it.   |
 |----------------------------------------------------------------------------------------------------|--------------------------------------------------------------|
 
-### *class* inkmap.synth.Scene(image, coverage, transform, model, params=<factory>)
+### *class* inkmap.synth.Scene(image, coverage, transform, model, params=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -2021,6 +2229,36 @@ works on a bare `pip install inkmap`, with no optional dependency.
 ### inkmap.synth.degrade(image, , blur=0.0, noise=0.0, gradient=0.0, glare=0.0, jpeg_quality=None, rng=None)
 
 Apply a capture-order degradation chain to a float image, returning uint8.
+
+* **Return type:**
+  `ndarray`
+
+### inkmap.synth.mark_sheet()
+
+A card of square registration marks, and where each one’s centre truly is.
+
+Three bullseyes and a solid square at the corners, as on an OMR form, and two QR
+finder patterns inside: 700 x 500 cells, marks 50 cells (42 for a finder). Render it
+with [`render()`](_autosummary/inkmap.synth.html.md#inkmap.synth.render) at about 1.2 pixels per cell for ~60 px marks. Returns
+`(model, truth)`, `truth` being `(centre_uv, rings)` per mark in model units,
+so `cv2.perspectiveTransform` through a scene’s transform gives the true image
+centres.
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`MatrixModel`](_autosummary/inkmap.models.grid.html.md#inkmap.models.grid.MatrixModel), [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`float`](https://docs.python.org/3/builtins/functions.html#float)], [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)]]]
+
+### inkmap.synth.nested_square(side, rings=())
+
+A square mark as a `(side, side)` cell grid: foreground, then alternating rings.
+
+`rings` are the sides of the nested squares as fractions of `side`, outermost
+first, alternating background and foreground. Each must leave an equal whole number
+of cells on both sides, or the mark would be off-centre – that is an error.
+
+```pycon
+>>> nested_square(7, (5 / 7, 3 / 7)).astype(int)[3]
+array([1, 0, 1, 1, 1, 0, 1])
+```
 
 * **Return type:**
   `ndarray`
@@ -2082,7 +2320,7 @@ See `docs/terminology.md` for the full cross-field mapping.
 | [`Polarity`](_autosummary/inkmap.types.html.md#inkmap.types.Polarity)(\*values)                                | Which apparent-brightness state the foreground corresponds to.                     |
 | [`Region`](_autosummary/inkmap.types.html.md#inkmap.types.Region)(\*values)                                  | Four-way pixel classification.                                                     |
 
-### *class* inkmap.types.InkMap(coverage, region, placement, polarity=Polarity.FOREGROUND_IS_DARK, weight=None, blur_sigma=None, metadata=<factory>)
+### *class* inkmap.types.InkMap(coverage, region, placement, polarity=Polarity.FOREGROUND_IS_DARK, weight=None, blur_sigma=None, metadata=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -2144,7 +2382,7 @@ channel that should gate a physical measurement. Coverage is geometric and ignor
 the point spread function; confidence is epistemic and says nothing about
 partial-area contamination. See [`inkmap.coverage.measurement_weight()`](_autosummary/inkmap.coverage.html.md#inkmap.coverage.measurement_weight).
 
-### *class* inkmap.types.Placement(model, transform, quad, locator='', payload=None, refined=False, score=None, metadata=<factory>)
+### *class* inkmap.types.Placement(model, transform, quad, locator='', payload=None, refined=False, score=None, metadata=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -2327,18 +2565,18 @@ leaving only interiors. If weight is empty, the image cannot support a measureme
 
 # About this build
 
-This documentation was built on **2026-10-14 00:19 UTC** from commit <a href="https://github.com/thorwhalen/inkmap/commit/28b9d1092af3a8c89e96d11ac2cd6f1b9834407b"><code>28b9d10</code></a> on branch <code>main</code>, for **inkmap 0.1.3** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-19 11:24 UTC** from commit <a href="https://github.com/thorwhalen/inkmap/commit/4c6de7db71b785b6af098c14eb4189e84dc121d6"><code>4c6de7d</code></a> on branch <code>main</code>, for **inkmap 0.1.4** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.1.3) is behind the latest release on PyPI (0.1.4): `pip install inkmap` gives newer code than these docs describe.
+- The documented version (0.1.4) is behind the latest release on PyPI (0.1.5): `pip install inkmap` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/inkmap/commit/28b9d1092af3a8c89e96d11ac2cd6f1b9834407b"><code>28b9d1092af3a8c89e96d11ac2cd6f1b9834407b</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/inkmap/commit/4c6de7db71b785b6af098c14eb4189e84dc121d6"><code>4c6de7db71b785b6af098c14eb4189e84dc121d6</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
 | Tags at this commit | none                                                                                                                                                     |
 | Working tree        | clean                                                                                                                                                    |
@@ -2349,15 +2587,15 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/inkmap</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/inkmap/actions/runs/38489273717">38489273717</a>    |
+| Run          | <a href="https://github.com/thorwhalen/inkmap/actions/runs/39244129679">39244129679</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>28b9d1092af3a8c89e96d11ac2cd6f1b9834407b</code> (in the history of the built commit) |
+| Event commit | <code>4c6de7db71b785b6af098c14eb4189e84dc121d6</code> (in the history of the built commit) |
 
 ## Tools
 
 |          |         |
 |----------|---------|
-| epythet  | 0.2.17  |
+| epythet  | 0.2.18  |
 | Sphinx   | 9.1.0   |
 | docutils | 0.22.4  |
 | Python   | 3.12.15 |
@@ -2376,14 +2614,14 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/inkmap/0.1.4/">0.1.4</a>, newer than the documented version (0.1.3).
+Latest release: <a href="https://pypi.org/project/inkmap/0.1.5/">0.1.5</a>, newer than the documented version (0.1.4).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/inkmap && cd inkmap
-git checkout 28b9d1092af3a8c89e96d11ac2cd6f1b9834407b
-pip install "epythet==0.2.17"
+git checkout 4c6de7db71b785b6af098c14eb4189e84dc121d6
+pip install "epythet==0.2.18"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
 

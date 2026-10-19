@@ -28,7 +28,7 @@ See `docs/terminology.md` for the full cross-field mapping.
 | [`Polarity`](#inkmap.types.Polarity)(\*values)                                | Which apparent-brightness state the foreground corresponds to.                     |
 | [`Region`](#inkmap.types.Region)(\*values)                                  | Four-way pixel classification.                                                     |
 
-### *class* inkmap.types.InkMap(coverage, region, placement, polarity=Polarity.FOREGROUND_IS_DARK, weight=None, blur_sigma=None, metadata=<factory>)
+### *class* inkmap.types.InkMap(coverage, region, placement, polarity=Polarity.FOREGROUND_IS_DARK, weight=None, blur_sigma=None, metadata=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -90,7 +90,7 @@ channel that should gate a physical measurement. Coverage is geometric and ignor
 the point spread function; confidence is epistemic and says nothing about
 partial-area contamination. See [`inkmap.coverage.measurement_weight()`](inkmap.coverage.html.md#inkmap.coverage.measurement_weight).
 
-### *class* inkmap.types.Placement(model, transform, quad, locator='', payload=None, refined=False, score=None, metadata=<factory>)
+### *class* inkmap.types.Placement(model, transform, quad, locator='', payload=None, refined=False, score=None, metadata=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 

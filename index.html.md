@@ -195,6 +195,23 @@ Locating is a large share of the cost on big frames and scales with pixel count,
 
 Use it when your codes are large in the frame: a code’s modules should still span about 4 px after downscaling (`config.MIN_COARSE_PIXELS_PER_FEATURE`), i.e. 8 px at full resolution for 0.5 and about 11.5 px for 0.35. Below that the module count and pattern read off the small frame go wrong even though the code still decodes (at 2 px a 25 x 25 QR reads as 21 x 21), and refinement cannot repair a wrong model. So, with `full_res_retry=True` (the default), any coarse placement under that floor, or found but not decoded, is re-located on a full-resolution crop around it (`metadata["locate_retry"]` says why). The crops are small, but if every code needs one the speedup is gone, so pick the scale from your smallest code. With `full_res_retry=False`, placements under the floor are kept and marked `metadata["locate_undersampled"] = True`; do not trust their model. Custom locators run on the downscaled frame and must return coordinates in the frame they are given. A code the coarse pass misses entirely is not recovered, so lower the downscaling instead. The default, `None`, locates at full resolution exactly as before.
 
+## Registration marks
+
+Printed targets often carry plain marks with no code to decode: a solid square, or nested-square bullseyes at the corners of a sheet, as on OMR forms. `find_square_marks` finds them and returns each one’s projective centre to a small fraction of a pixel, which is what pose estimation needs:
+
+```python
+from inkmap.locate import BULLSEYE_RINGS, find_square_marks
+
+marks = find_square_marks(gray)                 # largest first
+for m in marks:
+    m.centre, m.sigma_px                        # sub-pixel centre, its typical error
+    m.corners                                   # (4, 2), clockwise from the top-left
+    m.rings                                     # () for a solid square
+bullseyes = [m for m in marks if m.ring_error(BULLSEYE_RINGS) < 0.06]
+```
+
+Nested marks are told apart by their ring ratios (bullseye 0.64/0.32, QR finder 5/7 and 3/7), which perspective barely changes. Anything square is a candidate (a QR symbol’s data modules too), so which mark is which on your layout stays with you; marks over 10% of the frame need `max_side_share=`. On synthetic sheets at up to 15% corner perspective and blur ≤ 2 px, the worst centre error is 0.13 px ([validation]()).
+
 ## Extending it
 
 ```python

@@ -25,6 +25,25 @@ at call time, so overriding one is a call-site concern, not global mutable state
 | [`DEFAULT_LOCATORS`](#inkmap.config.DEFAULT_LOCATORS)              | Locator strategies tried by default, in order.                                                                                                                                                                                                                                                                                                                                          |
 | [`LOCATE_RETRY_PADDING`](#inkmap.config.LOCATE_RETRY_PADDING)          | a coarse placement that was not decoded, or is under `MIN_COARSE_PIXELS_PER_FEATURE`, is retried on a full-resolution crop around it, padded on each side by this fraction of the placement's larger bounding-box side.                                                                                                                                                                 |
 | [`MIN_COARSE_PIXELS_PER_FEATURE`](#inkmap.config.MIN_COARSE_PIXELS_PER_FEATURE) | below this many image pixels per model feature (a QR module, a barcode's narrowest bar) *in the downscaled frame*, the model a locator reads off that frame is unreliable even when the code decodes -- with modules at 2 px a 25 x 25 QR is read as 21 x 21, at 2.5-3.5 px tens of its 625 modules flip, and only from 4 px are they all right (synthetic pages, `locate(scale=0.5)`). |
+| [`MARK_DARK_SHARE`](#inkmap.config.MARK_DARK_SHARE)               | A pixel is foreground when it is darker than this share of the local mean brightness.                                                                                                                                                                                                                                                                                                   |
+| [`MARK_MIN_CONTRAST`](#inkmap.config.MARK_MIN_CONTRAST)             | ...and darker than the local mean by at least this many grey levels (of 255).                                                                                                                                                                                                                                                                                                           |
+| [`MARK_LOCAL_WINDOW_SHARE`](#inkmap.config.MARK_LOCAL_WINDOW_SHARE)       | wider than any mark, so a mark's own ink does not raise the threshold inside it.                                                                                                                                                                                                                                                                                                        |
+| [`MARK_BORDER_PX`](#inkmap.config.MARK_BORDER_PX)                | A contour within this many pixels of the frame's edge is cut by it.                                                                                                                                                                                                                                                                                                                     |
+| [`MARK_POLY_EPSILON_SHARE`](#inkmap.config.MARK_POLY_EPSILON_SHARE)       | A contour is a quadrilateral when a polygon within this share of its perimeter fits it with four vertices (`cv2.approxPolyDP`'s epsilon).                                                                                                                                                                                                                                               |
+| [`MARK_MAX_SIDE_RATIO`](#inkmap.config.MARK_MAX_SIDE_RATIO)           | A quadrilateral whose opposite sides differ by more than this factor is not a square seen at any plausible incidence.                                                                                                                                                                                                                                                                   |
+| [`MARK_MIN_HOLE_AREA_SHARE`](#inkmap.config.MARK_MIN_HOLE_AREA_SHARE)      | the square is solid.                                                                                                                                                                                                                                                                                                                                                                    |
+| [`MARK_CORNER_TRIM_SHARE`](#inkmap.config.MARK_CORNER_TRIM_SHARE)        | Contour points within this share of a side's length from either corner are left out of that side's line fit: the corner is where binarisation rounds the outline.                                                                                                                                                                                                                       |
+| [`MARK_EDGE_PROFILE_PX`](#inkmap.config.MARK_EDGE_PROFILE_PX)          | Each side's line is refined against the grey image along profiles this many pixels either side of it (and no more than MARK_EDGE_PROFILE_SHARE of the side's length), long enough to bracket a blurred edge, short enough not to reach a ring's next edge.                                                                                                                              |
+| [`MARK_EDGE_STEP_PX`](#inkmap.config.MARK_EDGE_STEP_PX)             | Spacing of the samples along each edge profile, in pixels.                                                                                                                                                                                                                                                                                                                              |
+| [`MARK_EDGE_ITERATIONS`](#inkmap.config.MARK_EDGE_ITERATIONS)          | Refinement passes per side.                                                                                                                                                                                                                                                                                                                                                             |
+| [`MARK_EDGE_OUTLIER_PX`](#inkmap.config.MARK_EDGE_OUTLIER_PX)          | A refined edge crossing further than this from the fitted line (or three times the line's scatter, if larger) is an outlier -- a glare bite, a speck -- and is refitted without.                                                                                                                                                                                                        |
+| [`MARK_MAX_SIDE_SCATTER_PX`](#inkmap.config.MARK_MAX_SIDE_SCATTER_PX)      | A quadrilateral whose refined sides scatter about their lines by more than this (rms, in pixels), or this share of its side if larger, is not a square: a disc's outline also fits four lines, but its scatter grows with its size (0.35 px for a 10 px radius, 1 px for 20 px), where a square's stays at the noise floor.                                                             |
+| [`MARK_MIN_QUAD_SIDE_PX`](#inkmap.config.MARK_MIN_QUAD_SIDE_PX)         | The smallest square considered at all, in pixels on a side.                                                                                                                                                                                                                                                                                                                             |
+| [`MARK_WINDOW_OVER_MAX_SIDE`](#inkmap.config.MARK_WINDOW_OVER_MAX_SIDE)     | The local-mean window is kept at least this many times the largest mark looked for (`max_side_share`): a mark wider than the window raises its own threshold and is hollowed by its own ink.                                                                                                                                                                                            |
+| [`MARK_NESTED_HOLE_AREA_RATIO`](#inkmap.config.MARK_NESTED_HOLE_AREA_RATIO)   | A square in a hole less than this many times its own area is the inner square of a nested mark (a bullseye's hole is 4x its inner square, a QR finder's 2.8x), not a mark of its own.                                                                                                                                                                                                   |
+| [`MARK_MAX_ASPECT`](#inkmap.config.MARK_MAX_ASPECT)               | A quadrilateral whose mean opposite-side lengths differ by more than this factor is a rectangle, not a square: 1.6 is a square seen at about 51 degrees of incidence.                                                                                                                                                                                                                   |
+| [`MARK_CLIP_GUARD_SHARE`](#inkmap.config.MARK_CLIP_GUARD_SHARE)         | A solid square whose neighbourhood out to this many sides runs off the frame, and holds more than MARK_CLIP_GUARD_INK_SHARE foreground, may be the inner square of a nested mark the frame cuts, and is dropped.                                                                                                                                                                        |
+| [`MARK_RING_SPREAD_SHARE`](#inkmap.config.MARK_RING_SPREAD_SHARE)        | `sigma_px` calibration, fitted on synthetic sheets (rotations, perspective up to 0.15, blur 0.7-1.5 px, noise 1-4) so that the median centre error is about sigma for both kinds of mark.                                                                                                                                                                                               |
 
 ### inkmap.config.BLACK_CLIP_LEVEL *= 2*
 
@@ -77,6 +96,122 @@ pass’s position error, while keeping the crop a small fraction of the frame.
 
 Default clear margin around a mark, in model units, labelled Region.MARGIN.
 4 matches the QR quiet zone required by ISO/IEC 18004.
+
+### inkmap.config.MARK_BORDER_PX *= 2*
+
+A contour within this many pixels of the frame’s edge is cut by it. Its shape is not
+the mark’s, and a clipped mark’s centre is wrong by a share of its side, so it is
+dropped rather than measured.
+
+### inkmap.config.MARK_CLIP_GUARD_SHARE *= 1.2*
+
+A solid square whose neighbourhood out to this many sides runs off the frame, and
+holds more than MARK_CLIP_GUARD_INK_SHARE foreground, may be the inner square of a
+nested mark the frame cuts, and is dropped. A bullseye’s outer edge is 1.06 inner
+sides out from its inner square, a QR finder’s 0.67.
+
+### inkmap.config.MARK_CORNER_TRIM_SHARE *= 0.15*
+
+Contour points within this share of a side’s length from either corner are left out
+of that side’s line fit: the corner is where binarisation rounds the outline.
+
+### inkmap.config.MARK_DARK_SHARE *= 0.72*
+
+A pixel is foreground when it is darker than this share of the local mean
+brightness. Relative rather than absolute, so that an unevenly lit sheet (3.5:1 from
+one side to the other) and a dim frame are binarised alike.
+
+### inkmap.config.MARK_EDGE_ITERATIONS *= 2*
+
+Refinement passes per side. The first takes the line from the contour’s quantised
+position to the edge; the second re-centres the profiles on it.
+
+### inkmap.config.MARK_EDGE_OUTLIER_PX *= 0.75*
+
+A refined edge crossing further than this from the fitted line (or three times the
+line’s scatter, if larger) is an outlier – a glare bite, a speck – and is refitted
+without.
+
+### inkmap.config.MARK_EDGE_PROFILE_PX *= 2.5*
+
+Each side’s line is refined against the grey image along profiles this many pixels
+either side of it (and no more than MARK_EDGE_PROFILE_SHARE of the side’s length),
+long enough to bracket a blurred edge, short enough not to reach a ring’s next edge.
+
+### inkmap.config.MARK_EDGE_STEP_PX *= 0.25*
+
+Spacing of the samples along each edge profile, in pixels.
+
+### inkmap.config.MARK_LOCAL_WINDOW_SHARE *= 0.12*
+
+wider
+than any mark, so a mark’s own ink does not raise the threshold inside it.
+
+* **Type:**
+  The local mean is taken over a window this share of the frame’s shorter side
+
+### inkmap.config.MARK_MAX_ASPECT *= 1.6*
+
+A quadrilateral whose mean opposite-side lengths differ by more than this factor is
+a rectangle, not a square: 1.6 is a square seen at about 51 degrees of incidence.
+
+### inkmap.config.MARK_MAX_SIDE_RATIO *= 2.5*
+
+A quadrilateral whose opposite sides differ by more than this factor is not a square
+seen at any plausible incidence.
+
+### inkmap.config.MARK_MAX_SIDE_SCATTER_PX *= 0.25*
+
+A quadrilateral whose refined sides scatter about their lines by more than this
+(rms, in pixels), or this share of its side if larger, is not a square: a disc’s
+outline also fits four lines, but its scatter grows with its size (0.35 px for a
+10 px radius, 1 px for 20 px), where a square’s stays at the noise floor. A disc
+under ~10 px radius cannot be told from a square this way.
+
+### inkmap.config.MARK_MIN_CONTRAST *= 6.0*
+
+…and darker than the local mean by at least this many grey levels (of 255).
+Without a floor, sensor noise on a near-black table is “darker than 72% of the local
+mean” everywhere, and the contour search drowns in blobs.
+
+### inkmap.config.MARK_MIN_HOLE_AREA_SHARE *= 0.02*
+
+the square is solid.
+
+* **Type:**
+  A hole smaller than this share of its square’s area is noise
+
+### inkmap.config.MARK_MIN_QUAD_SIDE_PX *= 5.0*
+
+The smallest square considered at all, in pixels on a side. Lower than any mark’s
+own `min_side_px`, because a nested mark’s inner square is a third of its side and
+must be found for the mark to be.
+
+### inkmap.config.MARK_NESTED_HOLE_AREA_RATIO *= 9.0*
+
+A square in a hole less than this many times its own area is the inner square of a
+nested mark (a bullseye’s hole is 4x its inner square, a QR finder’s 2.8x), not a
+mark of its own. A sheet’s outline or a form’s box holds its marks in a far larger
+hole.
+
+### inkmap.config.MARK_POLY_EPSILON_SHARE *= 0.04*
+
+A contour is a quadrilateral when a polygon within this share of its perimeter fits
+it with four vertices (`cv2.approxPolyDP`’s epsilon).
+
+### inkmap.config.MARK_RING_SPREAD_SHARE *= 0.5*
+
+`sigma_px` calibration, fitted on synthetic sheets (rotations, perspective up to
+0.15, blur 0.7-1.5 px, noise 1-4) so that the median centre error is about sigma for
+both kinds of mark. A nested mark’s term is this share of the rms distance of its
+squares’ centres from their mean; a solid mark, with nothing to disagree with, gets
+this floor (its side-fit scatter alone understated its error ~4x).
+
+### inkmap.config.MARK_WINDOW_OVER_MAX_SIDE *= 1.2*
+
+The local-mean window is kept at least this many times the largest mark looked for
+(`max_side_share`): a mark wider than the window raises its own threshold and is
+hollowed by its own ink.
 
 ### inkmap.config.MIN_COARSE_PIXELS_PER_FEATURE *= 4.0*
 

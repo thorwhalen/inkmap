@@ -30,6 +30,7 @@
   <meta name="twitter:title" content="inkmap.synth | inkmap" />
   <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
   <link rel="stylesheet" type="text/css" href="../../_static/theme.css?v=d6d7c91b" />
+  <link rel="stylesheet" type="text/css" href="../../_static/sphinx_autodoc_typehints.css?v=057ac668" />
   <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
   <link rel="stylesheet" type="text/css" href="../../_static/epythet.css?v=ded595e6" />
   <link rel="search" title="Search" href="../../search.html" />
@@ -204,197 +205,265 @@
 </span><span id="line-30"><span class="kn">from</span><span class="w"> </span><span class="nn">.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">model_quad</span>
 </span><span id="line-31"><span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">MatrixModel</span><span class="p">,</span> <span class="n">Model</span>
 </span><span id="line-32">
-</span><span id="line-33"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Scene"</span><span class="p">,</span> <span class="s2">"render"</span><span class="p">,</span> <span class="s2">"qr_model"</span><span class="p">,</span> <span class="s2">"default_matrix"</span><span class="p">,</span> <span class="s2">"degrade"</span><span class="p">]</span>
-</span><span id="line-34">
-</span><span id="line-35"><span class="n">_DEFAULT_MATRIX_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"data"</span> <span class="o">/</span> <span class="s2">"default_qr.txt"</span>
-</span><span id="line-36">
-</span><span id="line-37">
+</span><span id="line-33"><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="line-34">    <span class="s2">"Scene"</span><span class="p">,</span>
+</span><span id="line-35">    <span class="s2">"render"</span><span class="p">,</span>
+</span><span id="line-36">    <span class="s2">"qr_model"</span><span class="p">,</span>
+</span><span id="line-37">    <span class="s2">"default_matrix"</span><span class="p">,</span>
+</span><span id="line-38">    <span class="s2">"degrade"</span><span class="p">,</span>
+</span><span id="line-39">    <span class="s2">"nested_square"</span><span class="p">,</span>
+</span><span id="line-40">    <span class="s2">"mark_sheet"</span><span class="p">,</span>
+</span><span id="line-41"><span class="p">]</span>
+</span><span id="line-42">
+</span><span id="line-43"><span class="n">_DEFAULT_MATRIX_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"data"</span> <span class="o">/</span> <span class="s2">"default_qr.txt"</span>
+</span><span id="line-44">
+</span><span id="line-45">
 <div class="viewcode-block" id="Scene">
 <a class="viewcode-back" href="../../_autosummary/inkmap.synth.html#inkmap.synth.Scene">[docs]</a>
-</span><span id="line-38"><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-39"><span class="k">class</span><span class="w"> </span><span class="nc">Scene</span><span class="p">:</span>
-</span><span id="line-40"><span class="w">    </span><span class="sd">"""A synthetic image together with the truth used to make it."""</span>
-</span><span id="line-41">
-</span><span id="line-42">    <span class="n">image</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
-</span><span id="line-43"><span class="w">    </span><span class="sd">"""(H, W) uint8 grayscale."""</span>
-</span><span id="line-44">
-</span><span id="line-45">    <span class="n">coverage</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
-</span><span id="line-46"><span class="w">    </span><span class="sd">"""(H, W) float32 exact foreground area coverage."""</span>
-</span><span id="line-47">
-</span><span id="line-48">    <span class="n">transform</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
-</span><span id="line-49"><span class="w">    </span><span class="sd">"""(3, 3) true model -&gt; image mapping."""</span>
-</span><span id="line-50">
-</span><span id="line-51">    <span class="n">model</span><span class="p">:</span> <span class="n">Model</span>
-</span><span id="line-52">    <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
-</span><span id="line-53">
-</span><span id="line-54">    <span class="nd">@property</span>
-</span><span id="line-55">    <span class="k">def</span><span class="w"> </span><span class="nf">quad</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-</span><span id="line-56">        <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">perspectiveTransform</span><span class="p">(</span>
-</span><span id="line-57">            <span class="n">model_quad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span>
-</span><span id="line-58">        <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span></div>
+</span><span id="line-46"><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-47"><span class="k">class</span><span class="w"> </span><span class="nc">Scene</span><span class="p">:</span>
+</span><span id="line-48"><span class="w">    </span><span class="sd">"""A synthetic image together with the truth used to make it."""</span>
+</span><span id="line-49">
+</span><span id="line-50">    <span class="n">image</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+</span><span id="line-51"><span class="w">    </span><span class="sd">"""(H, W) uint8 grayscale."""</span>
+</span><span id="line-52">
+</span><span id="line-53">    <span class="n">coverage</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+</span><span id="line-54"><span class="w">    </span><span class="sd">"""(H, W) float32 exact foreground area coverage."""</span>
+</span><span id="line-55">
+</span><span id="line-56">    <span class="n">transform</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+</span><span id="line-57"><span class="w">    </span><span class="sd">"""(3, 3) true model -&gt; image mapping."""</span>
+</span><span id="line-58">
+</span><span id="line-59">    <span class="n">model</span><span class="p">:</span> <span class="n">Model</span>
+</span><span id="line-60">    <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+</span><span id="line-61">
+</span><span id="line-62">    <span class="nd">@property</span>
+</span><span id="line-63">    <span class="k">def</span><span class="w"> </span><span class="nf">quad</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+</span><span id="line-64">        <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">perspectiveTransform</span><span class="p">(</span>
+</span><span id="line-65">            <span class="n">model_quad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span>
+</span><span id="line-66">        <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span></div>
 
-</span><span id="line-59">
-</span><span id="line-60">
+</span><span id="line-67">
+</span><span id="line-68">
 <div class="viewcode-block" id="default_matrix">
 <a class="viewcode-back" href="../../_autosummary/inkmap.synth.html#inkmap.synth.default_matrix">[docs]</a>
-</span><span id="line-61"><span class="k">def</span><span class="w"> </span><span class="nf">default_matrix</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-</span><span id="line-62"><span class="w">    </span><span class="sd">"""The shipped QR module matrix (a real version-3 symbol), True = dark module.</span>
-</span><span id="line-63">
-</span><span id="line-64"><span class="sd">    Shipped so that :func:`render` -- and therefore the test suite and every example --</span>
-</span><span id="line-65"><span class="sd">    works on a bare ``pip install inkmap``, with no optional dependency.</span>
-</span><span id="line-66"><span class="sd">    """</span>
-</span><span id="line-67">    <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="line-68">        <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-</span><span id="line-69">        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">_DEFAULT_MATRIX_PATH</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
-</span><span id="line-70">        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"#"</span><span class="p">)</span>
-</span><span id="line-71">    <span class="p">]</span>
-</span><span id="line-72">    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">c</span> <span class="o">==</span> <span class="s2">"1"</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span></div>
+</span><span id="line-69"><span class="k">def</span><span class="w"> </span><span class="nf">default_matrix</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+</span><span id="line-70"><span class="w">    </span><span class="sd">"""The shipped QR module matrix (a real version-3 symbol), True = dark module.</span>
+</span><span id="line-71">
+</span><span id="line-72"><span class="sd">    Shipped so that :func:`render` -- and therefore the test suite and every example --</span>
+</span><span id="line-73"><span class="sd">    works on a bare ``pip install inkmap``, with no optional dependency.</span>
+</span><span id="line-74"><span class="sd">    """</span>
+</span><span id="line-75">    <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="line-76">        <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+</span><span id="line-77">        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">_DEFAULT_MATRIX_PATH</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+</span><span id="line-78">        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"#"</span><span class="p">)</span>
+</span><span id="line-79">    <span class="p">]</span>
+</span><span id="line-80">    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">c</span> <span class="o">==</span> <span class="s2">"1"</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span></div>
 
-</span><span id="line-73">
-</span><span id="line-74">
+</span><span id="line-81">
+</span><span id="line-82">
 <div class="viewcode-block" id="qr_model">
 <a class="viewcode-back" href="../../_autosummary/inkmap.synth.html#inkmap.synth.qr_model">[docs]</a>
-</span><span id="line-75"><span class="k">def</span><span class="w"> </span><span class="nf">qr_model</span><span class="p">(</span><span class="n">payload</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"m"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MatrixModel</span><span class="p">:</span>
-</span><span id="line-76"><span class="w">    </span><span class="sd">"""A QR :class:`~inkmap.models.MatrixModel`, from ``payload`` via segno.</span>
-</span><span id="line-77">
-</span><span id="line-78"><span class="sd">    With no payload, uses the shipped matrix and needs no dependency. Uses</span>
-</span><span id="line-79"><span class="sd">    ``segno.make_qr`` rather than ``segno.make``: the latter may return a Micro QR for</span>
-</span><span id="line-80"><span class="sd">    short payloads, a different symbology with different module counts.</span>
-</span><span id="line-81"><span class="sd">    """</span>
-</span><span id="line-82">    <span class="k">if</span> <span class="n">payload</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-83">        <span class="k">return</span> <span class="n">MatrixModel</span><span class="p">(</span><span class="n">default_matrix</span><span class="p">(),</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"symbology"</span><span class="p">:</span> <span class="s2">"QR Code"</span><span class="p">})</span>
-</span><span id="line-84">    <span class="k">try</span><span class="p">:</span>
-</span><span id="line-85">        <span class="kn">import</span><span class="w"> </span><span class="nn">segno</span>
-</span><span id="line-86">    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-</span><span id="line-87">        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-</span><span id="line-88">            <span class="sa">f</span><span class="s2">"generating a QR for </span><span class="si">{</span><span class="n">payload</span><span class="si">!r}</span><span class="s2"> needs segno -- pip install 'inkmap[synth]', "</span>
-</span><span id="line-89">            <span class="s2">"or call qr_model() with no payload for the shipped one"</span>
-</span><span id="line-90">        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-</span><span id="line-91">    <span class="n">qr</span> <span class="o">=</span> <span class="n">segno</span><span class="o">.</span><span class="n">make_qr</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">error</span><span class="p">)</span>
-</span><span id="line-92">    <span class="n">cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="nb">bool</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">qr</span><span class="o">.</span><span class="n">matrix</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-</span><span id="line-93">    <span class="k">return</span> <span class="n">MatrixModel</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"symbology"</span><span class="p">:</span> <span class="s2">"QR Code"</span><span class="p">,</span> <span class="s2">"payload"</span><span class="p">:</span> <span class="n">payload</span><span class="p">})</span></div>
+</span><span id="line-83"><span class="k">def</span><span class="w"> </span><span class="nf">qr_model</span><span class="p">(</span><span class="n">payload</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"m"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MatrixModel</span><span class="p">:</span>
+</span><span id="line-84"><span class="w">    </span><span class="sd">"""A QR :class:`~inkmap.models.MatrixModel`, from ``payload`` via segno.</span>
+</span><span id="line-85">
+</span><span id="line-86"><span class="sd">    With no payload, uses the shipped matrix and needs no dependency. Uses</span>
+</span><span id="line-87"><span class="sd">    ``segno.make_qr`` rather than ``segno.make``: the latter may return a Micro QR for</span>
+</span><span id="line-88"><span class="sd">    short payloads, a different symbology with different module counts.</span>
+</span><span id="line-89"><span class="sd">    """</span>
+</span><span id="line-90">    <span class="k">if</span> <span class="n">payload</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-91">        <span class="k">return</span> <span class="n">MatrixModel</span><span class="p">(</span><span class="n">default_matrix</span><span class="p">(),</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"symbology"</span><span class="p">:</span> <span class="s2">"QR Code"</span><span class="p">})</span>
+</span><span id="line-92">    <span class="k">try</span><span class="p">:</span>
+</span><span id="line-93">        <span class="kn">import</span><span class="w"> </span><span class="nn">segno</span>
+</span><span id="line-94">    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+</span><span id="line-95">        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+</span><span id="line-96">            <span class="sa">f</span><span class="s2">"generating a QR for </span><span class="si">{</span><span class="n">payload</span><span class="si">!r}</span><span class="s2"> needs segno -- pip install 'inkmap[synth]', "</span>
+</span><span id="line-97">            <span class="s2">"or call qr_model() with no payload for the shipped one"</span>
+</span><span id="line-98">        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+</span><span id="line-99">    <span class="n">qr</span> <span class="o">=</span> <span class="n">segno</span><span class="o">.</span><span class="n">make_qr</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">error</span><span class="p">)</span>
+</span><span id="line-100">    <span class="n">cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="nb">bool</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">qr</span><span class="o">.</span><span class="n">matrix</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+</span><span id="line-101">    <span class="k">return</span> <span class="n">MatrixModel</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"symbology"</span><span class="p">:</span> <span class="s2">"QR Code"</span><span class="p">,</span> <span class="s2">"payload"</span><span class="p">:</span> <span class="n">payload</span><span class="p">})</span></div>
 
-</span><span id="line-94">
-</span><span id="line-95">
+</span><span id="line-102">
+</span><span id="line-103">
+<div class="viewcode-block" id="nested_square">
+<a class="viewcode-back" href="../../_autosummary/inkmap.synth.html#inkmap.synth.nested_square">[docs]</a>
+</span><span id="line-104"><span class="k">def</span><span class="w"> </span><span class="nf">nested_square</span><span class="p">(</span><span class="n">side</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">rings</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">())</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+</span><span id="line-105"><span class="w">    </span><span class="sd">"""A square mark as a ``(side, side)`` cell grid: foreground, then alternating rings.</span>
+</span><span id="line-106">
+</span><span id="line-107"><span class="sd">    ``rings`` are the sides of the nested squares as fractions of ``side``, outermost</span>
+</span><span id="line-108"><span class="sd">    first, alternating background and foreground. Each must leave an equal whole number</span>
+</span><span id="line-109"><span class="sd">    of cells on both sides, or the mark would be off-centre -- that is an error.</span>
+</span><span id="line-110">
+</span><span id="line-111"><span class="sd">    &gt;&gt;&gt; nested_square(7, (5 / 7, 3 / 7)).astype(int)[3]</span>
+</span><span id="line-112"><span class="sd">    array([1, 0, 1, 1, 1, 0, 1])</span>
+</span><span id="line-113"><span class="sd">    """</span>
+</span><span id="line-114">    <span class="n">cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">side</span><span class="p">,</span> <span class="n">side</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+</span><span id="line-115">    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">ratio</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rings</span><span class="p">):</span>
+</span><span id="line-116">        <span class="n">inner</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">side</span> <span class="o">*</span> <span class="n">ratio</span><span class="p">)</span>
+</span><span id="line-117">        <span class="n">offset</span><span class="p">,</span> <span class="n">odd</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">side</span> <span class="o">-</span> <span class="n">inner</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</span><span id="line-118">        <span class="k">if</span> <span class="n">odd</span> <span class="ow">or</span> <span class="nb">abs</span><span class="p">(</span><span class="n">inner</span> <span class="o">-</span> <span class="n">side</span> <span class="o">*</span> <span class="n">ratio</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-9</span><span class="p">:</span>
+</span><span id="line-119">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="line-120">                <span class="sa">f</span><span class="s2">"a </span><span class="si">{</span><span class="n">side</span><span class="si">}</span><span class="s2">-cell mark cannot hold a centred ring of </span><span class="si">{</span><span class="n">ratio</span><span class="si">}</span><span class="s2"> "</span>
+</span><span id="line-121">                <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">side</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">ratio</span><span class="si">}</span><span class="s2"> cells); choose a side that makes it whole"</span>
+</span><span id="line-122">            <span class="p">)</span>
+</span><span id="line-123">        <span class="n">cells</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">inner</span><span class="p">,</span> <span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">inner</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span>
+</span><span id="line-124">    <span class="k">return</span> <span class="n">cells</span></div>
+
+</span><span id="line-125">
+</span><span id="line-126">
+<div class="viewcode-block" id="mark_sheet">
+<a class="viewcode-back" href="../../_autosummary/inkmap.synth.html#inkmap.synth.mark_sheet">[docs]</a>
+</span><span id="line-127"><span class="k">def</span><span class="w"> </span><span class="nf">mark_sheet</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">MatrixModel</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">]]]:</span>
+</span><span id="line-128"><span class="w">    </span><span class="sd">"""A card of square registration marks, and where each one's centre truly is.</span>
+</span><span id="line-129">
+</span><span id="line-130"><span class="sd">    Three bullseyes and a solid square at the corners, as on an OMR form, and two QR</span>
+</span><span id="line-131"><span class="sd">    finder patterns inside: 700 x 500 cells, marks 50 cells (42 for a finder). Render it</span>
+</span><span id="line-132"><span class="sd">    with :func:`render` at about 1.2 pixels per cell for ~60 px marks. Returns</span>
+</span><span id="line-133"><span class="sd">    ``(model, truth)``, ``truth`` being ``(centre_uv, rings)`` per mark in model units,</span>
+</span><span id="line-134"><span class="sd">    so ``cv2.perspectiveTransform`` through a scene's transform gives the true image</span>
+</span><span id="line-135"><span class="sd">    centres.</span>
+</span><span id="line-136"><span class="sd">    """</span>
+</span><span id="line-137">    <span class="kn">from</span><span class="w"> </span><span class="nn">.locate.marks</span><span class="w"> </span><span class="kn">import</span> <span class="n">BULLSEYE_RINGS</span><span class="p">,</span> <span class="n">QR_FINDER_RINGS</span>
+</span><span id="line-138">
+</span><span id="line-139">    <span class="n">cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">500</span><span class="p">,</span> <span class="mi">700</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+</span><span id="line-140">    <span class="n">truth</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-141">    <span class="n">bullseye</span> <span class="o">=</span> <span class="n">nested_square</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">BULLSEYE_RINGS</span><span class="p">)</span>
+</span><span id="line-142">    <span class="n">finder</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">nested_square</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="n">QR_FINDER_RINGS</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">))</span>
+</span><span id="line-143">    <span class="n">layout</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="line-144">        <span class="p">(</span><span class="n">bullseye</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">BULLSEYE_RINGS</span><span class="p">),</span>
+</span><span id="line-145">        <span class="p">(</span><span class="n">bullseye</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">620</span><span class="p">,</span> <span class="n">BULLSEYE_RINGS</span><span class="p">),</span>
+</span><span id="line-146">        <span class="p">(</span><span class="n">bullseye</span><span class="p">,</span> <span class="mi">420</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">BULLSEYE_RINGS</span><span class="p">),</span>
+</span><span id="line-147">        <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">),</span> <span class="mi">420</span><span class="p">,</span> <span class="mi">620</span><span class="p">,</span> <span class="p">()),</span>
+</span><span id="line-148">        <span class="p">(</span><span class="n">finder</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="n">QR_FINDER_RINGS</span><span class="p">),</span>
+</span><span id="line-149">        <span class="p">(</span><span class="n">finder</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="n">QR_FINDER_RINGS</span><span class="p">),</span>
+</span><span id="line-150">    <span class="p">]</span>
+</span><span id="line-151">    <span class="k">for</span> <span class="n">block</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">rings</span> <span class="ow">in</span> <span class="n">layout</span><span class="p">:</span>
+</span><span id="line-152">        <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">shape</span>
+</span><span id="line-153">        <span class="n">cells</span><span class="p">[</span><span class="n">row</span> <span class="p">:</span> <span class="n">row</span> <span class="o">+</span> <span class="n">rows</span><span class="p">,</span> <span class="n">col</span> <span class="p">:</span> <span class="n">col</span> <span class="o">+</span> <span class="n">cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">block</span>
+</span><span id="line-154">        <span class="n">truth</span><span class="o">.</span><span class="n">append</span><span class="p">(((</span><span class="n">col</span> <span class="o">+</span> <span class="n">cols</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">row</span> <span class="o">+</span> <span class="n">rows</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">),</span> <span class="n">rings</span><span class="p">))</span>
+</span><span id="line-155">    <span class="k">return</span> <span class="n">MatrixModel</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"target"</span><span class="p">:</span> <span class="s2">"square registration marks"</span><span class="p">}),</span> <span class="n">truth</span></div>
+
+</span><span id="line-156">
+</span><span id="line-157">
 <div class="viewcode-block" id="render">
 <a class="viewcode-back" href="../../_autosummary/inkmap.synth.html#inkmap.synth.render">[docs]</a>
-</span><span id="line-96"><span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span>
-</span><span id="line-97">    <span class="n">model</span><span class="p">:</span> <span class="n">Model</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-98">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-99">    <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">800</span><span class="p">,</span>
-</span><span id="line-100">    <span class="n">pixels_per_unit</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
-</span><span id="line-101">    <span class="n">perspective</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="line-102">    <span class="n">rotation</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="line-103">    <span class="n">blur</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="line-104">    <span class="n">noise</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="line-105">    <span class="n">gradient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="line-106">    <span class="n">glare</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="line-107">    <span class="n">jpeg_quality</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-108">    <span class="n">samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">SUPERSAMPLES</span><span class="p">,</span>
-</span><span id="line-109">    <span class="n">rng</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-110"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Scene</span><span class="p">:</span>
-</span><span id="line-111"><span class="w">    </span><span class="sd">"""Render one synthetic photograph of ``model`` with exact ground-truth coverage.</span>
-</span><span id="line-112">
-</span><span id="line-113"><span class="sd">    Degradations are applied in capture order -- geometry, then optics (blur, glare),</span>
-</span><span id="line-114"><span class="sd">    then illumination, then sensor noise, then compression -- because any other order</span>
-</span><span id="line-115"><span class="sd">    models a camera that does not exist. ``perspective`` jitters the four corners by</span>
-</span><span id="line-116"><span class="sd">    that fraction of the mark's span; ``rotation`` is in degrees; ``gradient`` is the</span>
-</span><span id="line-117"><span class="sd">    fractional illumination falloff across the frame.</span>
-</span><span id="line-118"><span class="sd">    """</span>
-</span><span id="line-119">    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">rng</span><span class="p">)</span>
-</span><span id="line-120">    <span class="n">model</span> <span class="o">=</span> <span class="n">qr_model</span><span class="p">()</span> <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">model</span>
-</span><span id="line-121">    <span class="n">height</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">else</span> <span class="n">size</span>
-</span><span id="line-122">
-</span><span id="line-123">    <span class="n">mw</span><span class="p">,</span> <span class="n">mh</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">extent</span>
-</span><span id="line-124">    <span class="n">span_x</span><span class="p">,</span> <span class="n">span_y</span> <span class="o">=</span> <span class="n">mw</span> <span class="o">*</span> <span class="n">pixels_per_unit</span><span class="p">,</span> <span class="n">mh</span> <span class="o">*</span> <span class="n">pixels_per_unit</span>
-</span><span id="line-125">    <span class="n">ox</span><span class="p">,</span> <span class="n">oy</span> <span class="o">=</span> <span class="p">(</span><span class="n">width</span> <span class="o">-</span> <span class="n">span_x</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="p">(</span><span class="n">height</span> <span class="o">-</span> <span class="n">span_y</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
-</span><span id="line-126">
-</span><span id="line-127">    <span class="n">dst</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-</span><span id="line-128">        <span class="p">[[</span><span class="n">ox</span><span class="p">,</span> <span class="n">oy</span><span class="p">],</span> <span class="p">[</span><span class="n">ox</span> <span class="o">+</span> <span class="n">span_x</span><span class="p">,</span> <span class="n">oy</span><span class="p">],</span> <span class="p">[</span><span class="n">ox</span> <span class="o">+</span> <span class="n">span_x</span><span class="p">,</span> <span class="n">oy</span> <span class="o">+</span> <span class="n">span_y</span><span class="p">],</span> <span class="p">[</span><span class="n">ox</span><span class="p">,</span> <span class="n">oy</span> <span class="o">+</span> <span class="n">span_y</span><span class="p">]],</span>
-</span><span id="line-129">        <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
-</span><span id="line-130">    <span class="p">)</span>
-</span><span id="line-131">    <span class="k">if</span> <span class="n">rotation</span><span class="p">:</span>
-</span><span id="line-132">        <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">rotation</span><span class="p">)</span>
-</span><span id="line-133">        <span class="n">c</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
-</span><span id="line-134">        <span class="n">center</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">width</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">height</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-</span><span id="line-135">        <span class="n">dst</span> <span class="o">=</span> <span class="p">(</span><span class="n">dst</span> <span class="o">-</span> <span class="n">center</span><span class="p">)</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">c</span><span class="p">,</span> <span class="o">-</span><span class="n">s</span><span class="p">],</span> <span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="n">c</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">T</span> <span class="o">+</span> <span class="n">center</span>
-</span><span id="line-136">    <span class="k">if</span> <span class="n">perspective</span><span class="p">:</span>
-</span><span id="line-137">        <span class="n">reach</span> <span class="o">=</span> <span class="n">perspective</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">span_x</span><span class="p">,</span> <span class="n">span_y</span><span class="p">)</span>
-</span><span id="line-138">        <span class="n">dst</span> <span class="o">=</span> <span class="n">dst</span> <span class="o">+</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="n">reach</span><span class="p">,</span> <span class="n">reach</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-</span><span id="line-139">
-</span><span id="line-140">    <span class="n">transform</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">getPerspectiveTransform</span><span class="p">(</span><span class="n">model_quad</span><span class="p">(</span><span class="n">model</span><span class="p">),</span> <span class="n">dst</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
-</span><span id="line-141">    <span class="n">coverage</span> <span class="o">=</span> <span class="n">coverage_map</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">transform</span><span class="p">,</span> <span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">),</span> <span class="n">samples</span><span class="o">=</span><span class="n">samples</span><span class="p">)</span>
-</span><span id="line-142">
-</span><span id="line-143">    <span class="n">image</span> <span class="o">=</span> <span class="n">degrade</span><span class="p">(</span>
-</span><span id="line-144">        <span class="mf">255.0</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">coverage</span><span class="p">),</span>
-</span><span id="line-145">        <span class="n">blur</span><span class="o">=</span><span class="n">blur</span><span class="p">,</span>
-</span><span id="line-146">        <span class="n">noise</span><span class="o">=</span><span class="n">noise</span><span class="p">,</span>
-</span><span id="line-147">        <span class="n">gradient</span><span class="o">=</span><span class="n">gradient</span><span class="p">,</span>
-</span><span id="line-148">        <span class="n">glare</span><span class="o">=</span><span class="n">glare</span><span class="p">,</span>
-</span><span id="line-149">        <span class="n">jpeg_quality</span><span class="o">=</span><span class="n">jpeg_quality</span><span class="p">,</span>
-</span><span id="line-150">        <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">,</span>
-</span><span id="line-151">    <span class="p">)</span>
-</span><span id="line-152">
-</span><span id="line-153">    <span class="k">return</span> <span class="n">Scene</span><span class="p">(</span>
-</span><span id="line-154">        <span class="n">image</span><span class="o">=</span><span class="n">image</span><span class="p">,</span>
-</span><span id="line-155">        <span class="n">coverage</span><span class="o">=</span><span class="n">coverage</span><span class="p">,</span>
-</span><span id="line-156">        <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
-</span><span id="line-157">        <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-</span><span id="line-158">        <span class="n">params</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-</span><span id="line-159">            <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">),</span>
-</span><span id="line-160">            <span class="n">pixels_per_unit</span><span class="o">=</span><span class="n">pixels_per_unit</span><span class="p">,</span>
-</span><span id="line-161">            <span class="n">perspective</span><span class="o">=</span><span class="n">perspective</span><span class="p">,</span>
-</span><span id="line-162">            <span class="n">rotation</span><span class="o">=</span><span class="n">rotation</span><span class="p">,</span>
-</span><span id="line-163">            <span class="n">blur</span><span class="o">=</span><span class="n">blur</span><span class="p">,</span>
-</span><span id="line-164">            <span class="n">noise</span><span class="o">=</span><span class="n">noise</span><span class="p">,</span>
-</span><span id="line-165">            <span class="n">gradient</span><span class="o">=</span><span class="n">gradient</span><span class="p">,</span>
-</span><span id="line-166">            <span class="n">glare</span><span class="o">=</span><span class="n">glare</span><span class="p">,</span>
-</span><span id="line-167">            <span class="n">jpeg_quality</span><span class="o">=</span><span class="n">jpeg_quality</span><span class="p">,</span>
-</span><span id="line-168">        <span class="p">),</span>
-</span><span id="line-169">    <span class="p">)</span></div>
+</span><span id="line-158"><span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span>
+</span><span id="line-159">    <span class="n">model</span><span class="p">:</span> <span class="n">Model</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-160">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-161">    <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">800</span><span class="p">,</span>
+</span><span id="line-162">    <span class="n">pixels_per_unit</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
+</span><span id="line-163">    <span class="n">perspective</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="line-164">    <span class="n">rotation</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="line-165">    <span class="n">blur</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="line-166">    <span class="n">noise</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="line-167">    <span class="n">gradient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="line-168">    <span class="n">glare</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="line-169">    <span class="n">jpeg_quality</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-170">    <span class="n">samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">SUPERSAMPLES</span><span class="p">,</span>
+</span><span id="line-171">    <span class="n">rng</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-172"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Scene</span><span class="p">:</span>
+</span><span id="line-173"><span class="w">    </span><span class="sd">"""Render one synthetic photograph of ``model`` with exact ground-truth coverage.</span>
+</span><span id="line-174">
+</span><span id="line-175"><span class="sd">    Degradations are applied in capture order -- geometry, then optics (blur, glare),</span>
+</span><span id="line-176"><span class="sd">    then illumination, then sensor noise, then compression -- because any other order</span>
+</span><span id="line-177"><span class="sd">    models a camera that does not exist. ``perspective`` jitters the four corners by</span>
+</span><span id="line-178"><span class="sd">    that fraction of the mark's span; ``rotation`` is in degrees; ``gradient`` is the</span>
+</span><span id="line-179"><span class="sd">    fractional illumination falloff across the frame.</span>
+</span><span id="line-180"><span class="sd">    """</span>
+</span><span id="line-181">    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">rng</span><span class="p">)</span>
+</span><span id="line-182">    <span class="n">model</span> <span class="o">=</span> <span class="n">qr_model</span><span class="p">()</span> <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">model</span>
+</span><span id="line-183">    <span class="n">height</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">else</span> <span class="n">size</span>
+</span><span id="line-184">
+</span><span id="line-185">    <span class="n">mw</span><span class="p">,</span> <span class="n">mh</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">extent</span>
+</span><span id="line-186">    <span class="n">span_x</span><span class="p">,</span> <span class="n">span_y</span> <span class="o">=</span> <span class="n">mw</span> <span class="o">*</span> <span class="n">pixels_per_unit</span><span class="p">,</span> <span class="n">mh</span> <span class="o">*</span> <span class="n">pixels_per_unit</span>
+</span><span id="line-187">    <span class="n">ox</span><span class="p">,</span> <span class="n">oy</span> <span class="o">=</span> <span class="p">(</span><span class="n">width</span> <span class="o">-</span> <span class="n">span_x</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="p">(</span><span class="n">height</span> <span class="o">-</span> <span class="n">span_y</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+</span><span id="line-188">
+</span><span id="line-189">    <span class="n">dst</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+</span><span id="line-190">        <span class="p">[[</span><span class="n">ox</span><span class="p">,</span> <span class="n">oy</span><span class="p">],</span> <span class="p">[</span><span class="n">ox</span> <span class="o">+</span> <span class="n">span_x</span><span class="p">,</span> <span class="n">oy</span><span class="p">],</span> <span class="p">[</span><span class="n">ox</span> <span class="o">+</span> <span class="n">span_x</span><span class="p">,</span> <span class="n">oy</span> <span class="o">+</span> <span class="n">span_y</span><span class="p">],</span> <span class="p">[</span><span class="n">ox</span><span class="p">,</span> <span class="n">oy</span> <span class="o">+</span> <span class="n">span_y</span><span class="p">]],</span>
+</span><span id="line-191">        <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+</span><span id="line-192">    <span class="p">)</span>
+</span><span id="line-193">    <span class="k">if</span> <span class="n">rotation</span><span class="p">:</span>
+</span><span id="line-194">        <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">rotation</span><span class="p">)</span>
+</span><span id="line-195">        <span class="n">c</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+</span><span id="line-196">        <span class="n">center</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">width</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">height</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+</span><span id="line-197">        <span class="n">dst</span> <span class="o">=</span> <span class="p">(</span><span class="n">dst</span> <span class="o">-</span> <span class="n">center</span><span class="p">)</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">c</span><span class="p">,</span> <span class="o">-</span><span class="n">s</span><span class="p">],</span> <span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="n">c</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">T</span> <span class="o">+</span> <span class="n">center</span>
+</span><span id="line-198">    <span class="k">if</span> <span class="n">perspective</span><span class="p">:</span>
+</span><span id="line-199">        <span class="n">reach</span> <span class="o">=</span> <span class="n">perspective</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">span_x</span><span class="p">,</span> <span class="n">span_y</span><span class="p">)</span>
+</span><span id="line-200">        <span class="n">dst</span> <span class="o">=</span> <span class="n">dst</span> <span class="o">+</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="n">reach</span><span class="p">,</span> <span class="n">reach</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+</span><span id="line-201">
+</span><span id="line-202">    <span class="n">transform</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">getPerspectiveTransform</span><span class="p">(</span><span class="n">model_quad</span><span class="p">(</span><span class="n">model</span><span class="p">),</span> <span class="n">dst</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+</span><span id="line-203">    <span class="n">coverage</span> <span class="o">=</span> <span class="n">coverage_map</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">transform</span><span class="p">,</span> <span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">),</span> <span class="n">samples</span><span class="o">=</span><span class="n">samples</span><span class="p">)</span>
+</span><span id="line-204">
+</span><span id="line-205">    <span class="n">image</span> <span class="o">=</span> <span class="n">degrade</span><span class="p">(</span>
+</span><span id="line-206">        <span class="mf">255.0</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">coverage</span><span class="p">),</span>
+</span><span id="line-207">        <span class="n">blur</span><span class="o">=</span><span class="n">blur</span><span class="p">,</span>
+</span><span id="line-208">        <span class="n">noise</span><span class="o">=</span><span class="n">noise</span><span class="p">,</span>
+</span><span id="line-209">        <span class="n">gradient</span><span class="o">=</span><span class="n">gradient</span><span class="p">,</span>
+</span><span id="line-210">        <span class="n">glare</span><span class="o">=</span><span class="n">glare</span><span class="p">,</span>
+</span><span id="line-211">        <span class="n">jpeg_quality</span><span class="o">=</span><span class="n">jpeg_quality</span><span class="p">,</span>
+</span><span id="line-212">        <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">,</span>
+</span><span id="line-213">    <span class="p">)</span>
+</span><span id="line-214">
+</span><span id="line-215">    <span class="k">return</span> <span class="n">Scene</span><span class="p">(</span>
+</span><span id="line-216">        <span class="n">image</span><span class="o">=</span><span class="n">image</span><span class="p">,</span>
+</span><span id="line-217">        <span class="n">coverage</span><span class="o">=</span><span class="n">coverage</span><span class="p">,</span>
+</span><span id="line-218">        <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+</span><span id="line-219">        <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+</span><span id="line-220">        <span class="n">params</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+</span><span id="line-221">            <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">),</span>
+</span><span id="line-222">            <span class="n">pixels_per_unit</span><span class="o">=</span><span class="n">pixels_per_unit</span><span class="p">,</span>
+</span><span id="line-223">            <span class="n">perspective</span><span class="o">=</span><span class="n">perspective</span><span class="p">,</span>
+</span><span id="line-224">            <span class="n">rotation</span><span class="o">=</span><span class="n">rotation</span><span class="p">,</span>
+</span><span id="line-225">            <span class="n">blur</span><span class="o">=</span><span class="n">blur</span><span class="p">,</span>
+</span><span id="line-226">            <span class="n">noise</span><span class="o">=</span><span class="n">noise</span><span class="p">,</span>
+</span><span id="line-227">            <span class="n">gradient</span><span class="o">=</span><span class="n">gradient</span><span class="p">,</span>
+</span><span id="line-228">            <span class="n">glare</span><span class="o">=</span><span class="n">glare</span><span class="p">,</span>
+</span><span id="line-229">            <span class="n">jpeg_quality</span><span class="o">=</span><span class="n">jpeg_quality</span><span class="p">,</span>
+</span><span id="line-230">        <span class="p">),</span>
+</span><span id="line-231">    <span class="p">)</span></div>
 
-</span><span id="line-170">
-</span><span id="line-171">
+</span><span id="line-232">
+</span><span id="line-233">
 <div class="viewcode-block" id="degrade">
 <a class="viewcode-back" href="../../_autosummary/inkmap.synth.html#inkmap.synth.degrade">[docs]</a>
-</span><span id="line-172"><span class="k">def</span><span class="w"> </span><span class="nf">degrade</span><span class="p">(</span>
-</span><span id="line-173">    <span class="n">image</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-</span><span id="line-174">    <span class="o">*</span><span class="p">,</span>
-</span><span id="line-175">    <span class="n">blur</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="line-176">    <span class="n">noise</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="line-177">    <span class="n">gradient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="line-178">    <span class="n">glare</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="line-179">    <span class="n">jpeg_quality</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-180">    <span class="n">rng</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-181"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-</span><span id="line-182"><span class="w">    </span><span class="sd">"""Apply a capture-order degradation chain to a float image, returning uint8."""</span>
-</span><span id="line-183">    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">rng</span><span class="p">)</span>
-</span><span id="line-184">    <span class="n">x</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-</span><span id="line-185">    <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
-</span><span id="line-186">
-</span><span id="line-187">    <span class="k">if</span> <span class="n">blur</span><span class="p">:</span>
-</span><span id="line-188">        <span class="n">x</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">GaussianBlur</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">blur</span><span class="p">)</span>
-</span><span id="line-189">    <span class="k">if</span> <span class="n">glare</span><span class="p">:</span>
-</span><span id="line-190">        <span class="n">yy</span><span class="p">,</span> <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">h</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">w</span><span class="p">]</span>
-</span><span id="line-191">        <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">[</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">]</span>
-</span><span id="line-192">        <span class="n">radius</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">)</span>
-</span><span id="line-193">        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">glare</span> <span class="o">*</span> <span class="mf">255.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
-</span><span id="line-194">            <span class="o">-</span><span class="p">(((</span><span class="n">xx</span> <span class="o">-</span> <span class="n">cx</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">yy</span> <span class="o">-</span> <span class="n">cy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">radius</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
-</span><span id="line-195">        <span class="p">)</span>
-</span><span id="line-196">    <span class="k">if</span> <span class="n">gradient</span><span class="p">:</span>
-</span><span id="line-197">        <span class="n">yy</span><span class="p">,</span> <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">h</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">w</span><span class="p">]</span>
-</span><span id="line-198">        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">gradient</span> <span class="o">*</span> <span class="p">(</span><span class="n">xx</span> <span class="o">/</span> <span class="n">w</span> <span class="o">*</span> <span class="mf">0.6</span> <span class="o">+</span> <span class="n">yy</span> <span class="o">/</span> <span class="n">h</span> <span class="o">*</span> <span class="mf">0.4</span><span class="p">))</span>
-</span><span id="line-199">    <span class="k">if</span> <span class="n">noise</span><span class="p">:</span>
-</span><span id="line-200">        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">noise</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-</span><span id="line-201">
-</span><span id="line-202">    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
-</span><span id="line-203">    <span class="k">if</span> <span class="n">jpeg_quality</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-204">        <span class="n">ok</span><span class="p">,</span> <span class="n">buf</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imencode</span><span class="p">(</span>
-</span><span id="line-205">            <span class="s2">".jpg"</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">IMWRITE_JPEG_QUALITY</span><span class="p">),</span> <span class="n">jpeg_quality</span><span class="p">]</span>
-</span><span id="line-206">        <span class="p">)</span>
-</span><span id="line-207">        <span class="k">if</span> <span class="n">ok</span><span class="p">:</span>
-</span><span id="line-208">            <span class="n">out</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imdecode</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">IMREAD_GRAYSCALE</span><span class="p">)</span>
-</span><span id="line-209">    <span class="k">return</span> <span class="n">out</span></div>
+</span><span id="line-234"><span class="k">def</span><span class="w"> </span><span class="nf">degrade</span><span class="p">(</span>
+</span><span id="line-235">    <span class="n">image</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+</span><span id="line-236">    <span class="o">*</span><span class="p">,</span>
+</span><span id="line-237">    <span class="n">blur</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="line-238">    <span class="n">noise</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="line-239">    <span class="n">gradient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="line-240">    <span class="n">glare</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="line-241">    <span class="n">jpeg_quality</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-242">    <span class="n">rng</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-243"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+</span><span id="line-244"><span class="w">    </span><span class="sd">"""Apply a capture-order degradation chain to a float image, returning uint8."""</span>
+</span><span id="line-245">    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">rng</span><span class="p">)</span>
+</span><span id="line-246">    <span class="n">x</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+</span><span id="line-247">    <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+</span><span id="line-248">
+</span><span id="line-249">    <span class="k">if</span> <span class="n">blur</span><span class="p">:</span>
+</span><span id="line-250">        <span class="n">x</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">GaussianBlur</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">blur</span><span class="p">)</span>
+</span><span id="line-251">    <span class="k">if</span> <span class="n">glare</span><span class="p">:</span>
+</span><span id="line-252">        <span class="n">yy</span><span class="p">,</span> <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">h</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">w</span><span class="p">]</span>
+</span><span id="line-253">        <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">[</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">]</span>
+</span><span id="line-254">        <span class="n">radius</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">)</span>
+</span><span id="line-255">        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">glare</span> <span class="o">*</span> <span class="mf">255.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+</span><span id="line-256">            <span class="o">-</span><span class="p">(((</span><span class="n">xx</span> <span class="o">-</span> <span class="n">cx</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">yy</span> <span class="o">-</span> <span class="n">cy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">radius</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+</span><span id="line-257">        <span class="p">)</span>
+</span><span id="line-258">    <span class="k">if</span> <span class="n">gradient</span><span class="p">:</span>
+</span><span id="line-259">        <span class="n">yy</span><span class="p">,</span> <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">h</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">w</span><span class="p">]</span>
+</span><span id="line-260">        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">gradient</span> <span class="o">*</span> <span class="p">(</span><span class="n">xx</span> <span class="o">/</span> <span class="n">w</span> <span class="o">*</span> <span class="mf">0.6</span> <span class="o">+</span> <span class="n">yy</span> <span class="o">/</span> <span class="n">h</span> <span class="o">*</span> <span class="mf">0.4</span><span class="p">))</span>
+</span><span id="line-261">    <span class="k">if</span> <span class="n">noise</span><span class="p">:</span>
+</span><span id="line-262">        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">noise</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</span><span id="line-263">
+</span><span id="line-264">    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+</span><span id="line-265">    <span class="k">if</span> <span class="n">jpeg_quality</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-266">        <span class="n">ok</span><span class="p">,</span> <span class="n">buf</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imencode</span><span class="p">(</span>
+</span><span id="line-267">            <span class="s2">".jpg"</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">IMWRITE_JPEG_QUALITY</span><span class="p">),</span> <span class="n">jpeg_quality</span><span class="p">]</span>
+</span><span id="line-268">        <span class="p">)</span>
+</span><span id="line-269">        <span class="k">if</span> <span class="n">ok</span><span class="p">:</span>
+</span><span id="line-270">            <span class="n">out</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imdecode</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">IMREAD_GRAYSCALE</span><span class="p">)</span>
+</span><span id="line-271">    <span class="k">return</span> <span class="n">out</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -409,7 +478,7 @@
 </footer>
     </div>
     
-    <script src="../../_static/documentation_options.js?v=360bc84d"></script>
+    <script src="../../_static/documentation_options.js?v=fd825880"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

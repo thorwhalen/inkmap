@@ -22,7 +22,7 @@ or the raster’s own edges become the accuracy limit rather than the photograph
 | [`PolygonModel`](#inkmap.models.freeform.PolygonModel)(polygons[, extent_override, ...]) | Foreground as closed outlines, with holes -- the exact case.          |
 | [`GlyphModel`](#inkmap.models.freeform.GlyphModel)(text[, font_path, font_size, ...])  | A run of printed text, rendered once at high resolution.              |
 
-### *class* inkmap.models.freeform.GlyphModel(text, font_path=None, font_size=256, padding=8, metadata=<factory>)
+### *class* inkmap.models.freeform.GlyphModel(text, font_path=None, font_size=256, padding=8, metadata=dict())
 
 Bases: [`BaseModel`](inkmap.models.base.html.md#inkmap.models.base.BaseModel)
 
@@ -40,7 +40,7 @@ pass `font_path`. Model space is the rendered pixel grid.
 
 Typical stroke width of the rendered text, in raster cells.
 
-### *class* inkmap.models.freeform.PolygonModel(polygons, extent_override=None, metadata=<factory>)
+### *class* inkmap.models.freeform.PolygonModel(polygons, extent_override=None, metadata=dict())
 
 Bases: [`BaseModel`](inkmap.models.base.html.md#inkmap.models.base.BaseModel)
 
@@ -58,7 +58,7 @@ Even-odd crossing test, vectorised over all points and all edges.
 * **Return type:**
   `ndarray`
 
-### *class* inkmap.models.freeform.RasterModel(mask, metadata=<factory>)
+### *class* inkmap.models.freeform.RasterModel(mask, metadata=dict())
 
 Bases: [`BaseModel`](inkmap.models.base.html.md#inkmap.models.base.BaseModel)
 

@@ -21,6 +21,7 @@
       confidence
       measurement_weight
       locate
+      find_square_marks
    
    .. rubric:: Classes
 
@@ -33,6 +34,7 @@
       Model
       Measurement
       Measurability
+      SquareMark
    
 .. rubric:: Modules
 
