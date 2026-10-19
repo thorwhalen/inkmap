@@ -54,9 +54,11 @@ from . import config, coverage as _coverage, geometry, models, photometry
 from .coverage import confidence, coverage_map, measurement_weight, observed_coverage
 from .locate import (
     LOCATORS,
+    PatchRegions,
     SquareMark,
     find_square_marks,
     locate,
+    locate_patch,
     place,
     validated_scale,
 )
@@ -112,6 +114,8 @@ __all__ = [
     "LOCATORS",
     "find_square_marks",
     "SquareMark",
+    "locate_patch",
+    "PatchRegions",
     "models",
     "geometry",
     "photometry",

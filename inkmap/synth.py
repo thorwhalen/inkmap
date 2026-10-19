@@ -38,6 +38,8 @@ __all__ = [
     "degrade",
     "nested_square",
     "mark_sheet",
+    "PatchScene",
+    "render_patch",
 ]
 
 _DEFAULT_MATRIX_PATH = Path(__file__).parent / "data" / "default_qr.txt"
@@ -153,6 +155,152 @@ def mark_sheet() -> tuple[MatrixModel, list[tuple[tuple[float, float], tuple]]]:
         cells[row : row + rows, col : col + cols] = block
         truth.append(((col + cols / 2.0, row + rows / 2.0), rings))
     return MatrixModel(cells, metadata={"target": "square registration marks"}), truth
+
+
+@dataclass(frozen=True)
+class PatchScene:
+    """A synthetic colour photograph of a printed patch on a paper strip, and its truth."""
+
+    image: np.ndarray
+    """(H, W, 3) uint8 BGR."""
+
+    patch_quad: np.ndarray
+    """(4, 2) true image corners of the patch, clockwise from its top-left."""
+
+    paper_quad: np.ndarray
+    """(4, 2) true image corners of the paper strip, in the same order."""
+
+    params: dict[str, Any] = field(default_factory=dict)
+
+
+def render_patch(
+    *,
+    size: tuple[int, int] = (600, 800),
+    patch_bgr: tuple[float, float, float] = (60.0, 110.0, 200.0),
+    paper_bgr: tuple[float, float, float] = (232.0, 236.0, 238.0),
+    background_bgr: tuple[float, float, float] = (70.0, 80.0, 95.0),
+    patch_size: tuple[float, float] = (40.0, 24.0),
+    paper_size: tuple[float, float] = (100.0, 32.0),
+    pixels_per_unit: float = 6.0,
+    centre: tuple[float, float] | None = None,
+    perspective: float = 0.0,
+    rotation: float = 0.0,
+    blur: float = 0.0,
+    noise: float = 0.0,
+    gradient: float = 0.0,
+    background_texture: float = 0.0,
+    supersample: int = 8,
+    rng: np.random.Generator | int | None = None,
+) -> PatchScene:
+    """Render a uniform colour patch centred on a paper strip, over a background.
+
+    Model space is the strip's own, in units: a ``paper_size`` strip with a
+    ``patch_size`` patch at its centre, mapped into the frame at ``pixels_per_unit``
+    around ``centre`` (the frame's centre by default), then rotated by ``rotation``
+    degrees and its corners jittered by ``perspective`` of the strip's span. Edges are
+    anti-aliased by drawing at ``supersample`` times the resolution and area-averaging,
+    so the true patch quad is exact to that sampling. ``background_texture`` adds
+    low-frequency blotches of that many grey levels to the background (a table, a
+    cloth). Degradations then apply per channel, as in :func:`degrade`.
+    """
+    rng = np.random.default_rng(rng)
+    height, width = size
+    cx, cy = (width / 2.0, height / 2.0) if centre is None else centre
+    pw, ph = paper_size
+    qw, qh = patch_size
+
+    def rect(w, h):
+        return np.array(
+            [[-w / 2, -h / 2], [w / 2, -h / 2], [w / 2, h / 2], [-w / 2, h / 2]],
+            dtype=np.float64,
+        )
+
+    paper_uv, patch_uv = rect(pw, ph), rect(qw, qh)
+    dst = paper_uv * pixels_per_unit
+    theta = np.deg2rad(rotation)
+    c, s_ = np.cos(theta), np.sin(theta)
+    dst = dst @ np.array([[c, -s_], [s_, c]]).T + (cx, cy)
+    if perspective:
+        reach = perspective * max(pw, ph) * pixels_per_unit
+        dst = dst + rng.uniform(-reach, reach, (4, 2))
+    transform = cv2.getPerspectiveTransform(
+        paper_uv.astype(np.float32), dst.astype(np.float32)
+    )
+
+    def to_image(uv):
+        return cv2.perspectiveTransform(
+            uv.reshape(-1, 1, 2).astype(np.float64), transform
+        ).reshape(4, 2)
+
+    paper_quad, patch_quad = to_image(paper_uv), to_image(patch_uv)
+
+    k = int(supersample)
+    big = np.empty((height * k, width * k, 3), dtype=np.float32)
+    big[:] = background_bgr
+    if background_texture:
+        blotches = cv2.resize(
+            rng.normal(0.0, 1.0, (max(2, height // 40), max(2, width // 40))),
+            (width * k, height * k),
+            interpolation=cv2.INTER_CUBIC,
+        )
+        big += (background_texture * blotches)[..., None].astype(np.float32)
+
+    def fill(quad, colour):
+        # Exact centre sampling: a sub-pixel is inside when its centre is on the inner
+        # side of all four edges. (cv2.fillConvexPoly includes both boundary rows, which
+        # widens the right and bottom edges by a sub-pixel: 1/8 px of bias at k = 8.)
+        # Sub-pixel j of pixel x is centred at x - 0.5 + (j + 0.5) / k.
+        lo = np.floor(quad.min(axis=0)).astype(int) - 1
+        hi = np.ceil(quad.max(axis=0)).astype(int) + 1
+        lo = np.maximum(lo, 0)
+        hi = np.minimum(hi, (width - 1, height - 1))
+        if (hi < lo).any():
+            return
+        xs = np.arange(lo[0] * k, (hi[0] + 1) * k)
+        ys = np.arange(lo[1] * k, (hi[1] + 1) * k)
+        gx, gy = np.meshgrid((xs + 0.5) / k - 0.5, (ys + 0.5) / k - 0.5)
+        orientation = np.sign(
+            np.sum(
+                quad[:, 0] * np.roll(quad[:, 1], -1)
+                - np.roll(quad[:, 0], -1) * quad[:, 1]
+            )
+        )
+        inside = np.ones(gx.shape, dtype=bool)
+        for (ax, ay), (bx, by) in zip(quad, np.roll(quad, -1, axis=0)):
+            cross = (bx - ax) * (gy - ay) - (by - ay) * (gx - ax)
+            inside &= orientation * cross >= 0
+        block = big[ys[0] : ys[-1] + 1, xs[0] : xs[-1] + 1]
+        block[inside] = colour
+
+    fill(paper_quad, paper_bgr)
+    fill(patch_quad, patch_bgr)
+    image = cv2.resize(big, (width, height), interpolation=cv2.INTER_AREA)
+    channels = [
+        degrade(
+            image[..., i],
+            blur=blur,
+            noise=noise,
+            gradient=gradient,
+            rng=int(rng.integers(1 << 31)),
+        )
+        for i in range(3)
+    ]
+    return PatchScene(
+        image=np.dstack(channels),
+        patch_quad=patch_quad,
+        paper_quad=paper_quad,
+        params=dict(
+            size=size,
+            patch_bgr=patch_bgr,
+            paper_bgr=paper_bgr,
+            pixels_per_unit=pixels_per_unit,
+            perspective=perspective,
+            rotation=rotation,
+            blur=blur,
+            noise=noise,
+            gradient=gradient,
+        ),
+    )
 
 
 def render(

@@ -15,7 +15,9 @@ That is the seam that makes this work for "anything the user provides a model fo
 
 Plain registration marks -- solid squares and nested-square bullseyes, which carry no
 code to decode -- are found by :func:`find_square_marks`, which returns their
-projective sub-pixel centres rather than placements of a model.
+projective sub-pixel centres rather than placements of a model. A plain printed
+patch -- a uniform colour rectangle, no code -- and the ring of substrate round it are
+found by :func:`locate_patch`, seeded at a point inside it.
 """
 
 from __future__ import annotations
@@ -38,6 +40,7 @@ from .marks import (
     quad_centre,
     ring_ratios,
 )
+from .patch import PatchRegions, locate_patch, locate_patch_centre
 from .qr import locate_qr_aruco, locate_qr_opencv, locate_qr_zxing
 
 Locator = Callable[[np.ndarray, np.ndarray], list[Placement]]
@@ -58,6 +61,9 @@ __all__ = [
     "QR_FINDER_RINGS",
     "quad_centre",
     "ring_ratios",
+    "locate_patch",
+    "locate_patch_centre",
+    "PatchRegions",
 ]
 
 #: Registry of locator strategies. Add your own: ``LOCATORS["mine"] = my_locator``.
@@ -66,6 +72,7 @@ LOCATORS: dict[str, Locator] = {
     "qr_aruco": locate_qr_aruco,
     "qr_opencv": locate_qr_opencv,
     "barcode_zxing": locate_barcode_zxing,
+    "patch": locate_patch_centre,  # opt-in: not in config.DEFAULT_LOCATORS
 }
 
 

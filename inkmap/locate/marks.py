@@ -318,7 +318,12 @@ def _clockwise_from_top_left(corners: np.ndarray) -> np.ndarray:
 
 
 def _fit_quad(
-    contour: np.ndarray, approx: np.ndarray, gray: np.ndarray, *, min_contrast
+    contour: np.ndarray,
+    approx: np.ndarray,
+    gray: np.ndarray,
+    *,
+    min_contrast,
+    level_window: int | None = None,
 ):
     """Refine a four-vertex polygon into four sub-pixel side lines and their corners.
 
@@ -346,7 +351,13 @@ def _fit_quad(
             config.MARK_EDGE_PROFILE_PX, config.MARK_EDGE_PROFILE_SHARE * len(side)
         )
         for _ in range(config.MARK_EDGE_ITERATIONS):
-            refined = _refine_side(gray, line, half=half, min_contrast=min_contrast)
+            refined = _refine_side(
+                gray,
+                line,
+                half=half,
+                min_contrast=min_contrast,
+                level_window=level_window,
+            )
             if refined is None:
                 break
             line = refined
@@ -378,7 +389,14 @@ def _fit_line(points: np.ndarray):
     return centre, direction, float(along.min()), float(along.max()), resid, len(points)
 
 
-def _refine_side(gray: np.ndarray, line, *, half: float, min_contrast: float):
+def _refine_side(
+    gray: np.ndarray,
+    line,
+    *,
+    half: float,
+    min_contrast: float,
+    level_window: int | None = None,
+):
     """Move a side's line onto the grey image's mid-level edge, to a fraction of a pixel.
 
     A line fitted to contour pixels inherits their quantisation: on an edge that runs
@@ -412,7 +430,20 @@ def _refine_side(gray: np.ndarray, line, *, half: float, min_contrast: float):
     one_side, other_side = np.median(profiles[:, 0]), np.median(profiles[:, -1])
     if abs(other_side - one_side) < min_contrast:
         return None
-    d = profiles - 0.5 * (one_side + other_side)
+    if level_window is None:
+        level = 0.5 * (one_side + other_side)
+    else:
+        # The mid-level local to each profile, smoothed along the side over
+        # ``level_window`` profiles: under uneven light it drifts along a long side, and
+        # one level for the whole side would tilt the fitted line on a faint edge.
+        ends = 0.5 * (profiles[:, 0] + profiles[:, -1])
+        k = max(1, min(int(level_window), len(ends)))
+        kernel = np.ones(k) / k
+        level = (
+            np.convolve(ends, kernel, mode="same")
+            / np.convolve(np.ones_like(ends), kernel, mode="same")
+        )[:, None]
+    d = profiles - level
     a, b = d[:, :-1], d[:, 1:]
     crosses = (np.sign(a) != np.sign(b)) & (a != b)
     with np.errstate(divide="ignore", invalid="ignore"):

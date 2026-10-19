@@ -173,6 +173,43 @@ Where it stops: each ring must be several blur widths across. With the same layo
 
 `sigma_px` is calibrated on these sheets (rotations, perspective up to 0.15, blur 0.7–1.5 px, noise 1–4) so that the median centre error over sigma is 1.09 for solid marks and 1.01 for nested ones. The tail is heavier than a Gaussian's: the 95th percentile of that ratio is 3–6, so weigh marks by sigma, but do not gate on it.
 
+## Plain patches
+
+`inkmap.locate_patch` on `synth.render_patch()`: a uniform patch (40 × 24 units) centred on a paper strip (100 × 32) over a textured table (blotches of ±10 grey levels), at 6 px per unit in an 800 × 600 frame, with a 20% illumination gradient, noise σ = 2 per channel, and twelve random rotations within ±45° per row. "Pale blue" (BGR 205, 215, 225 on paper 232, 236, 238) is a Delta E of about 10 from its paper: the hard case, where Otsu's first split takes the whole strip as the patch and only the re-split finds it. The corner error is the largest of the four, whichever corner each list starts from. "Patch px off the patch" counts interior-mask pixels whose centre lies outside the true patch, "substrate px off the paper" ring pixels outside the true paper: the two ways a measurement would be silently contaminated.
+
+patch | perspective | blur (px) | ok | corner error median (px) | max (px) | patch px off the patch | substrate px off the paper 
+---|---|---|---|---|---|---|---
+ dark grey | 0.00 | 1.0 | 12/12 | 0.020 | 0.032 | 0 | 0 
+ dark grey | 0.00 | 1.5 | 12/12 | 0.161 | 0.169 | 0 | 0 
+ dark grey | 0.05 | 1.0 | 12/12 | 0.018 | 0.025 | 0 | 0 
+ dark grey | 0.05 | 1.5 | 12/12 | 0.157 | 0.189 | 0 | 0 
+ dark grey | 0.10 | 1.0 | 12/12 | 0.018 | 0.031 | 0 | 0 
+ dark grey | 0.10 | 1.5 | 12/12 | 0.170 | 0.211 | 0 | 0 
+ blue | 0.00 | 1.0 | 12/12 | 0.018 | 0.035 | 0 | 0 
+ blue | 0.00 | 1.5 | 12/12 | 0.136 | 0.146 | 0 | 0 
+ blue | 0.05 | 1.0 | 12/12 | 0.021 | 0.028 | 0 | 0 
+ blue | 0.05 | 1.5 | 12/12 | 0.136 | 0.176 | 0 | 0 
+ blue | 0.10 | 1.0 | 12/12 | 0.018 | 0.029 | 0 | 0 
+ blue | 0.10 | 1.5 | 12/12 | 0.143 | 0.186 | 0 | 0 
+ red | 0.00 | 1.0 | 12/12 | 0.021 | 0.032 | 0 | 0 
+ red | 0.00 | 1.5 | 12/12 | 0.163 | 0.169 | 0 | 0 
+ red | 0.05 | 1.0 | 12/12 | 0.021 | 0.026 | 0 | 0 
+ red | 0.05 | 1.5 | 12/12 | 0.156 | 0.173 | 0 | 0 
+ red | 0.10 | 1.0 | 12/12 | 0.021 | 0.033 | 0 | 0 
+ red | 0.10 | 1.5 | 12/12 | 0.168 | 0.214 | 0 | 0 
+ pale blue | 0.00 | 1.0 | 12/12 | 0.088 | 0.144 | 0 | 0 
+ pale blue | 0.00 | 1.5 | 12/12 | 0.257 | 0.352 | 0 | 0 
+ pale blue | 0.05 | 1.0 | 12/12 | 0.085 | 0.123 | 0 | 0 
+ pale blue | 0.05 | 1.5 | 12/12 | 0.232 | 0.387 | 0 | 0 
+ pale blue | 0.10 | 1.0 | 12/12 | 0.095 | 0.153 | 0 | 0 
+ pale blue | 0.10 | 1.5 | 12/12 | 0.222 | 0.523 | 0 | 0 
+
+[exited with code 0]
+
+Four things earn these numbers, each found by this table while developing: fitting the sides to the image's own values projected on the patch-to-paper colour direction, not to Delta E (a norm, which noise lifts near zero) nor to CIELAB (whose cube root moves a blurred edge's mid-level: dark patches at blur 1.5, 0.29 → 0.11 px); taking that mid-level per profile along a side, not once per side (under the gradient it drifts along a long side and tilts a faint edge's line: pale corners 0.71 → 0.10 px); measuring rectangularity against the fitted quad, not the minimum-area rectangle (which refused sound patches in perspective); and requiring a colour step across every side, which is what refuses a pale patch that leaked into shaded paper, a region that otherwise passed as a convincing quadrilateral. Reproduce with `python scripts/validate.py patch`.
+
+Where it stops: the patch colour is one global seed colour, so with lightness falling 40% across the frame a pale patch (Delta E ~10 from its paper) is mostly refused, with the reason in `notes`. A patch within ~4 Delta E of its paper cannot be separated at all, and is refused.
+
 ## Real photographs
 
 189 CC-licensed photographs of QR codes in the wild from Wikimedia Commons — signs,
