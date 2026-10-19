@@ -793,3 +793,32 @@ def test_variable_width_symbology_is_verified_against_the_payload(data):
     assert _decodes_to(ink.model.bars, data), (
         "recovered bars do not decode to the payload"
     )
+
+
+def test_locate_is_the_package_and_callable_as_the_cascade():
+    """inkmap.locate is the locator package, and calling it runs the cascade.
+
+    Regression (#5): the facade re-exported the locate() function over the package,
+    so ``inkmap.locate.LOCATORS``, ``from inkmap import locate; locate.LOCATORS``
+    (the package docstring's own example) and ``import inkmap.locate.marks as m``
+    all failed.
+    """
+    import importlib
+    import inspect
+    import types
+
+    from inkmap import locate
+
+    assert isinstance(inkmap.locate, types.ModuleType)
+    assert locate is inkmap.locate is importlib.import_module("inkmap.locate")
+    assert locate.LOCATORS is inkmap.LOCATORS
+    assert inkmap.locate.find_square_marks is inkmap.find_square_marks
+    import inkmap.locate.marks as marks  # noqa: F401
+
+    assert "scale" in inspect.signature(inkmap.locate).parameters
+    import pickle
+
+    assert pickle.loads(pickle.dumps(inkmap.locate)) is inkmap.locate  # process pools
+    scene = synth.render(rng=0)
+    bgr = cv2.cvtColor(scene.image, cv2.COLOR_GRAY2BGR)
+    assert len(inkmap.locate(bgr, scene.image)) == len(locate.locate(bgr, scene.image)) > 0

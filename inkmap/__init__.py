@@ -50,14 +50,14 @@ from __future__ import annotations
 import cv2
 import numpy as np
 
-from . import config, coverage as _coverage, geometry, models, photometry
+# ``locate`` is the locator package, and callable as the cascade: locate(bgr, gray).
+from . import config, coverage as _coverage, geometry, locate, models, photometry
 from .coverage import confidence, coverage_map, measurement_weight, observed_coverage
 from .locate import (
     LOCATORS,
     PatchRegions,
     SquareMark,
     find_square_marks,
-    locate,
     locate_patch,
     place,
     validated_scale,
@@ -215,7 +215,7 @@ def find_all(
     restoring sub-pixel geometry. Codes need about 4 px per module *after* downscaling
     (``config.MIN_COARSE_PIXELS_PER_FEATURE``); those below are re-located at full
     resolution. ``None`` (default) locates at full resolution. See
-    :func:`inkmap.locate` (its ``scale``). Ignored when ``model``/``quad`` are given.
+    :func:`inkmap.locate.locate` (its ``scale``). Ignored when ``model``/``quad`` are given.
     """
     locate_scale = validated_scale(locate_scale)
     if model is not None:
@@ -230,7 +230,7 @@ def find_all(
     else:
         bgr = _as_bgr(image)
         gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
-        placements = locate(bgr, gray, locators=locators, scale=locate_scale)
+        placements = locate.locate(bgr, gray, locators=locators, scale=locate_scale)
 
     return analyze(image, placements, **kwargs)
 
