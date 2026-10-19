@@ -225,7 +225,7 @@ ink = inkmap.analyze(photo, [regions.placement])[0]   # or: find(photo, locators
 inkmap.measure(photo, ink)                        # patch vs the substrate round it
 ```
 
-The patch is grown from the seed's CIELAB colour and its sides fitted to the colour edge, so a pale patch on white paper is placed as well as a dark one. The verdict refuses a patch that leaked into the paper, is cut by the frame, or has no paper round it; see [validation](docs/validation.md#plain-patches). On flash bursts, seed on an unlit frame: under flash a pale patch clips to white.
+The patch is grown from the seed's CIELAB colour and its sides fitted to the colour edge, so a pale patch on white paper is placed as well as a dark one. Uneven light is divided out when it would otherwise defeat a pale patch. The verdict refuses a patch that leaked into the paper, is cut by the frame, or has no paper round it; see [validation](docs/validation.md#plain-patches). On flash bursts, seed on an unlit frame: under flash a pale patch clips to white.
 
 ## Extending it
 

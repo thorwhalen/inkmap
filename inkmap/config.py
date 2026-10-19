@@ -281,3 +281,21 @@ PATCH_INTERIOR_MADS = 4.0
 #: this many pooled deviations apart. One evenly spread population -- a patch under a
 #: lighting gradient -- scores about 3.5; a patch beside its paper, far more.
 PATCH_TWO_COLOUR_SEPARATION = 5.0
+
+# --- Plain patches: flattening uneven light ------------------------------------ #
+
+#: When a patch is refused, the light over its paper may be fitted and divided out,
+#: and the patch located again (``locate_patch(flatten="auto")``). The paper is
+#: sampled round the refused region, out to this share of its larger side...
+PATCH_FLATTEN_PAD_SHARE = 0.5
+#: ...needing at least this many paper-like pixels, of which at most this many are
+#: used in the fit.
+PATCH_FLATTEN_MIN_PX = 200
+PATCH_FLATTEN_MAX_SAMPLES = 50_000
+#: The field is a polynomial of this degree in the frame coordinates: 2 follows an
+#: oblique gradient and vignetting.
+PATCH_FLATTEN_DEGREE = 2
+#: Fitted as an upper envelope: pixels more than this many robust deviations below the
+#: fit (the darker patch, specks) are dropped and the fit repeated, this many times.
+PATCH_FLATTEN_ENVELOPE_SIGMAS = 2.5
+PATCH_FLATTEN_ITERATIONS = 6

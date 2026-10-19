@@ -271,3 +271,29 @@ def test_non_finite_and_malformed_seeds_are_errors():
     for seed in [(np.nan, 10), (10, 20, 30)]:
         with pytest.raises(ValueError, match="finite"):
             locate_patch(image, seed=seed)
+
+
+def test_uneven_light_is_flattened_out_for_a_pale_patch():
+    """Light falling 40% across the frame: a pale patch is found only once flattened."""
+    scene = synth.render_patch(
+        patch_bgr=(205, 215, 225), perspective=0.05, rotation=20.0, blur=1.0,
+        noise=2.0, gradient=0.4, background_texture=10.0, rng=1001,
+    )
+    plain = locate_patch(scene.image, flatten="never")
+    assert not plain.ok
+    regions = locate_patch(scene.image)  # flatten="auto": only after a refusal
+    assert regions.ok and regions.flattened, regions.notes
+    assert _corner_error(regions.quad, scene.patch_quad) < MAX_CORNER_ERROR_PX
+    assert _inside(scene.patch_quad, regions.patch, by=1.0)
+    assert _inside(scene.paper_quad, regions.substrate)
+
+
+def test_flattening_is_not_tried_on_an_accepted_patch():
+    scene = synth.render_patch(blur=1.0, noise=2.0, rng=1)
+    regions = locate_patch(scene.image)
+    assert regions.ok and not regions.flattened
+    always = locate_patch(scene.image, flatten="always")
+    assert always.ok and always.flattened
+    assert _corner_error(always.quad, scene.patch_quad) < MAX_CORNER_ERROR_PX
+    with pytest.raises(ValueError, match="flatten"):
+        locate_patch(scene.image, flatten="sometimes")
