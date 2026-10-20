@@ -233,6 +233,12 @@ PATCH_POLY_EPSILON_SHARE = 0.02
 #: the paper a pale patch was first merged with (one is usually enough).
 PATCH_MAX_RESPLITS = 3
 
+#: When the search fails, the light is fitted over the substrate it found -- at least
+#: PATCH_FLATTEN_MIN_PX pixels, by a polynomial of PATCH_FLATTEN_DEGREE (planar: the
+#: usual oblique gradient) -- divided out, and the search run once more.
+PATCH_FLATTEN_MIN_PX = 50
+PATCH_FLATTEN_DEGREE = 1
+
 #: The patch's sides are fitted to its colour edge along the direction from the patch's
 #: colour to the median colour of this band outside it (in pixels from its outline).
 PATCH_EDGE_BAND_PX = (2.0, 6.0)

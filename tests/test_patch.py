@@ -44,6 +44,12 @@ CONDITIONS = {
     # the table, so this is found only by re-splitting the leaked region.
     "pale blue on white": dict(patch_bgr=(205, 215, 225), blur=1.0, noise=2.0),
     "pale, rotated": dict(patch_bgr=(200, 225, 230), rotation=-20.0, blur=1.0, noise=2.0),
+    # Past what re-splitting recovers (#7): the shaded paper nears the patch's colour,
+    # so the light is fitted over the substrate and divided out before a second search.
+    "pale blue, strong uneven light": dict(
+        patch_bgr=(205, 215, 225), perspective=0.05, rotation=12.0, blur=1.0, noise=2.0,
+        gradient=0.4, background_texture=10.0,
+    ),
 }
 
 

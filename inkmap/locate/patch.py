@@ -194,77 +194,92 @@ def locate_patch(
         raise ValueError(f"locate_patch takes an 8-bit image, got {bgr.dtype}")
     h, w = bgr.shape[:2]
     colour = bgr.astype(np.float32)
-    lab = cv2.cvtColor(colour / 255.0, cv2.COLOR_BGR2Lab)
-    sx, sy = _seed_point(seed, w, h)
-    half = max(1, int(round(seed_share * min(h, w) / 2)))
-    window = (
-        slice(max(sy - half, 0), sy + half + 1),
-        slice(max(sx - half, 0), sx + half + 1),
-    )
-    seed_lab = _seed_colour(lab, window, (sx, sy), min_delta_e=min_delta_e)
-    distance = np.linalg.norm(lab - seed_lab, axis=-1).astype(np.float32)
-    tau = float(
-        np.clip(
-            _otsu(np.minimum(distance, 3 * max_delta_e).ravel()),
-            min_delta_e,
-            max_delta_e,
-        )
-    )
 
-    def assess(region: np.ndarray, tau: float) -> PatchRegions:
-        return _assess(
-            region,
-            lab=lab,
-            seed_lab=seed_lab,
-            colour=colour,
-            distance=distance,
-            tau=tau,
-            min_delta_e=min_delta_e,
-            edge_margin_share=edge_margin_share,
-            ring_share=ring_share,
-            min_area_share=min_area_share,
-            min_rectangularity=min_rectangularity,
-            min_substrate_px=min_substrate_px,
-            min_substrate_lift=min_substrate_lift,
-            max_substrate_chroma=max_substrate_chroma,
-            min_side_share=min_side_share,
-            min_edge_step=min_edge_step,
+    def search(colour: np.ndarray) -> PatchRegions:
+        lab = cv2.cvtColor(colour / 255.0, cv2.COLOR_BGR2Lab)
+        sx, sy = _seed_point(seed, w, h)
+        half = max(1, int(round(seed_share * min(h, w) / 2)))
+        window = (
+            slice(max(sy - half, 0), sy + half + 1),
+            slice(max(sx - half, 0), sx + half + 1),
+        )
+        seed_lab = _seed_colour(lab, window, (sx, sy), min_delta_e=min_delta_e)
+        distance = np.linalg.norm(lab - seed_lab, axis=-1).astype(np.float32)
+        tau = float(
+            np.clip(
+                _otsu(np.minimum(distance, 3 * max_delta_e).ravel()),
+                min_delta_e,
+                max_delta_e,
+            )
         )
 
-    region = _seeded_region(distance, tau, window)
-    if region is None:
-        empty = np.zeros((h, w), dtype=bool)
-        notes = ("no patch-coloured pixels at the seed",)
-        return PatchRegions(
-            empty, empty, empty, None, False, notes, tuple(map(float, seed_lab)), tau
-        )
-    first = found = assess(region, tau)
-    # Otsu splits the frame's strongest contrast first, which for a pale patch on white
-    # paper over a dark table is strip-versus-table: the region is then patch and paper
-    # together, and the verdict fails. Only then, split the region's own distances
-    # again, tighter each time: under uneven light the first re-split can still hold a
-    # shaded part of the paper, and the edge check refuses it. A split that only cuts
-    # noise fails its verdict too, and the first answer stands.
-    for _ in range(config.PATCH_MAX_RESPLITS):
-        if found.ok:
-            break
-        inner_tau = max(_otsu_split(distance[found.region])[0], min_delta_e)
-        if inner_tau >= tau:
-            break
-        tau = inner_tau
+        def assess(region: np.ndarray, tau: float) -> PatchRegions:
+            return _assess(
+                region,
+                lab=lab,
+                seed_lab=seed_lab,
+                colour=colour,
+                distance=distance,
+                tau=tau,
+                min_delta_e=min_delta_e,
+                edge_margin_share=edge_margin_share,
+                ring_share=ring_share,
+                min_area_share=min_area_share,
+                min_rectangularity=min_rectangularity,
+                min_substrate_px=min_substrate_px,
+                min_substrate_lift=min_substrate_lift,
+                max_substrate_chroma=max_substrate_chroma,
+                min_side_share=min_side_share,
+                min_edge_step=min_edge_step,
+            )
+
         region = _seeded_region(distance, tau, window)
         if region is None:
-            break
-        found = assess(region, tau)
-    if found.ok or found is first:
+            empty = np.zeros((h, w), dtype=bool)
+            notes = ("no patch-coloured pixels at the seed",)
+            return PatchRegions(
+                empty, empty, empty, None, False, notes, tuple(map(float, seed_lab)), tau
+            )
+        first = found = assess(region, tau)
+        # Otsu splits the frame's strongest contrast first, which for a pale patch on white
+        # paper over a dark table is strip-versus-table: the region is then patch and paper
+        # together, and the verdict fails. Only then, split the region's own distances
+        # again, tighter each time: under uneven light the first re-split can still hold a
+        # shaded part of the paper, and the edge check refuses it. A split that only cuts
+        # noise fails its verdict too, and the first answer stands.
+        for _ in range(config.PATCH_MAX_RESPLITS):
+            if found.ok:
+                break
+            inner_tau = max(_otsu_split(distance[found.region])[0], min_delta_e)
+            if inner_tau >= tau:
+                break
+            tau = inner_tau
+            region = _seeded_region(distance, tau, window)
+            if region is None:
+                break
+            found = assess(region, tau)
+        if found.ok or found is first:
+            return found
+        return replace(
+            first,
+            notes=first.notes
+            + (
+                f"re-split to Delta E {found.threshold_delta_e:.1f}: {'; '.join(found.notes)}",
+            ),
+        )
+
+    found = search(colour)
+    if found.ok or found.substrate.sum() < config.PATCH_FLATTEN_MIN_PX:
         return found
-    return replace(
-        first,
-        notes=first.notes
-        + (
-            f"re-split to Delta E {found.threshold_delta_e:.1f}: {'; '.join(found.notes)}",
-        ),
-    )
+    # A pale patch under strong uneven light: the shaded paper nears the patch's colour
+    # and the region leaks into it. The substrate the failed search found still samples
+    # the light; divide it out and search again. The first answer stands if this fails.
+    from ..photometry import smooth_field
+
+    field = smooth_field(colour, found.substrate, degree=config.PATCH_FLATTEN_DEGREE)
+    level = colour[found.substrate].mean(axis=0)
+    flat = search(colour * (level / np.maximum(field, 1.0)).astype(np.float32))
+    return flat if flat.ok else found
 
 
 def _assess(

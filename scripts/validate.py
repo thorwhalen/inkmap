@@ -252,15 +252,17 @@ def plain_patches() -> None:
 
     print("\n## Plain patches")
     print(
-        "\n| patch | perspective | blur (px) | ok | corner error median (px) "
+        "\n| patch | light falloff | perspective | blur (px) | ok | corner error median (px) "
         "| max (px) | patch px off the patch | substrate px off the paper |"
     )
-    print("|---|---|---|---|---|---|---|---|")
+    print("|---|---|---|---|---|---|---|---|---|")
+    # (patch colour, lightness falling across the frame); the last row is #7's
     colours = {
-        "dark grey": (40, 40, 45),
-        "blue": (160, 90, 40),
-        "red": (50, 50, 190),
-        "pale blue": (205, 215, 225),
+        "dark grey": ((40, 40, 45), 0.2),
+        "blue": ((160, 90, 40), 0.2),
+        "red": ((50, 50, 190), 0.2),
+        "pale blue": ((205, 215, 225), 0.2),
+        "pale blue, strong light": ((205, 215, 225), 0.4),
     }
 
     def truth_mask(quad, shape):
@@ -268,7 +270,7 @@ def plain_patches() -> None:
         cv2.fillConvexPoly(mask, np.round(quad * 16).astype(np.int32), 1, shift=4)
         return mask.astype(bool)
 
-    for name, bgr in colours.items():
+    for name, (bgr, gradient) in colours.items():
         for perspective in (0.0, 0.05, 0.1):
             for blur in (1.0, 1.5):
                 ok, errors, spill, table = 0, [], 0, 0
@@ -280,7 +282,7 @@ def plain_patches() -> None:
                         rotation=float(rng.uniform(-45, 45)),
                         blur=blur,
                         noise=2.0,
-                        gradient=0.2,
+                        gradient=gradient,
                         background_texture=10.0,
                         rng=t,
                     )
@@ -306,7 +308,7 @@ def plain_patches() -> None:
                     )
                 e = np.array(errors) if errors else np.array([np.nan])
                 print(
-                    f"| {name} | {perspective:.2f} | {blur:.1f} | {ok}/{TRIALS} "
+                    f"| {name} | {gradient:.0%} | {perspective:.2f} | {blur:.1f} | {ok}/{TRIALS} "
                     f"| {np.median(e):.3f} | {e.max():.3f} | {spill} | {table} |"
                 )
 
