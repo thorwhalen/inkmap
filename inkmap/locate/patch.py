@@ -238,7 +238,14 @@ def locate_patch(
             empty = np.zeros((h, w), dtype=bool)
             notes = ("no patch-coloured pixels at the seed",)
             return PatchRegions(
-                empty, empty, empty, None, False, notes, tuple(map(float, seed_lab)), tau
+                empty,
+                empty,
+                empty,
+                None,
+                False,
+                notes,
+                tuple(map(float, seed_lab)),
+                tau,
             )
         first = found = assess(region, tau)
         # Otsu splits the frame's strongest contrast first, which for a pale patch on white
