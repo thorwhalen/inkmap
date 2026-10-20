@@ -56,6 +56,7 @@ at call time, so overriding one is a call-site concern, not global mutable state
 | [`PATCH_MIN_SIDE_SHARE`](#inkmap.config.PATCH_MIN_SIDE_SHARE)           | ...on at least three sides, each holding substrate in this share of its ring.                                                                                                                                                                                                                                                                                                           |
 | [`PATCH_POLY_EPSILON_SHARE`](#inkmap.config.PATCH_POLY_EPSILON_SHARE)       | A patch's outline is four-sided when a polygon within this share of its perimeter fits it with four vertices.                                                                                                                                                                                                                                                                           |
 | [`PATCH_MAX_RESPLITS`](#inkmap.config.PATCH_MAX_RESPLITS)             | How many times the patch region may be re-split by Otsu within itself, peeling off the paper a pale patch was first merged with (one is usually enough).                                                                                                                                                                                                                                |
+| [`PATCH_FLATTEN_MIN_PX`](#inkmap.config.PATCH_FLATTEN_MIN_PX)           | When the search fails, the light is fitted over the substrate it found -- at least PATCH_FLATTEN_MIN_PX pixels, by a polynomial of PATCH_FLATTEN_DEGREE (planar: the usual oblique gradient) -- divided out, and the search run once more.                                                                                                                                              |
 | [`PATCH_EDGE_BAND_PX`](#inkmap.config.PATCH_EDGE_BAND_PX)             | The patch's sides are fitted to its colour edge along the direction from the patch's colour to the median colour of this band outside it (in pixels from its outline).                                                                                                                                                                                                                  |
 | [`PATCH_MIN_EDGE_STEP`](#inkmap.config.PATCH_MIN_EDGE_STEP)            | A patch must show a colour step of at least this (in Delta E along the patch-to- paper direction) across every side, measured between PATCH_EDGE_STEP_OFFSET_PX inside and outside it.                                                                                                                                                                                                  |
 | [`PATCH_SUBSTRATE_SPLIT_GAP`](#inkmap.config.PATCH_SUBSTRATE_SPLIT_GAP)      | The substrate ring's lightness is split (paper from a darker background) only when its two Otsu classes are this many L\* apart; shading alone spreads paper less.                                                                                                                                                                                                                      |
@@ -268,6 +269,12 @@ along a long side, which on a faint edge tilts the fitted line.
 
 The interior is eroded clear of the patch’s blurred edge by this share of its
 shorter side.
+
+### inkmap.config.PATCH_FLATTEN_MIN_PX *= 50*
+
+When the search fails, the light is fitted over the substrate it found – at least
+PATCH_FLATTEN_MIN_PX pixels, by a polynomial of PATCH_FLATTEN_DEGREE (planar: the
+usual oblique gradient) – divided out, and the search run once more.
 
 ### inkmap.config.PATCH_INTERIOR_MADS *= 4.0*
 

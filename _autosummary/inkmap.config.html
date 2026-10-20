@@ -271,34 +271,37 @@ at call time, so overriding one is a call-site concern, not global mutable state
 <tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.PATCH_MAX_RESPLITS" title="inkmap.config.PATCH_MAX_RESPLITS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_MAX_RESPLITS</span></code></a></p></td>
 <td><p>How many times the patch region may be re-split by Otsu within itself, peeling off the paper a pale patch was first merged with (one is usually enough).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.PATCH_EDGE_BAND_PX" title="inkmap.config.PATCH_EDGE_BAND_PX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_EDGE_BAND_PX</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.PATCH_FLATTEN_MIN_PX" title="inkmap.config.PATCH_FLATTEN_MIN_PX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_FLATTEN_MIN_PX</span></code></a></p></td>
+<td><p>When the search fails, the light is fitted over the substrate it found -- at least PATCH_FLATTEN_MIN_PX pixels, by a polynomial of PATCH_FLATTEN_DEGREE (planar: the usual oblique gradient) -- divided out, and the search run once more.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.PATCH_EDGE_BAND_PX" title="inkmap.config.PATCH_EDGE_BAND_PX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_EDGE_BAND_PX</span></code></a></p></td>
 <td><p>The patch's sides are fitted to its colour edge along the direction from the patch's colour to the median colour of this band outside it (in pixels from its outline).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.PATCH_MIN_EDGE_STEP" title="inkmap.config.PATCH_MIN_EDGE_STEP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_MIN_EDGE_STEP</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.PATCH_MIN_EDGE_STEP" title="inkmap.config.PATCH_MIN_EDGE_STEP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_MIN_EDGE_STEP</span></code></a></p></td>
 <td><p>A patch must show a colour step of at least this (in Delta E along the patch-to- paper direction) across every side, measured between PATCH_EDGE_STEP_OFFSET_PX inside and outside it.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.PATCH_SUBSTRATE_SPLIT_GAP" title="inkmap.config.PATCH_SUBSTRATE_SPLIT_GAP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_SUBSTRATE_SPLIT_GAP</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.PATCH_SUBSTRATE_SPLIT_GAP" title="inkmap.config.PATCH_SUBSTRATE_SPLIT_GAP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_SUBSTRATE_SPLIT_GAP</span></code></a></p></td>
 <td><p>The substrate ring's lightness is split (paper from a darker background) only when its two Otsu classes are this many L* apart; shading alone spreads paper less.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.PATCH_MIN_EDGE_CONTRAST" title="inkmap.config.PATCH_MIN_EDGE_CONTRAST"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_MIN_EDGE_CONTRAST</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.PATCH_MIN_EDGE_CONTRAST" title="inkmap.config.PATCH_MIN_EDGE_CONTRAST"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_MIN_EDGE_CONTRAST</span></code></a></p></td>
 <td><p>A patch side is refined against the image only where its edge steps by at least this many 8-bit levels (along the patch-to-paper colour direction).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.PATCH_EDGE_LEVEL_WINDOW" title="inkmap.config.PATCH_EDGE_LEVEL_WINDOW"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_EDGE_LEVEL_WINDOW</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.PATCH_EDGE_LEVEL_WINDOW" title="inkmap.config.PATCH_EDGE_LEVEL_WINDOW"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_EDGE_LEVEL_WINDOW</span></code></a></p></td>
 <td><p>A patch side's edge level is taken per profile and smoothed over this many profiles (pixels) along the side, rather than once for the whole side: uneven light moves it along a long side, which on a faint edge tilts the fitted line.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.PATCH_MAX_OUTLINE_DEVIATION_PX" title="inkmap.config.PATCH_MAX_OUTLINE_DEVIATION_PX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_MAX_OUTLINE_DEVIATION_PX</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.PATCH_MAX_OUTLINE_DEVIATION_PX" title="inkmap.config.PATCH_MAX_OUTLINE_DEVIATION_PX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_MAX_OUTLINE_DEVIATION_PX</span></code></a></p></td>
 <td><p>The thresholded outline must lie within this many pixels of the fitted sides (95th percentile): a lobe leaked into shaded paper, or a rounded corner, strays further.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.PATCH_MAX_HOLE_SHARE" title="inkmap.config.PATCH_MAX_HOLE_SHARE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_MAX_HOLE_SHARE</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.PATCH_MAX_HOLE_SHARE" title="inkmap.config.PATCH_MAX_HOLE_SHARE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_MAX_HOLE_SHARE</span></code></a></p></td>
 <td><p>Pixels of the interior that are not the patch's colour are always left out of it.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.PATCH_SUBSTRATE_MAX_DELTA_E" title="inkmap.config.PATCH_SUBSTRATE_MAX_DELTA_E"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_SUBSTRATE_MAX_DELTA_E</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.PATCH_SUBSTRATE_MAX_DELTA_E" title="inkmap.config.PATCH_SUBSTRATE_MAX_DELTA_E"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_SUBSTRATE_MAX_DELTA_E</span></code></a></p></td>
 <td><p>a neighbouring light-grey patch, or a white table, can pass for paper otherwise.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.PATCH_INTERIOR_MADS" title="inkmap.config.PATCH_INTERIOR_MADS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_INTERIOR_MADS</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.PATCH_INTERIOR_MADS" title="inkmap.config.PATCH_INTERIOR_MADS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_INTERIOR_MADS</span></code></a></p></td>
 <td><p>Interior pixels further from the seed colour than the patch's median distance plus this many robust deviations (1.4826 MAD) are left out, with a pixel round them: the fringe of text or glare on the patch.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.config.PATCH_TWO_COLOUR_SEPARATION" title="inkmap.config.PATCH_TWO_COLOUR_SEPARATION"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_TWO_COLOUR_SEPARATION</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.config.PATCH_TWO_COLOUR_SEPARATION" title="inkmap.config.PATCH_TWO_COLOUR_SEPARATION"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PATCH_TWO_COLOUR_SEPARATION</span></code></a></p></td>
 <td><p>Two colours are distinct when their Otsu split along the principal axis is at least this many pooled deviations apart.</p></td>
 </tr>
 </tbody>
@@ -547,6 +550,13 @@ along a long side, which on a faint edge tilts the fitted line.</p>
 shorter side.</p>
 </dd></dl>
 <dl class="py data">
+<dt class="sig sig-object py" id="inkmap.config.PATCH_FLATTEN_MIN_PX">
+<span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PATCH_FLATTEN_MIN_PX</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">50</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PATCH_FLATTEN_MIN_PX" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PATCH_FLATTEN_MIN_PX'">¶</a></dt>
+<dd><p>When the search fails, the light is fitted over the substrate it found – at least
+PATCH_FLATTEN_MIN_PX pixels, by a polynomial of PATCH_FLATTEN_DEGREE (planar: the
+usual oblique gradient) – divided out, and the search run once more.</p>
+</dd></dl>
+<dl class="py data">
 <dt class="sig sig-object py" id="inkmap.config.PATCH_INTERIOR_MADS">
 <span class="sig-prename descclassname"><span class="pre">inkmap.config.</span></span><span class="sig-name descname"><span class="pre">PATCH_INTERIOR_MADS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4.0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.config.PATCH_INTERIOR_MADS" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.config.PATCH_INTERIOR_MADS'">¶</a></dt>
 <dd><p>Interior pixels further from the seed colour than the patch’s median distance plus
@@ -739,6 +749,7 @@ kernel reflects interior content across the border and biases alignment ~0.45 px
 <li><a :data-current="activeSection === '#inkmap.config.PATCH_EDGE_BAND_PX'" class="reference internal" href="#inkmap.config.PATCH_EDGE_BAND_PX"><code class="docutils literal notranslate"><span class="pre">PATCH_EDGE_BAND_PX</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.config.PATCH_EDGE_LEVEL_WINDOW'" class="reference internal" href="#inkmap.config.PATCH_EDGE_LEVEL_WINDOW"><code class="docutils literal notranslate"><span class="pre">PATCH_EDGE_LEVEL_WINDOW</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.config.PATCH_EDGE_MARGIN_SHARE'" class="reference internal" href="#inkmap.config.PATCH_EDGE_MARGIN_SHARE"><code class="docutils literal notranslate"><span class="pre">PATCH_EDGE_MARGIN_SHARE</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.config.PATCH_FLATTEN_MIN_PX'" class="reference internal" href="#inkmap.config.PATCH_FLATTEN_MIN_PX"><code class="docutils literal notranslate"><span class="pre">PATCH_FLATTEN_MIN_PX</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.config.PATCH_INTERIOR_MADS'" class="reference internal" href="#inkmap.config.PATCH_INTERIOR_MADS"><code class="docutils literal notranslate"><span class="pre">PATCH_INTERIOR_MADS</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.config.PATCH_MAX_HOLE_SHARE'" class="reference internal" href="#inkmap.config.PATCH_MAX_HOLE_SHARE"><code class="docutils literal notranslate"><span class="pre">PATCH_MAX_HOLE_SHARE</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.config.PATCH_MAX_OUTLINE_DEVIATION_PX'" class="reference internal" href="#inkmap.config.PATCH_MAX_OUTLINE_DEVIATION_PX"><code class="docutils literal notranslate"><span class="pre">PATCH_MAX_OUTLINE_DEVIATION_PX</span></code></a></li>
@@ -775,7 +786,7 @@ kernel reflects interior content across the border and biases alignment ~0.45 px
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=6e0256f3"></script>
+<script src="../_static/documentation_options.js?v=ca7ad2ea"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

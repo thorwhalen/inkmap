@@ -1,37 +1,37 @@
 {
   "schema_version": 1,
-  "built_at": "2026-10-19T13:07:40Z",
+  "built_at": "2026-10-20T10:25:19Z",
   "package": {
     "name": "inkmap",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "display_name": "inkmap",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "0fc1fd26f4430a300baeda429cb1616c0764485b",
-    "short_commit": "0fc1fd2",
+    "commit": "5b8c5ff0989b8d591922f26cdfe1469ccd21843c",
+    "short_commit": "5b8c5ff",
     "branch": "main",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/thorwhalen/inkmap",
-    "commit_url": "https://github.com/thorwhalen/inkmap/commit/0fc1fd26f4430a300baeda429cb1616c0764485b",
+    "commit_url": "https://github.com/thorwhalen/inkmap/commit/5b8c5ff0989b8d591922f26cdfe1469ccd21843c",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/inkmap",
-    "sha": "0fc1fd26f4430a300baeda429cb1616c0764485b",
+    "sha": "5b8c5ff0989b8d591922f26cdfe1469ccd21843c",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "39257224074",
-    "run_url": "https://github.com/thorwhalen/inkmap/actions/runs/39257224074",
+    "run_id": "39407520262",
+    "run_url": "https://github.com/thorwhalen/inkmap/actions/runs/39407520262",
     "server_url": "https://github.com"
   },
   "tools": {
     "epythet": "0.2.18",
-    "sphinx": "9.1.0",
+    "sphinx": "9.1.1",
     "docutils": "0.22.4",
     "python": "3.12.15"
   },
@@ -56,15 +56,15 @@
   },
   "site": {
     "modules_documented": 18,
-    "objects_documented": 257
+    "objects_documented": 258
   },
   "pypi": {
     "checked": true,
-    "latest": "0.1.6",
+    "latest": "0.1.7",
     "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/thorwhalen/inkmap && cd inkmap\ngit checkout 0fc1fd26f4430a300baeda429cb1616c0764485b\npip install \"epythet==0.2.18\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/thorwhalen/inkmap && cd inkmap\ngit checkout 5b8c5ff0989b8d591922f26cdfe1469ccd21843c\npip install \"epythet==0.2.18\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": true,

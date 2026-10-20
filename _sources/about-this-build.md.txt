@@ -5,7 +5,7 @@ orphan: true
 
 # About this build
 
-This documentation was built on **2026-10-19 13:07 UTC** from commit <a href="https://github.com/thorwhalen/inkmap/commit/0fc1fd26f4430a300baeda429cb1616c0764485b"><code>0fc1fd2</code></a> on branch <code>main</code>, for **inkmap 0.1.6** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-20 10:25 UTC** from commit <a href="https://github.com/thorwhalen/inkmap/commit/5b8c5ff0989b8d591922f26cdfe1469ccd21843c"><code>5b8c5ff</code></a> on branch <code>main</code>, for **inkmap 0.1.7** (from <code>pyproject.toml</code>).
 
 :::{note}
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -15,7 +15,7 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 | | |
 |---|---|
-| Commit | <a href="https://github.com/thorwhalen/inkmap/commit/0fc1fd26f4430a300baeda429cb1616c0764485b"><code>0fc1fd26f4430a300baeda429cb1616c0764485b</code></a> |
+| Commit | <a href="https://github.com/thorwhalen/inkmap/commit/5b8c5ff0989b8d591922f26cdfe1469ccd21843c"><code>5b8c5ff0989b8d591922f26cdfe1469ccd21843c</code></a> |
 | Branch | <code>main</code> |
 | Tags at this commit | none |
 | Working tree | clean |
@@ -26,16 +26,16 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 | | |
 |---|---|
 | Repository | <code>thorwhalen/inkmap</code> |
-| Run | <a href="https://github.com/thorwhalen/inkmap/actions/runs/39257224074">39257224074</a> |
+| Run | <a href="https://github.com/thorwhalen/inkmap/actions/runs/39407520262">39407520262</a> |
 | Ref | <code>refs/heads/main</code> |
-| Event commit | <code>0fc1fd26f4430a300baeda429cb1616c0764485b</code> (in the history of the built commit) |
+| Event commit | <code>5b8c5ff0989b8d591922f26cdfe1469ccd21843c</code> (in the history of the built commit) |
 
 ## Tools
 
 | | |
 |---|---|
 | epythet | 0.2.18 |
-| Sphinx | 9.1.0 |
+| Sphinx | 9.1.1 |
 | docutils | 0.22.4 |
 | Python | 3.12.15 |
 
@@ -53,13 +53,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/inkmap/0.1.6/">0.1.6</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/inkmap/0.1.7/">0.1.7</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/inkmap && cd inkmap
-git checkout 0fc1fd26f4430a300baeda429cb1616c0764485b
+git checkout 5b8c5ff0989b8d591922f26cdfe1469ccd21843c
 pip install "epythet==0.2.18"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

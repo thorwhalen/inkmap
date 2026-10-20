@@ -1,4 +1,4 @@
-> built 2026-10-19 13:07 UTC from 0fc1fd2 (main) · inkmap 0.1.6. Details: build_info.json
+> built 2026-10-20 10:25 UTC from 5b8c5ff (main) · inkmap 0.1.7. Details: build_info.json
 
 # index.html.md
 
@@ -370,6 +370,7 @@ at call time, so overriding one is a call-site concern, not global mutable state
 | [`PATCH_MIN_SIDE_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_MIN_SIDE_SHARE)           | ...on at least three sides, each holding substrate in this share of its ring.                                                                                                                                                                                                                                                                                                           |
 | [`PATCH_POLY_EPSILON_SHARE`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_POLY_EPSILON_SHARE)       | A patch's outline is four-sided when a polygon within this share of its perimeter fits it with four vertices.                                                                                                                                                                                                                                                                           |
 | [`PATCH_MAX_RESPLITS`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_MAX_RESPLITS)             | How many times the patch region may be re-split by Otsu within itself, peeling off the paper a pale patch was first merged with (one is usually enough).                                                                                                                                                                                                                                |
+| [`PATCH_FLATTEN_MIN_PX`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_FLATTEN_MIN_PX)           | When the search fails, the light is fitted over the substrate it found -- at least PATCH_FLATTEN_MIN_PX pixels, by a polynomial of PATCH_FLATTEN_DEGREE (planar: the usual oblique gradient) -- divided out, and the search run once more.                                                                                                                                              |
 | [`PATCH_EDGE_BAND_PX`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_EDGE_BAND_PX)             | The patch's sides are fitted to its colour edge along the direction from the patch's colour to the median colour of this band outside it (in pixels from its outline).                                                                                                                                                                                                                  |
 | [`PATCH_MIN_EDGE_STEP`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_MIN_EDGE_STEP)            | A patch must show a colour step of at least this (in Delta E along the patch-to- paper direction) across every side, measured between PATCH_EDGE_STEP_OFFSET_PX inside and outside it.                                                                                                                                                                                                  |
 | [`PATCH_SUBSTRATE_SPLIT_GAP`](_autosummary/inkmap.config.html.md#inkmap.config.PATCH_SUBSTRATE_SPLIT_GAP)      | The substrate ring's lightness is split (paper from a darker background) only when its two Otsu classes are this many L\* apart; shading alone spreads paper less.                                                                                                                                                                                                                      |
@@ -582,6 +583,12 @@ along a long side, which on a faint edge tilts the fitted line.
 
 The interior is eroded clear of the patch’s blurred edge by this share of its
 shorter side.
+
+### inkmap.config.PATCH_FLATTEN_MIN_PX *= 50*
+
+When the search fails, the light is fitted over the substrate it found – at least
+PATCH_FLATTEN_MIN_PX pixels, by a polynomial of PATCH_FLATTEN_DEGREE (planar: the
+usual oblique gradient) – divided out, and the search run once more.
 
 ### inkmap.config.PATCH_INTERIOR_MADS *= 4.0*
 
@@ -3510,7 +3517,7 @@ leaving only interiors. If weight is empty, the image cannot support a measureme
 
 # About this build
 
-This documentation was built on **2026-10-19 13:07 UTC** from commit <a href="https://github.com/thorwhalen/inkmap/commit/0fc1fd26f4430a300baeda429cb1616c0764485b"><code>0fc1fd2</code></a> on branch <code>main</code>, for **inkmap 0.1.6** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-20 10:25 UTC** from commit <a href="https://github.com/thorwhalen/inkmap/commit/5b8c5ff0989b8d591922f26cdfe1469ccd21843c"><code>5b8c5ff</code></a> on branch <code>main</code>, for **inkmap 0.1.7** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -3519,7 +3526,7 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/inkmap/commit/0fc1fd26f4430a300baeda429cb1616c0764485b"><code>0fc1fd26f4430a300baeda429cb1616c0764485b</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/inkmap/commit/5b8c5ff0989b8d591922f26cdfe1469ccd21843c"><code>5b8c5ff0989b8d591922f26cdfe1469ccd21843c</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
 | Tags at this commit | none                                                                                                                                                     |
 | Working tree        | clean                                                                                                                                                    |
@@ -3530,16 +3537,16 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/inkmap</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/inkmap/actions/runs/39257224074">39257224074</a>    |
+| Run          | <a href="https://github.com/thorwhalen/inkmap/actions/runs/39407520262">39407520262</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>0fc1fd26f4430a300baeda429cb1616c0764485b</code> (in the history of the built commit) |
+| Event commit | <code>5b8c5ff0989b8d591922f26cdfe1469ccd21843c</code> (in the history of the built commit) |
 
 ## Tools
 
 |          |         |
 |----------|---------|
 | epythet  | 0.2.18  |
-| Sphinx   | 9.1.0   |
+| Sphinx   | 9.1.1   |
 | docutils | 0.22.4  |
 | Python   | 3.12.15 |
 
@@ -3557,13 +3564,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/inkmap/0.1.6/">0.1.6</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/inkmap/0.1.7/">0.1.7</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/inkmap && cd inkmap
-git checkout 0fc1fd26f4430a300baeda429cb1616c0764485b
+git checkout 5b8c5ff0989b8d591922f26cdfe1469ccd21843c
 pip install "epythet==0.2.18"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
