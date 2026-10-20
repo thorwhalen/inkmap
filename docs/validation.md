@@ -175,40 +175,46 @@ Where it stops: each ring must be several blur widths across. With the same layo
 
 ## Plain patches
 
-`inkmap.locate_patch` on `synth.render_patch()`: a uniform patch (40 × 24 units) centred on a paper strip (100 × 32) over a textured table (blotches of ±10 grey levels), at 6 px per unit in an 800 × 600 frame, with a 20% illumination gradient, noise σ = 2 per channel, and twelve random rotations within ±45° per row. The scenes are drawn from seeds never used while developing the locator (a first table, on the seeds it was tuned on, hid a 5 px false accept that an adversarial review then found on other seeds). "Pale blue" (BGR 205, 215, 225 on paper 232, 236, 238) is a Delta E of about 10 from its paper: the hard case, where Otsu's first split takes the whole strip as the patch and only the re-split finds it. The corner error is the largest of the four, whichever corner each list starts from. "Patch px off the patch" counts interior-mask pixels whose centre lies outside the true patch, "substrate px off the paper" ring pixels outside the true paper: the two ways a measurement would be silently contaminated.
+`inkmap.locate_patch` on `synth.render_patch()`: a uniform patch (40 × 24 units) centred on a paper strip (100 × 32) over a textured table (blotches of ±10 grey levels), at 6 px per unit in an 800 × 600 frame, with a 20% illumination gradient (40% on the last rows), noise σ = 2 per channel, and twelve random rotations within ±45° per row. The scenes are drawn from seeds never used while developing the locator (a first table, on the seeds it was tuned on, hid a 5 px false accept that an adversarial review then found on other seeds). "Pale blue" (BGR 205, 215, 225 on paper 232, 236, 238) is a Delta E of about 10 from its paper: the hard case, where Otsu's first split takes the whole strip as the patch and only the re-split finds it. The corner error is the largest of the four, whichever corner each list starts from. "Patch px off the patch" counts interior-mask pixels whose centre lies outside the true patch, "substrate px off the paper" ring pixels outside the true paper: the two ways a measurement would be silently contaminated.
 
-| patch | perspective | blur (px) | ok | corner error median (px) | max (px) | patch px off the patch | substrate px off the paper |
-|---|---|---|---|---|---|---|---|
-| dark grey | 0.00 | 1.0 | 12/12 | 0.017 | 0.029 | 0 | 0 |
-| dark grey | 0.00 | 1.5 | 12/12 | 0.155 | 0.196 | 0 | 0 |
-| dark grey | 0.05 | 1.0 | 12/12 | 0.019 | 0.024 | 0 | 0 |
-| dark grey | 0.05 | 1.5 | 12/12 | 0.158 | 0.179 | 0 | 0 |
-| dark grey | 0.10 | 1.0 | 12/12 | 0.018 | 0.025 | 0 | 0 |
-| dark grey | 0.10 | 1.5 | 12/12 | 0.161 | 0.289 | 0 | 0 |
-| blue | 0.00 | 1.0 | 12/12 | 0.018 | 0.025 | 0 | 0 |
-| blue | 0.00 | 1.5 | 12/12 | 0.135 | 0.155 | 0 | 0 |
-| blue | 0.05 | 1.0 | 12/12 | 0.018 | 0.028 | 0 | 0 |
-| blue | 0.05 | 1.5 | 12/12 | 0.141 | 0.169 | 0 | 0 |
-| blue | 0.10 | 1.0 | 12/12 | 0.018 | 0.031 | 0 | 0 |
-| blue | 0.10 | 1.5 | 12/12 | 0.143 | 0.209 | 0 | 0 |
-| red | 0.00 | 1.0 | 12/12 | 0.020 | 0.029 | 0 | 0 |
-| red | 0.00 | 1.5 | 12/12 | 0.158 | 0.197 | 0 | 0 |
-| red | 0.05 | 1.0 | 12/12 | 0.018 | 0.023 | 0 | 0 |
-| red | 0.05 | 1.5 | 12/12 | 0.162 | 0.183 | 0 | 0 |
-| red | 0.10 | 1.0 | 12/12 | 0.019 | 0.027 | 0 | 0 |
-| red | 0.10 | 1.5 | 12/12 | 0.166 | 0.240 | 0 | 0 |
-| pale blue | 0.00 | 1.0 | 12/12 | 0.086 | 0.127 | 0 | 0 |
-| pale blue | 0.00 | 1.5 | 12/12 | 0.220 | 0.282 | 0 | 0 |
-| pale blue | 0.05 | 1.0 | 12/12 | 0.079 | 0.119 | 0 | 0 |
-| pale blue | 0.05 | 1.5 | 12/12 | 0.224 | 0.335 | 0 | 0 |
-| pale blue | 0.10 | 1.0 | 12/12 | 0.066 | 0.109 | 0 | 0 |
-| pale blue | 0.10 | 1.5 | 12/12 | 0.198 | 0.291 | 0 | 0 |
+| patch | light falloff | perspective | blur (px) | ok | corner error median (px) | max (px) | patch px off the patch | substrate px off the paper |
+|---|---|---|---|---|---|---|---|---|
+| dark grey | 20% | 0.00 | 1.0 | 12/12 | 0.017 | 0.029 | 0 | 0 |
+| dark grey | 20% | 0.00 | 1.5 | 12/12 | 0.153 | 0.196 | 0 | 0 |
+| dark grey | 20% | 0.05 | 1.0 | 12/12 | 0.017 | 0.024 | 0 | 0 |
+| dark grey | 20% | 0.05 | 1.5 | 12/12 | 0.157 | 0.177 | 0 | 0 |
+| dark grey | 20% | 0.10 | 1.0 | 12/12 | 0.018 | 0.025 | 0 | 0 |
+| dark grey | 20% | 0.10 | 1.5 | 12/12 | 0.161 | 0.285 | 0 | 0 |
+| blue | 20% | 0.00 | 1.0 | 12/12 | 0.017 | 0.028 | 0 | 0 |
+| blue | 20% | 0.00 | 1.5 | 12/12 | 0.133 | 0.154 | 0 | 0 |
+| blue | 20% | 0.05 | 1.0 | 12/12 | 0.017 | 0.029 | 0 | 0 |
+| blue | 20% | 0.05 | 1.5 | 12/12 | 0.138 | 0.168 | 0 | 0 |
+| blue | 20% | 0.10 | 1.0 | 12/12 | 0.019 | 0.032 | 0 | 0 |
+| blue | 20% | 0.10 | 1.5 | 12/12 | 0.144 | 0.208 | 0 | 0 |
+| red | 20% | 0.00 | 1.0 | 12/12 | 0.019 | 0.030 | 0 | 0 |
+| red | 20% | 0.00 | 1.5 | 12/12 | 0.158 | 0.196 | 0 | 0 |
+| red | 20% | 0.05 | 1.0 | 12/12 | 0.019 | 0.024 | 0 | 0 |
+| red | 20% | 0.05 | 1.5 | 12/12 | 0.160 | 0.185 | 0 | 0 |
+| red | 20% | 0.10 | 1.0 | 12/12 | 0.018 | 0.027 | 0 | 0 |
+| red | 20% | 0.10 | 1.5 | 12/12 | 0.168 | 0.239 | 0 | 0 |
+| pale blue | 20% | 0.00 | 1.0 | 12/12 | 0.084 | 0.127 | 0 | 0 |
+| pale blue | 20% | 0.00 | 1.5 | 12/12 | 0.220 | 0.281 | 0 | 0 |
+| pale blue | 20% | 0.05 | 1.0 | 12/12 | 0.077 | 0.121 | 0 | 0 |
+| pale blue | 20% | 0.05 | 1.5 | 12/12 | 0.223 | 0.336 | 0 | 0 |
+| pale blue | 20% | 0.10 | 1.0 | 12/12 | 0.067 | 0.110 | 0 | 0 |
+| pale blue | 20% | 0.10 | 1.5 | 12/12 | 0.198 | 0.291 | 0 | 0 |
+| pale blue, strong light | 40% | 0.00 | 1.0 | 11/12 | 0.115 | 0.182 | 0 | 0 |
+| pale blue, strong light | 40% | 0.00 | 1.5 | 11/12 | 0.195 | 0.375 | 0 | 0 |
+| pale blue, strong light | 40% | 0.05 | 1.0 | 12/12 | 0.089 | 0.130 | 0 | 0 |
+| pale blue, strong light | 40% | 0.05 | 1.5 | 12/12 | 0.192 | 0.339 | 0 | 0 |
+| pale blue, strong light | 40% | 0.10 | 1.0 | 12/12 | 0.071 | 0.145 | 0 | 0 |
+| pale blue, strong light | 40% | 0.10 | 1.5 | 12/12 | 0.156 | 0.281 | 0 | 0 |
 
 The accuracy comes from fitting the sides to the image's own values projected on the patch-to-paper colour direction, with the edge's mid-level taken per profile along each side: not to Delta E (a norm, which noise lifts near zero), not to CIELAB (whose cube root moves a blurred edge's mid-level: dark patches at blur 1.5, 0.29 → 0.11 px), and not with one level per side (under the gradient the level drifts along a long side and tilts a faint edge's line: pale corners 0.71 → 0.10 px).
 
 The zeros come from the verdict, which refuses rather than guesses. Each check was added because a wrong region otherwise passed as `ok`: a colour step across every side (a pale patch leaked into shaded paper); the thresholded outline within 2 px of the fitted sides (a partial leak on one side, a rounded corner); the region one colour, not two, and no large blob of another colour inside it (a seed near the patch's edge, or on the paper, giving the whole strip); rectangularity against the fitted quad, not the minimum-area rectangle (which refused sound patches in perspective). The substrate keeps only ring pixels within 8 Delta E of the paper's median colour, so a neighbouring light-grey patch on a colour bar is left out (870 of 4,872 ring pixels before, 9 after), and the interior drops the fringe of text or glare on the patch. Reproduce with `python scripts/validate.py patch`; the adversarial cases are in `tests/test_patch.py`.
 
-Where it stops: the patch colour is one global seed colour, so with lightness falling 40% across the frame a pale patch (Delta E ~10 from its paper) is mostly refused, with the reason in `notes` ([#7](https://github.com/thorwhalen/inkmap/issues/7)). A patch within ~4 Delta E of its paper, a patch on coloured paper (chroma over 15), a patch lighter than its paper, corner radii over a few percent of the patch, and heavy JPEG on a pale patch are all refused. A neighbour almost the paper's colour (within 8 Delta E) can still enter the substrate. On a 4000 × 3000 frame a call takes about 1.5 s; for speed, locate on a downscaled copy.
+Strong uneven light (lightness falling 40% across the frame) is handled by a second search: when the first fails, a plane is fitted to each channel over the substrate it found, divided out, and the patch searched for again ([#7](https://github.com/thorwhalen/inkmap/issues/7)); at 60% a pale patch is still refused about one time in six. A patch within ~4 Delta E of its paper, a patch on coloured paper (chroma over 15), a patch lighter than its paper, corner radii over a few percent of the patch, and heavy JPEG on a pale patch are all refused. A neighbour almost the paper's colour (within 8 Delta E) can still enter the substrate. On a 4000 × 3000 frame a call takes about 1.5 s; for speed, locate on a downscaled copy.
 
 ## Real photographs
 

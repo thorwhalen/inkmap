@@ -193,22 +193,30 @@ def illumination_field(
         return np.ones(image.shape[:2], dtype=np.float32)
 
     h, w = image.shape[:2]
-    ys, xs = np.nonzero(mask)
-    values = image[ys, xs].astype(np.float64)
-
-    basis = _poly_basis(xs / w, ys / h, degree)
-    coeffs, *_ = np.linalg.lstsq(basis, values, rcond=None)
-
-    yy, xx = np.mgrid[0:h, 0:w]
-    field = (_poly_basis((xx / w).ravel(), (yy / h).ravel(), degree) @ coeffs).reshape(
-        h, w
-    )
+    field = smooth_field(image, mask, degree=degree)
 
     inside = ink_map.inside_mask()
     scale = float(field[inside].mean()) if inside.any() else float(field.mean())
     if abs(scale) < 1e-9:
         return np.ones((h, w), dtype=np.float32)
     return (field / scale).astype(np.float32)
+
+
+def smooth_field(image: np.ndarray, mask: np.ndarray, *, degree: int = 1) -> np.ndarray:
+    """A 2-D polynomial of ``degree`` fitted to ``image`` over the pixels of ``mask``.
+
+    ``image`` is one channel or several (fitted each on its own); the field covers the
+    whole frame, in the image's own units, so dividing by it, normalised to the level
+    wanted, flattens the illumination that the masked pixels sample.
+    """
+    h, w = image.shape[:2]
+    ys, xs = np.nonzero(mask)
+    values = image[ys, xs].astype(np.float64)
+    basis = _poly_basis(xs / w, ys / h, degree)
+    coeffs, *_ = np.linalg.lstsq(basis, values, rcond=None)
+    yy, xx = np.mgrid[0:h, 0:w]
+    field = _poly_basis((xx / w).ravel(), (yy / h).ravel(), degree) @ coeffs
+    return field.reshape(image.shape[:2] + values.shape[1:])
 
 
 def _poly_basis(x: np.ndarray, y: np.ndarray, degree: int) -> np.ndarray:
