@@ -1,4 +1,4 @@
-> built 2026-10-20 10:25 UTC from 5b8c5ff (main) · inkmap 0.1.7. Details: build_info.json
+> built 2026-11-18 15:21 UTC from 7e3c2da (main) · inkmap 0.1.8. Details: build_info.json
 
 # index.html.md
 
@@ -1140,21 +1140,22 @@ continuous value is **coverage**, after ISO 12647-2:2013 3.1 *area coverage*. Se
 
 ### Functions
 
-| [`foreground`](_autosummary/inkmap.html.md#inkmap.foreground)(image, \*\*kwargs)                      | Foreground coverage of the largest mark, `(H, W) float32` in `[0, 1]`.         |
-|-----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
-| [`find`](_autosummary/inkmap.html.md#inkmap.find)(image, \*\*kwargs)                            | The largest mark in `image`, or `None`.                                        |
-| [`find_all`](_autosummary/inkmap.html.md#inkmap.find_all)(image, \*[, model, quad, locators, ...])  | Find every mark in `image` and compute its foreground coverage.                |
-| [`place`](_autosummary/inkmap.html.md#inkmap.place)(model, quad, \*[, ...])                      | Place a model at a known quadrilateral -- the universal escape hatch.          |
-| [`measure`](_autosummary/inkmap.html.md#inkmap.measure)(image, ink_map, \*[, linearize, ...])      | Aggregate `image` over the safe foreground and background pixels of `ink_map`. |
-| [`measurement_mask`](_autosummary/inkmap.html.md#inkmap.measurement_mask)(ink_map, \*[, kind, purity, ...]) | Pixels safe to measure: geometrically pure, then eroded clear of edges.        |
-| [`measurability`](_autosummary/inkmap.html.md#inkmap.measurability)(ink_map, \*[, min_pixels])           | Judge whether a foreground/background measurement can be trusted here.         |
-| [`srgb_to_linear`](_autosummary/inkmap.html.md#inkmap.srgb_to_linear)(image)                              | Undo the sRGB transfer function, returning float in `[0, 1]`.                  |
-| [`coverage_map`](_autosummary/inkmap.html.md#inkmap.coverage_map)(model, transform, image_shape, \*)    | Area fraction of each pixel covered by the model's foreground, in `[0, 1]`.    |
-| [`observed_coverage`](_autosummary/inkmap.html.md#inkmap.observed_coverage)(gray, placement, \*[, ...])      | Apparent coverage read from the photograph itself (Murray-Davies).             |
-| [`confidence`](_autosummary/inkmap.html.md#inkmap.confidence)(gray, placement, coverage, \*[, ...])   | How much to trust the coverage value at each pixel, in `[0, 1]`.               |
-| [`measurement_weight`](_autosummary/inkmap.html.md#inkmap.measurement_weight)(coverage, \*[, ...])            | Blur-aware weight in `[0, 1]`: how safe each pixel is to *measure*.            |
-| [`find_square_marks`](_autosummary/inkmap.html.md#inkmap.find_square_marks)(gray, \*[, min_side_px, ...])    | Every solid or nested square mark in `gray` (2-D, 0-255 scale), largest first. |
-| [`locate_patch`](_autosummary/inkmap.html.md#inkmap.locate_patch)(image, \*[, seed, seed_share, ...])   | The uniform patch at `seed`, and the ring of substrate just outside it.        |
+| [`foreground`](_autosummary/inkmap.html.md#inkmap.foreground)(image, \*\*kwargs)                      | Foreground coverage of the largest mark, `(H, W) float32` in `[0, 1]`.                                                                                                                                                                                                                                                                                         |
+|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`find`](_autosummary/inkmap.html.md#inkmap.find)(image, \*\*kwargs)                            | The largest mark in `image`, or `None`.                                                                                                                                                                                                                                                                                                                        |
+| [`find_all`](_autosummary/inkmap.html.md#inkmap.find_all)(image, \*[, model, quad, locators, ...])  | Find every mark in `image` and compute its foreground coverage.                                                                                                                                                                                                                                                                                                |
+| [`place`](_autosummary/inkmap.html.md#inkmap.place)(model, quad, \*[, ...])                      | Place a model at a known quadrilateral -- the universal escape hatch.                                                                                                                                                                                                                                                                                          |
+| [`measure`](_autosummary/inkmap.html.md#inkmap.measure)(image, ink_map, \*[, linearize, ...])      | Aggregate `image` over the safe foreground and background pixels of `ink_map`.                                                                                                                                                                                                                                                                                 |
+| [`measurement_mask`](_autosummary/inkmap.html.md#inkmap.measurement_mask)(ink_map, \*[, kind, purity, ...]) | Pixels safe to measure: geometrically pure, then eroded clear of edges.                                                                                                                                                                                                                                                                                        |
+| [`measurability`](_autosummary/inkmap.html.md#inkmap.measurability)(ink_map, \*[, min_pixels])           | Judge whether a foreground/background measurement can be trusted here.                                                                                                                                                                                                                                                                                         |
+| [`srgb_to_linear`](_autosummary/inkmap.html.md#inkmap.srgb_to_linear)(image)                              | Undo the sRGB transfer function, returning float in `[0, 1]`.                                                                                                                                                                                                                                                                                                  |
+| [`coverage_map`](_autosummary/inkmap.html.md#inkmap.coverage_map)(model, transform, image_shape, \*)    | Area fraction of each pixel covered by the model's foreground, in `[0, 1]`.                                                                                                                                                                                                                                                                                    |
+| [`observed_coverage`](_autosummary/inkmap.html.md#inkmap.observed_coverage)(gray, placement, \*[, ...])      | Apparent coverage read from the photograph itself (Murray-Davies).                                                                                                                                                                                                                                                                                             |
+| [`confidence`](_autosummary/inkmap.html.md#inkmap.confidence)(gray, placement, coverage, \*[, ...])   | How much to trust the coverage value at each pixel, in `[0, 1]`.                                                                                                                                                                                                                                                                                               |
+| [`measurement_weight`](_autosummary/inkmap.html.md#inkmap.measurement_weight)(coverage, \*[, ...])            | Blur-aware weight in `[0, 1]`: how safe each pixel is to *measure*.                                                                                                                                                                                                                                                                                            |
+| [`refine_placement`](_autosummary/inkmap.html.md#inkmap.refine_placement)(gray, placement)                  | `placement` with its transform refined to sub-pixel accuracy (ECC on `gray`), as `analyze()` does before measuring; the original transform is kept when the refinement fails or scores below [`config.ECC_MIN_CORRELATION`](_autosummary/inkmap.config.html.md#inkmap.config.ECC_MIN_CORRELATION) (`refined` says which, `score` is the correlation). |
+| [`find_square_marks`](_autosummary/inkmap.html.md#inkmap.find_square_marks)(gray, \*[, min_side_px, ...])    | Every solid or nested square mark in `gray` (2-D, 0-255 scale), largest first.                                                                                                                                                                                                                                                                                 |
+| [`locate_patch`](_autosummary/inkmap.html.md#inkmap.locate_patch)(image, \*[, seed, seed_share, ...])   | The uniform patch at `seed`, and the ring of substrate just outside it.                                                                                                                                                                                                                                                                                        |
 
 ### Classes
 
@@ -1690,6 +1691,19 @@ the mark is rotated past 45 degrees.
 
 Use this for anything without a decoder – printed letters, logos, engraved marks –
 or when you already know where the mark is and only want the coverage machinery.
+
+* **Return type:**
+  [`Placement`](_autosummary/inkmap.types.html.md#inkmap.types.Placement)
+
+### inkmap.refine_placement(gray, placement)
+
+`placement` with its transform refined to sub-pixel accuracy (ECC on `gray`), as
+`analyze()` does before measuring; the original transform is kept when the refinement
+fails or scores below [`config.ECC_MIN_CORRELATION`](_autosummary/inkmap.config.html.md#inkmap.config.ECC_MIN_CORRELATION) (`refined` says which, `score`
+is the correlation).
+
+Public for callers that locate codes, skip the coverage analysis (a code that is only
+decoded and posed, never measured) and still want the pose `analyze()` would give.
 
 * **Return type:**
   [`Placement`](_autosummary/inkmap.types.html.md#inkmap.types.Placement)
@@ -3517,16 +3531,18 @@ leaving only interiors. If weight is empty, the image cannot support a measureme
 
 # About this build
 
-This documentation was built on **2026-10-20 10:25 UTC** from commit <a href="https://github.com/thorwhalen/inkmap/commit/5b8c5ff0989b8d591922f26cdfe1469ccd21843c"><code>5b8c5ff</code></a> on branch <code>main</code>, for **inkmap 0.1.7** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-18 15:21 UTC** from commit <a href="https://github.com/thorwhalen/inkmap/commit/7e3c2da672b0256f02717abe1907dacddb9d548e"><code>7e3c2da</code></a> on branch <code>main</code>, for **inkmap 0.1.8** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.1.8) is behind the latest release on PyPI (0.1.9): `pip install inkmap` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/inkmap/commit/5b8c5ff0989b8d591922f26cdfe1469ccd21843c"><code>5b8c5ff0989b8d591922f26cdfe1469ccd21843c</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/inkmap/commit/7e3c2da672b0256f02717abe1907dacddb9d548e"><code>7e3c2da672b0256f02717abe1907dacddb9d548e</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
 | Tags at this commit | none                                                                                                                                                     |
 | Working tree        | clean                                                                                                                                                    |
@@ -3537,18 +3553,18 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/inkmap</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/inkmap/actions/runs/39407520262">39407520262</a>    |
+| Run          | <a href="https://github.com/thorwhalen/inkmap/actions/runs/44334201930">44334201930</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>5b8c5ff0989b8d591922f26cdfe1469ccd21843c</code> (in the history of the built commit) |
+| Event commit | <code>7e3c2da672b0256f02717abe1907dacddb9d548e</code> (in the history of the built commit) |
 
 ## Tools
 
 |          |         |
 |----------|---------|
-| epythet  | 0.2.18  |
+| epythet  | 0.2.22  |
 | Sphinx   | 9.1.1   |
 | docutils | 0.22.4  |
-| Python   | 3.12.15 |
+| Python   | 3.12.16 |
 
 ## Configuration as resolved
 
@@ -3564,14 +3580,14 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/inkmap/0.1.7/">0.1.7</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/inkmap/0.1.9/">0.1.9</a>, newer than the documented version (0.1.8).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/inkmap && cd inkmap
-git checkout 5b8c5ff0989b8d591922f26cdfe1469ccd21843c
-pip install "epythet==0.2.18"
+git checkout 7e3c2da672b0256f02717abe1907dacddb9d548e
+pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
 

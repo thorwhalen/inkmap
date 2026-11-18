@@ -56,21 +56,22 @@ continuous value is **coverage**, after ISO 12647-2:2013 3.1 *area coverage*. Se
 
 ### Functions
 
-| [`foreground`](#inkmap.foreground)(image, \*\*kwargs)                      | Foreground coverage of the largest mark, `(H, W) float32` in `[0, 1]`.         |
-|-----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
-| [`find`](#inkmap.find)(image, \*\*kwargs)                            | The largest mark in `image`, or `None`.                                        |
-| [`find_all`](#inkmap.find_all)(image, \*[, model, quad, locators, ...])  | Find every mark in `image` and compute its foreground coverage.                |
-| [`place`](#inkmap.place)(model, quad, \*[, ...])                      | Place a model at a known quadrilateral -- the universal escape hatch.          |
-| [`measure`](#inkmap.measure)(image, ink_map, \*[, linearize, ...])      | Aggregate `image` over the safe foreground and background pixels of `ink_map`. |
-| [`measurement_mask`](#inkmap.measurement_mask)(ink_map, \*[, kind, purity, ...]) | Pixels safe to measure: geometrically pure, then eroded clear of edges.        |
-| [`measurability`](#inkmap.measurability)(ink_map, \*[, min_pixels])           | Judge whether a foreground/background measurement can be trusted here.         |
-| [`srgb_to_linear`](#inkmap.srgb_to_linear)(image)                              | Undo the sRGB transfer function, returning float in `[0, 1]`.                  |
-| [`coverage_map`](#inkmap.coverage_map)(model, transform, image_shape, \*)    | Area fraction of each pixel covered by the model's foreground, in `[0, 1]`.    |
-| [`observed_coverage`](#inkmap.observed_coverage)(gray, placement, \*[, ...])      | Apparent coverage read from the photograph itself (Murray-Davies).             |
-| [`confidence`](#inkmap.confidence)(gray, placement, coverage, \*[, ...])   | How much to trust the coverage value at each pixel, in `[0, 1]`.               |
-| [`measurement_weight`](#inkmap.measurement_weight)(coverage, \*[, ...])            | Blur-aware weight in `[0, 1]`: how safe each pixel is to *measure*.            |
-| [`find_square_marks`](#inkmap.find_square_marks)(gray, \*[, min_side_px, ...])    | Every solid or nested square mark in `gray` (2-D, 0-255 scale), largest first. |
-| [`locate_patch`](#inkmap.locate_patch)(image, \*[, seed, seed_share, ...])   | The uniform patch at `seed`, and the ring of substrate just outside it.        |
+| [`foreground`](#inkmap.foreground)(image, \*\*kwargs)                      | Foreground coverage of the largest mark, `(H, W) float32` in `[0, 1]`.                                                                                                                                                                                                                                                                                         |
+|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`find`](#inkmap.find)(image, \*\*kwargs)                            | The largest mark in `image`, or `None`.                                                                                                                                                                                                                                                                                                                        |
+| [`find_all`](#inkmap.find_all)(image, \*[, model, quad, locators, ...])  | Find every mark in `image` and compute its foreground coverage.                                                                                                                                                                                                                                                                                                |
+| [`place`](#inkmap.place)(model, quad, \*[, ...])                      | Place a model at a known quadrilateral -- the universal escape hatch.                                                                                                                                                                                                                                                                                          |
+| [`measure`](#inkmap.measure)(image, ink_map, \*[, linearize, ...])      | Aggregate `image` over the safe foreground and background pixels of `ink_map`.                                                                                                                                                                                                                                                                                 |
+| [`measurement_mask`](#inkmap.measurement_mask)(ink_map, \*[, kind, purity, ...]) | Pixels safe to measure: geometrically pure, then eroded clear of edges.                                                                                                                                                                                                                                                                                        |
+| [`measurability`](#inkmap.measurability)(ink_map, \*[, min_pixels])           | Judge whether a foreground/background measurement can be trusted here.                                                                                                                                                                                                                                                                                         |
+| [`srgb_to_linear`](#inkmap.srgb_to_linear)(image)                              | Undo the sRGB transfer function, returning float in `[0, 1]`.                                                                                                                                                                                                                                                                                                  |
+| [`coverage_map`](#inkmap.coverage_map)(model, transform, image_shape, \*)    | Area fraction of each pixel covered by the model's foreground, in `[0, 1]`.                                                                                                                                                                                                                                                                                    |
+| [`observed_coverage`](#inkmap.observed_coverage)(gray, placement, \*[, ...])      | Apparent coverage read from the photograph itself (Murray-Davies).                                                                                                                                                                                                                                                                                             |
+| [`confidence`](#inkmap.confidence)(gray, placement, coverage, \*[, ...])   | How much to trust the coverage value at each pixel, in `[0, 1]`.                                                                                                                                                                                                                                                                                               |
+| [`measurement_weight`](#inkmap.measurement_weight)(coverage, \*[, ...])            | Blur-aware weight in `[0, 1]`: how safe each pixel is to *measure*.                                                                                                                                                                                                                                                                                            |
+| [`refine_placement`](#inkmap.refine_placement)(gray, placement)                  | `placement` with its transform refined to sub-pixel accuracy (ECC on `gray`), as `analyze()` does before measuring; the original transform is kept when the refinement fails or scores below [`config.ECC_MIN_CORRELATION`](inkmap.config.html.md#inkmap.config.ECC_MIN_CORRELATION) (`refined` says which, `score` is the correlation). |
+| [`find_square_marks`](#inkmap.find_square_marks)(gray, \*[, min_side_px, ...])    | Every solid or nested square mark in `gray` (2-D, 0-255 scale), largest first.                                                                                                                                                                                                                                                                                 |
+| [`locate_patch`](#inkmap.locate_patch)(image, \*[, seed, seed_share, ...])   | The uniform patch at `seed`, and the ring of substrate just outside it.                                                                                                                                                                                                                                                                                        |
 
 ### Classes
 
@@ -606,6 +607,19 @@ the mark is rotated past 45 degrees.
 
 Use this for anything without a decoder – printed letters, logos, engraved marks –
 or when you already know where the mark is and only want the coverage machinery.
+
+* **Return type:**
+  [`Placement`](inkmap.types.html.md#inkmap.types.Placement)
+
+### inkmap.refine_placement(gray, placement)
+
+`placement` with its transform refined to sub-pixel accuracy (ECC on `gray`), as
+`analyze()` does before measuring; the original transform is kept when the refinement
+fails or scores below [`config.ECC_MIN_CORRELATION`](inkmap.config.html.md#inkmap.config.ECC_MIN_CORRELATION) (`refined` says which, `score`
+is the correlation).
+
+Public for callers that locate codes, skip the coverage analysis (a code that is only
+decoded and posed, never measured) and still want the pose `analyze()` would give.
 
 * **Return type:**
   [`Placement`](inkmap.types.html.md#inkmap.types.Placement)

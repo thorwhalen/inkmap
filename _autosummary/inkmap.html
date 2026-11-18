@@ -29,7 +29,7 @@
 <meta content="inkmap" property="og:title"/>
 <meta content="inkmap" name="twitter:title"/>
 <link href="../_static/pygments.css?v=d75fae25" rel="stylesheet" type="text/css"/>
-<link href="../_static/theme.css?v=d6d7c91b" rel="stylesheet" type="text/css"/>
+<link href="../_static/theme.css?v=009055c6" rel="stylesheet" type="text/css"/>
 <link href="../_static/sphinx_autodoc_typehints.css?v=057ac668" rel="stylesheet" type="text/css"/>
 <link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
 <link href="../_static/epythet.css?v=ded595e6" rel="stylesheet" type="text/css"/>
@@ -206,10 +206,13 @@ continuous value is <strong>coverage</strong>, after ISO 12647-2:2013 3.1 <em>ar
 <tr class="row-even"><td><p><a class="reference internal" href="#inkmap.measurement_weight" title="inkmap.measurement_weight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">measurement_weight</span></code></a>(coverage, *[, ...])</p></td>
 <td><p>Blur-aware weight in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>: how safe each pixel is to <em>measure</em>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.find_square_marks" title="inkmap.find_square_marks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_square_marks</span></code></a>(gray, *[, min_side_px, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.refine_placement" title="inkmap.refine_placement"><code class="xref py py-obj docutils literal notranslate"><span class="pre">refine_placement</span></code></a>(gray, placement)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">placement</span></code> with its transform refined to sub-pixel accuracy (ECC on <code class="docutils literal notranslate"><span class="pre">gray</span></code>), as <code class="xref py py-func docutils literal notranslate"><span class="pre">analyze()</span></code> does before measuring; the original transform is kept when the refinement fails or scores below <a class="reference internal" href="inkmap.config.html#inkmap.config.ECC_MIN_CORRELATION" title="inkmap.config.ECC_MIN_CORRELATION"><code class="xref py py-data docutils literal notranslate"><span class="pre">config.ECC_MIN_CORRELATION</span></code></a> (<code class="docutils literal notranslate"><span class="pre">refined</span></code> says which, <code class="docutils literal notranslate"><span class="pre">score</span></code> is the correlation).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.find_square_marks" title="inkmap.find_square_marks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_square_marks</span></code></a>(gray, *[, min_side_px, ...])</p></td>
 <td><p>Every solid or nested square mark in <code class="docutils literal notranslate"><span class="pre">gray</span></code> (2-D, 0-255 scale), largest first.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#inkmap.locate_patch" title="inkmap.locate_patch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">locate_patch</span></code></a>(image, *[, seed, seed_share, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#inkmap.locate_patch" title="inkmap.locate_patch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">locate_patch</span></code></a>(image, *[, seed, seed_share, ...])</p></td>
 <td><p>The uniform patch at <code class="docutils literal notranslate"><span class="pre">seed</span></code>, and the ring of substrate just outside it.</p></td>
 </tr>
 </tbody>
@@ -829,6 +832,21 @@ or when you already know where the mark is and only want the coverage machinery.
 </dl>
 </dd></dl>
 <dl class="py function">
+<dt class="sig sig-object py" id="inkmap.refine_placement">
+<span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">refine_placement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placement</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap.html#refine_placement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.refine_placement" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.refine_placement'">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">placement</span></code> with its transform refined to sub-pixel accuracy (ECC on <code class="docutils literal notranslate"><span class="pre">gray</span></code>), as
+<code class="xref py py-func docutils literal notranslate"><span class="pre">analyze()</span></code> does before measuring; the original transform is kept when the refinement
+fails or scores below <a class="reference internal" href="inkmap.config.html#inkmap.config.ECC_MIN_CORRELATION" title="inkmap.config.ECC_MIN_CORRELATION"><code class="xref py py-data docutils literal notranslate"><span class="pre">config.ECC_MIN_CORRELATION</span></code></a> (<code class="docutils literal notranslate"><span class="pre">refined</span></code> says which, <code class="docutils literal notranslate"><span class="pre">score</span></code>
+is the correlation).</p>
+<p>Public for callers that locate codes, skip the coverage analysis (a code that is only
+decoded and posed, never measured) and still want the pose <code class="xref py py-func docutils literal notranslate"><span class="pre">analyze()</span></code> would give.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="inkmap.types.html#inkmap.types.Placement" title="inkmap.types.Placement"><code class="xref py py-class docutils literal notranslate"><span class="pre">Placement</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
 <dt class="sig sig-object py" id="inkmap.srgb_to_linear">
 <span class="sig-prename descclassname"><span class="pre">inkmap.</span></span><span class="sig-name descname"><span class="pre">srgb_to_linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/inkmap/photometry.html#srgb_to_linear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#inkmap.srgb_to_linear" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#inkmap.srgb_to_linear'">¶</a></dt>
 <dd><p>Undo the sRGB transfer function, returning float in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>.</p>
@@ -954,6 +972,7 @@ arithmetic that claims to be about light.</p>
 <li><a :data-current="activeSection === '#inkmap.measurement_weight'" class="reference internal" href="#inkmap.measurement_weight"><code class="docutils literal notranslate"><span class="pre">measurement_weight()</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.observed_coverage'" class="reference internal" href="#inkmap.observed_coverage"><code class="docutils literal notranslate"><span class="pre">observed_coverage()</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.place'" class="reference internal" href="#inkmap.place"><code class="docutils literal notranslate"><span class="pre">place()</span></code></a></li>
+<li><a :data-current="activeSection === '#inkmap.refine_placement'" class="reference internal" href="#inkmap.refine_placement"><code class="docutils literal notranslate"><span class="pre">refine_placement()</span></code></a></li>
 <li><a :data-current="activeSection === '#inkmap.srgb_to_linear'" class="reference internal" href="#inkmap.srgb_to_linear"><code class="docutils literal notranslate"><span class="pre">srgb_to_linear()</span></code></a></li>
 </ul>
 </div>
@@ -968,11 +987,11 @@ arithmetic that claims to be about light.</p>
 </div>
 </footer>
 </div>
-<script src="../_static/documentation_options.js?v=ca7ad2ea"></script>
+<script src="../_static/documentation_options.js?v=22607128"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
 <script src="../_static/copybutton.js?v=fd10adb8"></script>
-<script defer="defer" src="../_static/theme.js?v=5db23cf8"></script>
+<script defer="defer" src="../_static/theme.js?v=49cc6205"></script>
 </body>
 </html>

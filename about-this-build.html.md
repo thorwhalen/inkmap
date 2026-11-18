@@ -2,16 +2,18 @@
 
 # About this build
 
-This documentation was built on **2026-10-20 10:25 UTC** from commit <a href="https://github.com/thorwhalen/inkmap/commit/5b8c5ff0989b8d591922f26cdfe1469ccd21843c"><code>5b8c5ff</code></a> on branch <code>main</code>, for **inkmap 0.1.7** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-18 15:21 UTC** from commit <a href="https://github.com/thorwhalen/inkmap/commit/7e3c2da672b0256f02717abe1907dacddb9d548e"><code>7e3c2da</code></a> on branch <code>main</code>, for **inkmap 0.1.8** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.1.8) is behind the latest release on PyPI (0.1.9): `pip install inkmap` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                          |
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/inkmap/commit/5b8c5ff0989b8d591922f26cdfe1469ccd21843c"><code>5b8c5ff0989b8d591922f26cdfe1469ccd21843c</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/inkmap/commit/7e3c2da672b0256f02717abe1907dacddb9d548e"><code>7e3c2da672b0256f02717abe1907dacddb9d548e</code></a> |
 | Branch              | <code>main</code>                                                                                                                                        |
 | Tags at this commit | none                                                                                                                                                     |
 | Working tree        | clean                                                                                                                                                    |
@@ -22,18 +24,18 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/inkmap</code>                                                             |
-| Run          | <a href="https://github.com/thorwhalen/inkmap/actions/runs/39407520262">39407520262</a>    |
+| Run          | <a href="https://github.com/thorwhalen/inkmap/actions/runs/44334201930">44334201930</a>    |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>5b8c5ff0989b8d591922f26cdfe1469ccd21843c</code> (in the history of the built commit) |
+| Event commit | <code>7e3c2da672b0256f02717abe1907dacddb9d548e</code> (in the history of the built commit) |
 
 ## Tools
 
 |          |         |
 |----------|---------|
-| epythet  | 0.2.18  |
+| epythet  | 0.2.22  |
 | Sphinx   | 9.1.1   |
 | docutils | 0.22.4  |
-| Python   | 3.12.15 |
+| Python   | 3.12.16 |
 
 ## Configuration as resolved
 
@@ -49,14 +51,14 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/inkmap/0.1.7/">0.1.7</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/inkmap/0.1.9/">0.1.9</a>, newer than the documented version (0.1.8).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/inkmap && cd inkmap
-git checkout 5b8c5ff0989b8d591922f26cdfe1469ccd21843c
-pip install "epythet==0.2.18"
+git checkout 7e3c2da672b0256f02717abe1907dacddb9d548e
+pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
 
