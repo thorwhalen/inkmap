@@ -111,6 +111,7 @@ __all__ = [
     "confidence",
     "measurement_weight",
     "locate",
+    "refine_placement",
     "LOCATORS",
     "find_square_marks",
     "SquareMark",
@@ -160,7 +161,7 @@ def analyze(
     out: list[InkMap] = []
     for placement in placements:
         if refine:
-            placement = _refine(gray, placement)
+            placement = refine_placement(gray, placement)
         cov = _coverage_for(
             gray, placement, source=source, samples=samples, polarity=polarity
         )
@@ -256,8 +257,15 @@ def foreground(image, **kwargs) -> np.ndarray:
     return ink.coverage
 
 
-def _refine(gray: np.ndarray, placement: Placement) -> Placement:
-    """Sub-pixel-refine a placement's transform, keeping the original on failure."""
+def refine_placement(gray: np.ndarray, placement: Placement) -> Placement:
+    """``placement`` with its transform refined to sub-pixel accuracy (ECC on ``gray``), as
+    :func:`analyze` does before measuring; the original transform is kept when the refinement
+    fails or scores below :data:`config.ECC_MIN_CORRELATION` (``refined`` says which, ``score``
+    is the correlation).
+
+    Public for callers that locate codes, skip the coverage analysis (a code that is only
+    decoded and posed, never measured) and still want the pose :func:`analyze` would give.
+    """
     from dataclasses import replace
 
     transform, score = geometry.refine_transform(

@@ -297,6 +297,19 @@ def test_refinement_improves_corner_accuracy(hard_scene):
     assert score > 0.8
 
 
+def test_refine_placement_is_the_refinement_analyze_applies(hard_scene):
+    """The public refinement is the one ``analyze`` uses: a caller that only poses a code gets
+    the same transform, flagged refined, without the coverage analysis."""
+    gray = hard_scene.image
+    bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+    placement = inkmap.locate(bgr, gray)[0]
+    refined = inkmap.refine_placement(gray, placement)
+    assert refined.refined and refined.score > 0.8
+    analysed = inkmap.analyze(bgr, [placement])[0].placement
+    assert np.allclose(refined.transform, analysed.transform)
+    assert np.allclose(refined.quad, analysed.quad)
+
+
 def test_margin_is_outside_the_mark(qr_scene):
     ink = inkmap.find(qr_scene.image)
     assert (ink.region == Region.MARGIN).any()
