@@ -281,3 +281,20 @@ def test_public_surface():
     assert inkmap.find_square_marks is find_square_marks
     assert inkmap.SquareMark is SquareMark
     assert QR_FINDER_RINGS == (5 / 7, 3 / 7)
+
+
+@pytest.mark.parametrize("gap", [24, 48, 96, 200])
+def test_a_solid_mark_near_the_frame_edge_is_found_beside_dark_ink(gap):
+    """A solid mark within reach of the frame edge is not a clipped ring because a
+    patch of ink stands near it: only ink the frame cuts counts."""
+    g = np.full((2377, 1680), 255.0)
+    cx, cy = 1564, 2260
+    g[cy - 36 : cy + 36, cx - 36 : cx + 36] = 0
+    top = cy - 36 - gap - 60
+    g[top : top + 60, cx - 72 : cx + 24] = 0
+    found = [
+        m
+        for m in find_square_marks(g)
+        if abs(m.centre[0] - cx) < 5 and abs(m.centre[1] - cy) < 5
+    ]
+    assert found

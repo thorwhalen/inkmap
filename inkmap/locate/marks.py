@@ -279,7 +279,8 @@ def _may_be_clipped_ring(corners: np.ndarray, side: float, foreground: np.ndarra
     Once the frame cuts through a nested mark's hole, its inner square sits in open
     background, as a solid mark would. What gives it away is the ink of the cut rings
     beside it, in a neighbourhood that runs off the frame. A mark well inside the frame
-    is never judged this way, so ink near it (text, a QR symbol) costs nothing.
+    is never judged this way, so ink near it (text, a QR symbol) costs nothing, and
+    neither does ink near a mark close to the frame that the frame does not cut.
     """
     h, w = foreground.shape
     reach = config.MARK_CLIP_GUARD_SHARE * side
@@ -287,13 +288,27 @@ def _may_be_clipped_ring(corners: np.ndarray, side: float, foreground: np.ndarra
     x1, y1 = np.ceil(corners.max(axis=0) + reach).astype(int)
     if x0 >= 0 and y0 >= 0 and x1 < w and y1 < h:
         return False
+    cut_left, cut_top, cut_right, cut_bottom = x0 < 0, y0 < 0, x1 >= w, y1 >= h
     x0, y0, x1, y1 = max(x0, 0), max(y0, 0), min(x1, w - 1), min(y1, h - 1)
     near = foreground[y0 : y1 + 1, x0 : x1 + 1].copy()
     own = np.zeros_like(near, dtype=np.uint8)
     cv2.fillConvexPoly(own, np.round(corners - (x0, y0)).astype(np.int32), 1)
     own = cv2.dilate(own, np.ones((7, 7), np.uint8))  # the square's own blurred edge
     near[own.astype(bool)] = False
-    return near.mean() > config.MARK_CLIP_GUARD_INK_SHARE
+    # Only ink the frame itself cuts counts: the ring remnants run off the frame, so
+    # they touch the edge the neighbourhood is clipped by. A neighbouring patch or
+    # glyph that stops short of the frame is another thing, and costs nothing.
+    _, labels = cv2.connectedComponents(near.astype(np.uint8), connectivity=8)
+    edge_labels = np.concatenate(
+        [
+            labels[:, 0] if cut_left else [],
+            labels[:, -1] if cut_right else [],
+            labels[0, :] if cut_top else [],
+            labels[-1, :] if cut_bottom else [],
+        ]
+    )
+    cut = np.isin(labels, np.unique(edge_labels[edge_labels > 0]))
+    return cut.mean() > config.MARK_CLIP_GUARD_INK_SHARE
 
 
 def _line_intersection(l1, l2):
