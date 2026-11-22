@@ -1,36 +1,36 @@
 {
   "schema_version": 1,
-  "built_at": "2026-11-18T15:21:41Z",
+  "built_at": "2026-11-22T12:51:41Z",
   "package": {
     "name": "inkmap",
-    "version": "0.1.8",
+    "version": "0.1.9",
     "display_name": "inkmap",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "7e3c2da672b0256f02717abe1907dacddb9d548e",
-    "short_commit": "7e3c2da",
+    "commit": "c9a956bec0a5fd31e0b2e4e8a37f18cf4cfc9853",
+    "short_commit": "c9a956b",
     "branch": "main",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/thorwhalen/inkmap",
-    "commit_url": "https://github.com/thorwhalen/inkmap/commit/7e3c2da672b0256f02717abe1907dacddb9d548e",
+    "commit_url": "https://github.com/thorwhalen/inkmap/commit/c9a956bec0a5fd31e0b2e4e8a37f18cf4cfc9853",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/inkmap",
-    "sha": "7e3c2da672b0256f02717abe1907dacddb9d548e",
+    "sha": "c9a956bec0a5fd31e0b2e4e8a37f18cf4cfc9853",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "44334201930",
-    "run_url": "https://github.com/thorwhalen/inkmap/actions/runs/44334201930",
+    "run_id": "45024260850",
+    "run_url": "https://github.com/thorwhalen/inkmap/actions/runs/45024260850",
     "server_url": "https://github.com"
   },
   "tools": {
-    "epythet": "0.2.22",
+    "epythet": "0.2.23",
     "sphinx": "9.1.1",
     "docutils": "0.22.4",
     "python": "3.12.16"
@@ -60,16 +60,16 @@
   },
   "pypi": {
     "checked": true,
-    "latest": "0.1.9",
+    "latest": "0.1.10",
     "relation": "behind",
     "error": null
   },
-  "reproduce": "git clone https://github.com/thorwhalen/inkmap && cd inkmap\ngit checkout 7e3c2da672b0256f02717abe1907dacddb9d548e\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/thorwhalen/inkmap && cd inkmap\ngit checkout c9a956bec0a5fd31e0b2e4e8a37f18cf4cfc9853\npip install \"epythet==0.2.23\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": false,
     "notes": [
-      "The documented version (0.1.8) is behind the latest release on PyPI (0.1.9): `pip install inkmap` gives newer code than these docs describe."
+      "The documented version (0.1.9) is behind the latest release on PyPI (0.1.10): `pip install inkmap` gives newer code than these docs describe."
     ]
   }
 }
